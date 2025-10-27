@@ -1,32 +1,52 @@
+:root {
+  color-scheme: light dark;
+  --accent: #00d1ff;
+}
+
+/* automatic dark/light adaptation */
+@media (prefers-color-scheme: dark) {
+  body { background: #111; color: #eee; }
+  .accordion-item, .card { background: #222; color: #eee; }
+}
+@media (prefers-color-scheme: light) {
+  body { background: #fff; color: #222; }
+  .accordion-item, .card { background: #f9f9f9; color: #222; }
+}
+
 body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   scroll-behavior: smooth;
 }
 
-h1, h2 {
-  letter-spacing: 0.5px;
+/* feature cards equal size */
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  min-height: 180px;
 }
-
-.card:hover {
+.feature-card:hover {
   transform: translateY(-4px);
-  transition: 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .accordion-button:not(.collapsed) {
-  background-color: #222 !important;
-  color: #00d1ff !important;
+  background-color: var(--accent);
+  color: #000;
 }
 
 .btn-outline-info {
-  border-color: #00d1ff;
-  color: #00d1ff;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .btn-outline-info:hover {
-  background-color: #00d1ff;
+  background-color: var(--accent);
   color: #000;
 }
 
 footer {
   font-size: 0.95rem;
+  opacity: 0.8;
 }
