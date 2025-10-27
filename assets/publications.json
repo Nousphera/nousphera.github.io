@@ -1,0 +1,98 @@
+[
+  {
+    "id": "fedstar",
+    "title": "🌟 FedSTAR — Semi-supervised FL with Adaptive Reliability",
+    "focus": "🧭 Adaptivity",
+    "year": 2022,
+    "venue": "ICASSP 2022",
+    "description": "Semi-supervised FL with adaptive reliability.",
+    "link": {
+      "href": "https://github.com/FederatedML/FedSTAR",
+      "label": "View Repo"
+    }
+  },
+  {
+    "id": "fedln",
+    "title": "🧩 FedLN — Federated Learning under Label Noise",
+    "focus": "🧭 Adaptivity",
+    "year": 2022,
+    "venue": "NeurIPS 2022 Workshop",
+    "description": "FL under label noise.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2208.09378",
+      "label": "Read Paper"
+    }
+  },
+  {
+    "id": "fedcompress",
+    "title": "⚡ FedCompress — Task-Adaptive Model Compression for FL",
+    "focus": "⚡ Efficiency",
+    "year": 2024,
+    "venue": "ICASSP 2024",
+    "description": "Task-adaptive model compression for efficient FL.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2401.14211",
+      "label": "Read Paper"
+    }
+  },
+  {
+    "id": "enccluster",
+    "title": "🔒 EncCluster — Scalable Encrypted Aggregation",
+    "focus": "🔒 Privacy",
+    "year": 2024,
+    "venue": "NeurIPS 2024 Workshop",
+    "description": "Scalable FM secure aggregation through weight clustering.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2406.09152",
+      "label": "Read Paper"
+    }
+  },
+  {
+    "id": "deltamask",
+    "title": "🧩 DeltaMask — Communication-Efficient FM Fine-Tuning",
+    "focus": "⚡ Efficiency / 🛰️ Edge FMs",
+    "year": 2024,
+    "venue": "ICML 2024 Workshop",
+    "description": "Communication-efficient federated FM fine-tuning via masking.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2311.17299",
+      "label": "Read Paper"
+    }
+  },
+  {
+    "id": "mpsl",
+    "title": "🛰️ MPSL — Multimodal FM Fine-Tuning via Parallel SL",
+    "focus": "🛰️ Edge FMs / ⚡ Efficiency",
+    "year": 2025,
+    "venue": "IJCAI 2025 Workshop",
+    "description": "Multimodal FM fine-tuning via parallel SL.",
+    "link": {
+      "href": "https://github.com/Nousphera/MPSL",
+      "label": "View Repo"
+    }
+  },
+  {
+    "id": "matu",
+    "title": "🧠 MaTU — Many-Task Federated Fine-Tuning via Unified Task Vectors",
+    "focus": "🧭 Adaptivity / 🛰️ Edge FMs",
+    "year": 2025,
+    "venue": "IJCAI 2025",
+    "description": "Many-task federated FM fine-tuning via unified task vectors.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2502.06376",
+      "label": "Read Paper"
+    }
+  },
+  {
+    "id": "efu",
+    "title": "🔒 EFU — Enforceable Federated Unlearning",
+    "focus": "🔒 Privacy",
+    "year": 2025,
+    "venue": "CIKM 2025",
+    "description": "Enforceable Federated Unlearning.",
+    "link": {
+      "href": "https://arxiv.org/pdf/2502.06376",
+      "label": "Read Paper"
+    }
+  }
+]

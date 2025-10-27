@@ -26,10 +26,10 @@ body {
   justify-content: center;
   height: 100%;
   min-height: 180px;
+  transition: transform 0.3s ease;
 }
 .feature-card:hover {
   transform: translateY(-4px);
-  transition: transform 0.3s ease;
 }
 
 .accordion-button:not(.collapsed) {
@@ -49,4 +49,23 @@ body {
 footer {
   font-size: 0.95rem;
   opacity: 0.8;
+}
+
+.contact-links {
+  gap: 0.75rem;
+}
+
+.contact-email {
+  position: relative;
+}
+.contact-email .contact-email-address {
+  display: none;
+}
+.contact-email:hover .contact-email-label,
+.contact-email:focus-visible .contact-email-label {
+  display: none;
+}
+.contact-email:hover .contact-email-address,
+.contact-email:focus-visible .contact-email-address {
+  display: inline;
 }
