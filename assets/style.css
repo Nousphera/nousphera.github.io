@@ -1,0 +1,32 @@
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+h1, h2 {
+  letter-spacing: 0.5px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  transition: 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #222 !important;
+  color: #00d1ff !important;
+}
+
+.btn-outline-info {
+  border-color: #00d1ff;
+  color: #00d1ff;
+}
+.btn-outline-info:hover {
+  background-color: #00d1ff;
+  color: #000;
+}
+
+footer {
+  font-size: 0.95rem;
+}
