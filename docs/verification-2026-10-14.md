@@ -18,3 +18,9 @@ Version distinctions remain explicit: FedLN/FedSTAR use final journal sources; D
 All 14 project pages were loaded and visually inspected in Chrome. Desktop, 320px and 390px phone widths, and a 768px tablet viewport were reviewed using Chrome's responsive preview. These are emulated layouts, not physical-device tests. Checked automatic and explicit themes, gallery keyword filtering, full-size figure dialog and Escape, and citation copying with visible confirmation. The citation control now retains keyboard focus after copying. Scientific figures keep their original white canvas in dark mode.
 
 Local sources, full-text PDF libraries and unpublished manuscripts remain outside these websites.
+
+## Deployment
+
+Nousphera implementation commit `ac9b944` passed its validation workflow and GitHub Pages deployment. All 52 checked public HTML pages, citations, figures, shared styles/scripts/fonts and sitemap returned content identical to the local files. The published FedLN page was also inspected in Chrome with automatic theme selection.
+
+Personal-site commit `c46c0f2` deployed successfully. Its live homepage matched the local file and contained all 14 individual project links plus the project-gallery link.

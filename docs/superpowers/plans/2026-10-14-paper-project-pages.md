@@ -18,8 +18,8 @@
 - [x] Build shared static generator, page template, gallery, CSS, theme and accessible figure/citation controls.
 - [x] Validate all records, source/asset paths, local links, metadata, citation files and generated reproducibility.
 - [x] Render project pages and gallery in the browser; inspect light/dark and narrow layouts.
-- [ ] Review content and implementation, resolve findings, connect personal site and publish both repositories.
-- [ ] Verify successful deployments and live project resources.
+- [x] Review content and implementation, resolve findings, connect personal site and publish both repositories.
+- [x] Verify successful deployments and live project resources.
 
 ## Review focus
 - Workshop vs main-conference and preprint vs final-version venue metadata.
