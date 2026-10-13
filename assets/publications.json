@@ -1,26 +1,26 @@
 [
   {
     "id": "fedstar",
-    "title": "🌟 FedSTAR — Semi-supervised FL with Adaptive Reliability",
+    "title": "🌟 FedSTAR — Federated Self-Training for Audio Recognition",
     "focus": "🧭 Adaptivity",
     "year": 2022,
-    "venue": "ICASSP 2022",
-    "description": "Semi-supervised FL with adaptive reliability.",
+    "venue": "ACM TECS 2022 · ICASSP 2022",
+    "description": "Federated self-training that uses labeled and unlabeled audio on client devices.",
     "link": {
-      "href": "https://github.com/FederatedML/FedSTAR",
-      "label": "View Repo"
+      "href": "https://github.com/Nousphera/FedSTAR",
+      "label": "Code & paper"
     }
   },
   {
     "id": "fedln",
     "title": "🧩 FedLN — Federated Learning under Label Noise",
     "focus": "🧭 Adaptivity",
-    "year": 2022,
-    "venue": "NeurIPS 2022 Workshop",
+    "year": 2024,
+    "venue": "ACM TIST 2024 · NeurIPS 2022 Workshop",
     "description": "FL under label noise.",
     "link": {
-      "href": "https://arxiv.org/pdf/2208.09378",
-      "label": "Read Paper"
+      "href": "https://github.com/Nousphera/FedLN",
+      "label": "Code & paper"
     }
   },
   {
@@ -31,8 +31,8 @@
     "venue": "ICASSP 2024",
     "description": "Task-adaptive model compression for efficient FL.",
     "link": {
-      "href": "https://arxiv.org/pdf/2401.14211",
-      "label": "Read Paper"
+      "href": "https://github.com/Nousphera/FedCompress",
+      "label": "Code & paper"
     }
   },
   {
