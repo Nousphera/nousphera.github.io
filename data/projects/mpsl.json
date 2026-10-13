@@ -1,0 +1,93 @@
+{
+  "slug": "mpsl",
+  "library_id": "2025-mpsl",
+  "name": "MPSL",
+  "title": "Fine-Tuning Multimodal Transformers on Edge: A Parallel Split Learning Approach",
+  "year": 2025,
+  "venue": "FedGenAI @ IJCAI",
+  "type": "Workshop",
+  "authors": [
+    "Timo Fudala",
+    "Vasileios Tsouvalas",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Multimodal fine-tuning with lightweight edge clients.",
+  "summary": "Multimodal transformers are expensive to fine-tune on edge devices, even when only a small fraction of their parameters changes. MPSL keeps modality-specific tokenizers on clients and moves a shared encoder to the server, coordinating learning through aggregated local losses while supporting different combinations of images, audio and text.",
+  "category": "Efficient learning",
+  "topics": [
+    "Multimodal learning",
+    "Parallel split learning",
+    "Edge AI"
+  ],
+  "accent": "#2463bb",
+  "accent_dark": "#9ec3ff",
+  "tint": "#eef4fc",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2502.06355",
+    "Code": "https://github.com/Nousphera/MPSL"
+  },
+  "figure": {
+    "src": "assets/projects/mpsl/overview.webp",
+    "width": 1484,
+    "height": 891,
+    "alt": "MPSL training diagram: image, audio and text inputs pass through lightweight client tokenizers; activations reach a shared multimodal encoder, and predictions, local losses and gradients travel between clients and server.",
+    "caption": "Lightweight tokenizers run on each client. A shared server encoder processes the modalities and uses aggregated client losses for one backward pass; training labels stay on the clients.",
+    "source_label": "Figure 1 in the public preprint",
+    "source_url": "https://arxiv.org/pdf/2502.06355#page=2",
+    "page": 2
+  },
+  "method": [
+    {
+      "title": "Tokenize each modality locally",
+      "text": "Convert images, audio or text into token representations on the client. Send these activations to the server instead of running the full transformer locally."
+    },
+    {
+      "title": "Share one multimodal encoder",
+      "text": "Process client activations through a common encoder. Fuse modalities before or after encoding according to the downstream task, then return predictions to clients."
+    },
+    {
+      "title": "Train with aggregated local losses",
+      "text": "Clients compute losses using their local labels. The server aggregates the losses, performs a shared backward pass and returns cut-layer gradients to update the client tokenizers."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Much less computation on classification clients",
+      "text": "Table 1 reports 0.1 client-side GFLOPs for MPSL versus 25.8 for FedAvg, with 1.0 million versus 43.7 million trainable client parameters. Accuracy varies by task: MPSL improves MELD but trails FedAvg on COCO-QA and Kinetics-Sounds."
+    },
+    {
+      "title": "Retrieval remains sensitive to batch size",
+      "text": "On MS-COCO and Flickr30K, MPSL outperforms the evaluated distributed baselines but remains below centralized retrieval performance. Larger batches improve alignment and recall, while requiring each client to hold more examples."
+    }
+  ],
+  "abstract": "Multimodal transformers integrate diverse data types like images, audio, and text, advancing tasks such as audio-visual understanding and image-text retrieval; yet their high parameterization limits deployment on resource-constrained edge devices. Split Learning (SL), which partitions models at a designated cut-layer to offload compute-intensive operations to the server, offers a promising approach for distributed training of multimodal transformers, though its application remains underexplored. We present MPSL, a parallel SL approach for computational efficient fine-tuning of multimodal transformers in a distributed manner, while eliminating label sharing, client synchronization, and per-client sub-model management. MPSL employs lightweight client-side tokenizers and a unified modality-agnostic encoder, allowing flexible adaptation to task-specific needs. Our evaluation across 7 multimodal datasets demonstrates that MPSL matches or outperforms Federated Learning, reduces client-side computations by 250×, and achieves superior scalability in communication cost with model growth. Through extensive analysis, we highlight task suitability, trade-offs, and scenarios where MPSL excels, inspiring further exploration.",
+  "bibtex": "@inproceedings{fudala2025mpsl,\n  title = {Fine-Tuning Multimodal Transformers on Edge: A Parallel Split Learning Approach},\n  author = {Timo Fudala and Vasileios Tsouvalas and Nirvana Meratnia},\n  booktitle = {FedGenAI Workshop at IJCAI 2025},\n  year = {2025},\n  url = {https://arxiv.org/abs/2502.06355},\n  eprint = {2502.06355},\n  archivePrefix = {arXiv}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/pdf/2502.06355",
+    "figure_note": "Crop from the public arXiv PDF, Figure 1, page 2; no labels or data modified. Abstract follows public arXiv metadata. Findings use Tables 1-3 and preserve the task-dependent accuracy trade-offs visible in the results. Venue follows the current publication catalog.",
+    "content_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/pdf/2502.06355",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "MPSL",
+    "parallel split learning",
+    "PSL",
+    "multimodal transformers",
+    "edge AI",
+    "foundation models",
+    "fine-tuning",
+    "audio-visual understanding",
+    "image-text retrieval"
+  ]
+}

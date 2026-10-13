@@ -1,0 +1,92 @@
+{
+  "slug": "fedser",
+  "library_id": "2022-privacy-preserving-ser",
+  "name": "FedSER",
+  "title": "Privacy-preserving Speech Emotion Recognition through Semi-Supervised Federated Learning",
+  "year": 2022,
+  "venue": "EmotionAware @ IEEE PerCom",
+  "type": "Workshop",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Tanir Ozcelebi",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Learn speech emotions from audio kept on each device",
+  "summary": "Speech emotion recognition depends on sensitive audio that is costly to annotate. This work combines an attention-based speech model with federated self-training, using labeled clips and confident predictions on unlabeled clips while keeping raw audio on each device, then studies label scarcity and speaker distribution in IEMOCAP experiments.",
+  "category": "Speech & audio",
+  "topics": [
+    "Speech emotion recognition",
+    "Semi-supervised learning",
+    "Federated learning"
+  ],
+  "accent": "#a34b61",
+  "accent_dark": "#efadc0",
+  "tint": "#fbf0f3",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2202.02611",
+    "Published version": "https://ieeexplore.ieee.org/document/9767445",
+    "PDF": "https://arxiv.org/pdf/2202.02611"
+  },
+  "figure": {
+    "src": "assets/projects/fedser/overview.webp",
+    "width": 2048,
+    "height": 777,
+    "alt": "An attention-based convolutional model analyzes audio spectrograms while federated clients train using labeled inputs and confidence-filtered pseudo-labels from unlabeled inputs.",
+    "caption": "Spectral, temporal, and channel attention help the local model represent speech. Federated self-training adds supervision from unlabeled audio, and clients share model updates with the server.",
+    "source_label": "Figure 1 · public preprint, p. 3",
+    "source_url": "https://arxiv.org/pdf/2202.02611",
+    "page": 3
+  },
+  "method": [
+    {
+      "title": "Attend to speech features",
+      "text": "A convolutional network processes log-mel spectrograms. Spectral, temporal, and channel attention weight features before the model predicts an emotion."
+    },
+    {
+      "title": "Use unlabeled speech",
+      "text": "Local self-training combines known labels with pseudo-labels from high-confidence predictions. A device-specific confidence schedule accounts for training progress and each client’s participation."
+    },
+    {
+      "title": "Aggregate across devices",
+      "text": "FedAvg combines the locally trained parameters into a shared model. Raw recordings remain on devices, and the method does not require a labeled or unlabeled server dataset."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Scarce labels still help",
+      "text": "On the improvised IEMOCAP subset with four emotion classes, self-training improves unweighted accuracy in all four tested partitions when only 10% of examples are labeled. The comparison uses identical labeled subsets in supervised federated baselines."
+    },
+    {
+      "title": "Speaker separation is harder",
+      "text": "Experiments distinguish speaker-independent evaluation from overlapping speakers, and random partitioning from per-speaker non-IID data. Recognition remains harder when test speakers are unseen, underscoring the importance of the evaluation split."
+    }
+  ],
+  "abstract": "Speech Emotion Recognition (SER) refers to the recognition of human emotions from natural speech. If done accurately, it can offer a number of benefits in building human-centered context-aware intelligent systems. Existing SER approaches are largely centralized, without considering users' privacy. Federated Learning (FL) is a distributed machine learning paradigm dealing with decentralization of privacy-sensitive personal data. In this paper, we present a privacy-preserving and data-efficient SER approach by utilizing the concept of FL. To the best of our knowledge, this is the first federated SER approach, which utilizes self-training learning in conjunction with federated learning to exploit both labeled and unlabeled on-device data. Our experimental evaluations on the IEMOCAP dataset shows that our federated approach can learn generalizable SER models even under low availability of data labels and highly non-i.i.d. distributions. We show that our approach with as few as 10% labeled data, on average, can improve the recognition rate by 8.67% compared to the fully-supervised federated counterparts.",
+  "bibtex": "@inproceedings{tsouvalas2022fedser,\n  author = {Tsouvalas, Vasileios and Ozcelebi, Tanir and Meratnia, Nirvana},\n  title = {Privacy-preserving Speech Emotion Recognition through Semi-Supervised Federated Learning},\n  booktitle = {2022 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)},\n  year = {2022},\n  pages = {359--364},\n  note = {EmotionAware workshop},\n  doi = {10.1109/PerComWorkshops53856.2022.9767445},\n  url = {https://doi.org/10.1109/PerComWorkshops53856.2022.9767445}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/abs/2202.02611",
+    "figure_note": "Crop from the public arXiv PDF, Figure 1, page 3; no figure labels or data modified. FedSER is a project-page shorthand; the paper is cited under its full published title. The study keeps raw audio local but does not establish a formal differential privacy guarantee.",
+    "content_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/abs/2202.02611",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "speech emotion recognition",
+    "SER",
+    "federated learning",
+    "semi-supervised learning",
+    "self-training",
+    "unlabeled audio",
+    "IEMOCAP",
+    "non-IID data",
+    "data efficiency"
+  ]
+}

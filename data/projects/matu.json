@@ -1,0 +1,91 @@
+{
+  "slug": "matu",
+  "library_id": "2025-matu",
+  "name": "MaTU",
+  "title": "Many-Task Federated Fine-Tuning via Unified Task Vectors",
+  "year": 2025,
+  "venue": "FedGenAI @ IJCAI",
+  "type": "Workshop",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Tanir Ozcelebi",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Many local tasks. One shared task vector.",
+  "summary": "Federated clients may work on several different tasks, making a single averaged model a poor fit. MaTU combines each client’s task updates into one unified vector with lightweight masks and scaling factors, then uses task similarity to share useful updates across clients while limiting interference between unrelated tasks.",
+  "category": "Reliable learning",
+  "topics": [
+    "Many-task federated learning",
+    "Task vectors",
+    "Model merging"
+  ],
+  "accent": "#b64f35",
+  "accent_dark": "#f4b19b",
+  "tint": "#fcf0eb",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2502.06376"
+  },
+  "figure": {
+    "src": "assets/projects/matu/overview.webp",
+    "width": 1598,
+    "height": 914,
+    "alt": "MaTU pipeline showing a client combining three task vectors into one unified vector and task modulators, then a server aggregating masks and estimating task similarity before producing updated vectors.",
+    "caption": "Clients communicate one unified vector plus a binary mask and scalar for each task. The server combines same-task updates and transfers information between tasks whose update directions agree.",
+    "source_label": "Figure 1 in the public preprint",
+    "source_url": "https://arxiv.org/pdf/2502.06376v3#page=3",
+    "page": 3
+  },
+  "method": [
+    {
+      "title": "Learn local task updates",
+      "text": "Fine-tune a common pre-trained model separately for each local task. Express each update as a task vector relative to the shared starting model."
+    },
+    {
+      "title": "Unify and modulate",
+      "text": "Merge local vectors into one representation. A binary mask and scaling factor per task recover its direction and magnitude without transmitting a separate full vector for every task."
+    },
+    {
+      "title": "Aggregate by task similarity",
+      "text": "Combine updates for the same task, then transfer information from the most similar tasks using sign agreement. Return a unified vector and modulators without retaining client-specific weights across rounds."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Stronger results with several tasks per client",
+      "text": "On the 8-task benchmark with 30 clients and 20% participation, MaTU achieves 79.47% average accuracy, compared with 67.60% for MaT-FL. Its reported communication metric is 8.04 million bits per task, versus 20.43 million for MaT-FL."
+    },
+    {
+      "title": "Evaluated across 30 vision tasks",
+      "text": "On the 30-task benchmark, MaTU reaches 77.40% average performance normalized to individual task fine-tuning, compared with 52.62% for MaT-FL. The scaling study shows modest additional communication as tasks per client increase."
+    }
+  ],
+  "abstract": "Federated Learning (FL) traditionally assumes homogeneous client tasks; however, in real-world scenarios, clients often specialize in diverse tasks, introducing task heterogeneity. To address this challenge, Many-Task FL (MaT-FL) has emerged, enabling clients to collaborate effectively despite task diversity. Existing MaT-FL approaches rely on client grouping or personalized layers, requiring the server to manage individual models and failing to account for clients handling multiple tasks. We propose MaTU, a MaT-FL approach that enables joint learning of task vectors across clients, eliminating the need for clustering or client-specific weight storage at the server. MaTU constructs a single “unified” task vector per client and leverages lightweight task-specific modulators — binary masks and scalar rescalers — to disentangle and adapt per-task behavior. This design ensures stateless server aggregation and naturally scales to large task sets with minimal communication overhead. Evaluated across 30 datasets, MaTU achieves superior performance over state-of-the-art MaT-FL approaches, with results comparable to per-task fine-tuning, while delivering significant communication savings.",
+  "bibtex": "@inproceedings{tsouvalas2025matu,\n  title = {Many-Task Federated Fine-Tuning via Unified Task Vectors},\n  author = {Vasileios Tsouvalas and Tanir Ozcelebi and Nirvana Meratnia},\n  booktitle = {FedGenAI Workshop at IJCAI 2025},\n  year = {2025},\n  url = {https://arxiv.org/abs/2502.06376},\n  eprint = {2502.06376},\n  archivePrefix = {arXiv}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/pdf/2502.06376v3",
+    "figure_note": "Crop from the public arXiv v3 PDF, Figure 1, page 3; no labels or data modified. Abstract uses the PDF version, whose wording differs from the arXiv metadata abstract. Quantitative findings are from Table 2 and the 30-task discussion on page 6. Venue follows the current publication catalog.",
+    "content_pages": [
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/pdf/2502.06376v3",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "MaTU",
+    "many-task federated learning",
+    "MaT-FL",
+    "task vectors",
+    "task heterogeneity",
+    "model merging",
+    "task similarity",
+    "knowledge transfer",
+    "federated fine-tuning"
+  ]
+}

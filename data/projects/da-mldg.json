@@ -1,0 +1,94 @@
+{
+  "slug": "da-mldg",
+  "library_id": "2023-da-mldg",
+  "name": "DA-MLDG",
+  "title": "On efficacy of Meta-Learning for Domain Generalization in Speech Emotion Recognition",
+  "year": 2023,
+  "venue": "PerFail @ IEEE PerCom",
+  "type": "Workshop",
+  "authors": [
+    "Raeshak King Gandhi",
+    "Vasileios Tsouvalas",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Why emotion models struggle beyond their training domain",
+  "summary": "Speech emotion models often lose accuracy when speakers, languages, or recording datasets change. DA-MLDG studies whether meta-learning can improve that transfer by weighting training episodes according to estimated domain shift; its evaluation exposes the limits of log-mel representations and motivates stronger features and more varied speech emotion datasets.",
+  "category": "Reliable learning",
+  "topics": [
+    "Domain generalization",
+    "Meta-learning",
+    "Speech emotion recognition"
+  ],
+  "accent": "#70518f",
+  "accent_dark": "#c7abe8",
+  "tint": "#f3eef9",
+  "links": {
+    "Paper": "https://ieeexplore.ieee.org/document/10150265/",
+    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf",
+    "Code": "https://github.com/vtsouval/DA_MLDG"
+  },
+  "figure": {
+    "src": "assets/projects/da-mldg/overview.webp",
+    "width": 1840,
+    "height": 792,
+    "alt": "Audio from multiple source domains is converted into spectrograms and divided into meta-train and meta-test sets; an energy-based domain shift margin adjusts the meta-test contribution.",
+    "caption": "Training repeatedly simulates a domain shift between source datasets. The estimated shift controls the influence of the meta-test loss when updating the shared emotion model.",
+    "source_label": "Figure 1 · PerFail paper, p. 423",
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf",
+    "page": 4
+  },
+  "method": [
+    {
+      "title": "Simulate unseen domains",
+      "text": "Split source-domain batches into non-overlapping meta-train and meta-test sets. Take a training step on the meta-train set before evaluating transfer to the held-out source domains."
+    },
+    {
+      "title": "Estimate the domain shift",
+      "text": "Compute the difference between average energy scores on the two sets after the meta-train step. This margin acts as an adaptive measure of the shift between domains."
+    },
+    {
+      "title": "Adapt the meta-objective",
+      "text": "Weight the meta-test loss by the estimated shift and optimize it together with the meta-train loss. Evaluate transfer to target corpora that were unavailable during training."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Modest gains, a persistent gap",
+      "text": "Across seven scenarios drawn from ten speech emotion datasets, domain-aware meta-learning gives modest improvements but does not solve generalization. The authors conclude that the resulting performance remains insufficient for practical use."
+    },
+    {
+      "title": "Representation matters",
+      "text": "Replacing log-mel inputs with pre-trained TRILLsson embeddings improves results in several settings, including the supervised baseline. The study points to richer input representations and more varied in-the-wild data as priorities."
+    }
+  ],
+  "abstract": "Speech Emotion Recognition (SER) refers to the recognition of human emotions from natural speech, vital for building human-centered context-aware intelligent systems. Here, domain shift, where models’ trained on one domain exhibit performance degradation when exposed to an unseen domain with different statistics, is a major limiting factor in SER applicability, as models have a strong dependence on speakers and languages characteristics used during training. Meta-Learning for Domain Generalization (MLDG) has shown great success in improving models’ generalization capacity and alleviate the domain shift problem in the vision domain; yet, its’ efficacy on SER remains largely unexplored. In this work, we propose a “domain-shift aware” MLDG approach to learn generalizable models across multiple domains in SER. Based on our extensive evaluation, we identify a number of pitfalls that contribute to poor models’ DG ability, and demonstrate that log-mel spectrograms representations lack distinct features required for MLDG in SER. We further explore the use of appropriate features to achieve DG in SER as to provide insides to future research directions for DG in SER.",
+  "bibtex": "@inproceedings{gandhi2023damldg,\n  author = {Gandhi, Raeshak King and Tsouvalas, Vasileios and Meratnia, Nirvana},\n  title = {On efficacy of Meta-Learning for Domain Generalization in Speech Emotion Recognition},\n  booktitle = {2023 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops)},\n  year = {2023},\n  pages = {421--426},\n  note = {PerFail 2023: Second International Workshop on Negative Results in Pervasive Computing},\n  doi = {10.1109/PerComWorkshops56833.2023.10150265},\n  url = {https://doi.org/10.1109/PerComWorkshops56833.2023.10150265}\n}",
+  "provenance": {
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf",
+    "figure_note": "Crop from the public TU/e-hosted publisher PDF, Figure 1, PDF page 4 (proceedings page 423; the PDF includes a cover page); no figure labels or data modified. The source title omits “the” before “efficacy”, unlike the catalog display title. The published abstract’s original wording is retained.",
+    "content_pages": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "abstract_source": {
+    "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf",
+    "label": "Published paper"
+  },
+  "keywords": [
+    "DA-MLDG",
+    "meta-learning",
+    "MLDG",
+    "domain generalization",
+    "domain shift",
+    "speech emotion recognition",
+    "SER",
+    "log-mel spectrograms",
+    "feature representations",
+    "negative results"
+  ]
+}

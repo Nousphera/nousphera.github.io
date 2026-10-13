@@ -1,0 +1,93 @@
+{
+  "slug": "ae-psl",
+  "library_id": "2026-ae-psl",
+  "name": "AE-PSL",
+  "title": "AutoEncoder-Compressed Parallel Split Learning for Pre-Trained Model Fine-Tuning",
+  "year": 2026,
+  "venue": "WAFL @ ECML-PKDD",
+  "type": "Workshop",
+  "authors": [
+    "Bas Meuwissen",
+    "Vasileios Tsouvalas",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Align first. Compress every training step.",
+  "summary": "Split learning moves computation off edge devices, but exchanging activations and gradients at every step can overwhelm the network. AE-PSL aligns a lightweight autoencoder with a pre-trained vision model and then with each client’s data, so distributed fine-tuning can exchange compact representations while preserving useful features.",
+  "category": "Efficient learning",
+  "topics": [
+    "Parallel split learning",
+    "Activation compression",
+    "Vision foundation models"
+  ],
+  "accent": "#6e42b7",
+  "accent_dark": "#c7acff",
+  "tint": "#f3effa",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2607.17913",
+    "Code": "https://github.com/Nousphera/AE_PSL"
+  },
+  "figure": {
+    "src": "assets/projects/ae-psl/overview.webp",
+    "width": 1416,
+    "height": 837,
+    "alt": "AE-PSL pipeline: general autoencoder alignment on public data, local client-specific alignment with decoder averaging, and distributed fine-tuning using compressed activations and gradients.",
+    "caption": "Two alignment stages prepare the compressor before fine-tuning. Each client keeps a local encoder, while the server shares one decoder; both stay frozen during the final training stage.",
+    "source_label": "Figure 1 in the public preprint",
+    "source_url": "https://arxiv.org/pdf/2607.17913v1#page=4",
+    "page": 4
+  },
+  "method": [
+    {
+      "title": "Align with the pre-trained model",
+      "text": "Train the autoencoder to reconstruct split-layer features from public data while the client-side model stays frozen. This learns a compression space compatible with the original model."
+    },
+    {
+      "title": "Adapt to each client",
+      "text": "Warm up the autoencoder on local client data. Keep the adapted encoder on each client and average the decoders into one shared server module."
+    },
+    {
+      "title": "Fine-tune through compact features",
+      "text": "Freeze the compression modules and fine-tune the split model. Exchange compressed patch-token activations and their gradients; the classification token remains uncompressed."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Accuracy stays close at about 10× compression",
+      "text": "With ViT-B/32, Table 1 reports accuracy within 0.7 percentage points of uncompressed training at the medium reduction setting across four vision datasets and both 5- and 25-client configurations."
+    },
+    {
+      "title": "A measured trade-off at stronger compression",
+      "text": "At about 20× communication reduction, the largest reported accuracy drop is 3.8 percentage points. AE-PSL has the highest accuracy among the evaluated compression methods in every Table 1 setting."
+    }
+  ],
+  "abstract": "Distributed Fine-Tuning (DFT) of large-scale Foundation Models (FMs) on resource-constrained edge devices is limited by local compute constraints and communication overhead. Parallel Split Learning (PSL) reduces client-side computation by keeping few model layers on each client and offloading the remaining computation to the server; however, clients must exchange intermediate activations and gradients with the server at every training step. Existing SL communication-compression methods mainly rely on task-agnostic heuristics, such as sparsification and quantization. While learnable SL compressors can better adapt to intermediate representations, they require co-training with the target model. Therefore, directly inserting them into off-the-shelf FMs introduces feature-distribution misalignment and degrades DFT performance. To address this, we propose AE-PSL, a communication-efficient PSL framework that compresses intermediate activations and gradients using a lightweight AutoEncoder (AE) placed at the split layer. To ensure compatibility of AE compression with pre-trained FMs, AE-PSL introduces a novel two-stage alignment mechanism, which adapts the AE to the pre-trained model’s feature manifold and client-specific feature distributions before DFT. We evaluate AE-PSL across four vision datasets and various communication reduction settings, showing that it preserves downstream accuracy at 10.2× reduction; at the same communication budget, the strongest evaluated heuristic baseline trails AE-PSL by 5.2 percent point. This demonstrates that AE-PSL offers a stronger accuracy–communication trade-off than heuristic SL compression.",
+  "bibtex": "@inproceedings{meuwissen2026aepsl,\n  title = {AutoEncoder-Compressed Parallel Split Learning for Pre-Trained Model Fine-Tuning},\n  author = {Bas Meuwissen and Vasileios Tsouvalas and Nirvana Meratnia},\n  booktitle = {4th Workshop on Advancements in Federated Learning (WAFL), ECML-PKDD 2026},\n  year = {2026},\n  url = {https://arxiv.org/abs/2607.17913},\n  eprint = {2607.17913},\n  archivePrefix = {arXiv}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/pdf/2607.17913v1",
+    "figure_note": "Crop from the public arXiv v1 PDF, Figure 1, page 4; no labels or data modified. Full abstract taken from PDF page 1, which includes results omitted from the arXiv metadata abstract. Venue follows the current publication catalog.",
+    "content_pages": [
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/pdf/2607.17913v1",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "AE-PSL",
+    "parallel split learning",
+    "PSL",
+    "autoencoder",
+    "activation compression",
+    "gradient compression",
+    "foundation models",
+    "distributed fine-tuning",
+    "edge devices"
+  ]
+}

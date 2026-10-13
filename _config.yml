@@ -1,3 +1,7 @@
-title: "Nousphera — Accelerating Decentralized ML"
-description: "Faster, Fairer, Smarter, Stronger — Decentralized Intelligence for Everyone."
+title: "Nousphera — Collaborative machine learning"
+description: "Research in efficient, reliable and private learning across devices, tasks and data."
 theme: null
+exclude:
+  - scripts
+  - tests
+  - docs

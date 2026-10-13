@@ -1,0 +1,98 @@
+{
+  "library_id": "2024-fedcode",
+  "name": "FedCode",
+  "category": "Efficient learning",
+  "authors": [
+    "Saeed Khalilian",
+    "Vasileios Tsouvalas",
+    "Tanir Ozcelebi",
+    "Nirvana Meratnia"
+  ],
+  "accent": "#246bb2",
+  "accent_dark": "#90c6ff",
+  "tint": "#edf5fd",
+  "topics": [
+    "Communication efficiency",
+    "Codebook transfer",
+    "Federated learning"
+  ],
+  "tagline": "Exchange codebooks to make federated communication smaller",
+  "summary": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models and reduce communication in both directions with limited extra client computation.",
+  "method": [
+    {
+      "title": "Turn weights into a codebook",
+      "text": "K-means groups similar model weights and stores their cluster centers in a small codebook. The server and clients retain their own weight structure."
+    },
+    {
+      "title": "Exchange centers in both directions",
+      "text": "The server sends a codebook for clients to update their weights using binary search. After local training, clients send their codebooks back for aggregation and a global weight update."
+    },
+    {
+      "title": "Recalibrate periodically",
+      "text": "Selected rounds also transmit compressed weight matrices with the codebook. These transfers realign cluster assignments as local training causes client and server weights to diverge."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Savings across vision and audio tasks",
+      "text": "Experiments with ResNet-20 and MobileNet on CIFAR-10 and CIFAR-100, and YAMNet on SpeechCommands, report substantial reductions in transmitted data with comparatively small accuracy losses against FedAvg."
+    },
+    {
+      "title": "Calibration controls the tradeoff",
+      "text": "The ablations connect codebook size and the frequency of compressed-weight transfers to model accuracy and communication volume. Periodic calibration supports stable learning; increasing the number of clusters eventually brings diminishing accuracy gains in the reported setup."
+    }
+  ],
+  "figure": {
+    "page": 4,
+    "source_label": "Figure 2 in the public preprint",
+    "alt": "FedCode communication loop with blue upstream and pink downstream paths: server and clients exchange weight-cluster codebooks, while occasional compressed-weight transfers calibrate clusters.",
+    "caption": "Most FedCode rounds communicate cluster centers upstream and downstream. Periodic transfers of compressed weights recalibrate the client and server models.",
+    "source_url": "https://arxiv.org/pdf/2311.09270",
+    "src": "assets/projects/fedcode/overview.webp",
+    "width": 1733,
+    "height": 1274
+  },
+  "provenance": {
+    "source_url": "https://arxiv.org/abs/2311.09270",
+    "figure_note": "Crop from the public arXiv v1 PDF, page 4; no labels or data modified. Method, findings, and abstract follow this preprint, whose abstract statistics differ from the published version. Venue and BibTeX identify IEEE EDGE 2024.",
+    "content_pages": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "bibtex": "@inproceedings{khalilian2024fedcode,\n  title = {{FedCode}: Communication-Efficient Federated Learning via Transferring Codebooks},\n  author = {Khalilian, Saeed and Tsouvalas, Vasileios and Ozcelebi, Tanir and Meratnia, Nirvana},\n  booktitle = {2024 IEEE International Conference on Edge Computing and Communications (EDGE)},\n  year = {2024},\n  pages = {99--109},\n  publisher = {IEEE},\n  doi = {10.1109/EDGE62653.2024.00022},\n  url = {https://doi.org/10.1109/EDGE62653.2024.00022}\n}",
+  "slug": "fedcode",
+  "title": "FedCode: Communication-Efficient Federated Learning via Transferring Codebooks",
+  "year": 2024,
+  "venue": "IEEE EDGE",
+  "type": "Conference",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2311.09270",
+    "Published version": "https://ieeexplore.ieee.org/document/10646450/",
+    "Code": "https://github.com/vtsouval/FedCode"
+  },
+  "abstract": "Federated Learning (FL) is a distributed machine learning paradigm that enables learning models from decentralized local data. While FL offers appealing properties for clients' data privacy, it imposes high communication burdens for exchanging model weights between a server and the clients. Existing approaches rely on model compression techniques, such as pruning and weight clustering to tackle this. However, transmitting the entire set of weight updates at each federated round, even in a compressed format, limits the potential for a substantial reduction in communication volume. We propose FedCode where clients transmit only codebooks, i.e., the cluster centers of updated model weight values. To ensure a smooth learning curve and proper calibration of clusters between the server and the clients, FedCode periodically transfers model weights after multiple rounds of solely communicating codebooks. This results in a significant reduction in communication volume between clients and the server in both directions, without imposing significant computational overhead on the clients or leading to major performance degradation of the models. We evaluate the effectiveness of FedCode using various publicly available datasets with ResNet-20 and MobileNet backbone model architectures. Our evaluations demonstrate a 12.2-fold data transmission reduction on average while maintaining a comparable model performance with an average accuracy loss of 1.3% compared to FedAvg. Further validation of FedCode performance under non-IID data distributions showcased an average accuracy loss of 2.0% compared to FedAvg while achieving approximately a 12.7-fold data transmission reduction.",
+  "abstract_source": {
+    "url": "https://arxiv.org/abs/2311.09270",
+    "label": "Public preprint",
+    "note": "Abstract and overview follow the public preprint; the citation identifies the published version."
+  },
+  "keywords": [
+    "FedCode",
+    "codebooks",
+    "codebook transfer",
+    "weight clustering",
+    "cluster centers",
+    "model compression",
+    "bidirectional communication",
+    "communication efficiency",
+    "non-IID data",
+    "federated learning"
+  ]
+}

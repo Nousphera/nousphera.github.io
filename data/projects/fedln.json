@@ -1,0 +1,117 @@
+{
+  "slug": "fedln",
+  "library_id": "2024-fedln",
+  "name": "FedLN",
+  "title": "Labeling Chaos to Learning Harmony: Federated Learning with Noisy Labels",
+  "year": 2024,
+  "venue": "ACM TIST",
+  "type": "Journal",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Aaqib Saeed",
+    "Tanir Ozcelebi",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Learning together when labels cannot be trusted",
+  "summary": "Federated clients have different amounts of label noise and different computational budgets. FedLN estimates noise on each client and offers three ways to limit its influence: correcting labels before training, adding adaptive knowledge distillation during local learning, or adjusting server aggregation to place more weight on reliable updates.",
+  "category": "Reliable learning",
+  "topics": [
+    "Label noise",
+    "Federated learning",
+    "Knowledge distillation"
+  ],
+  "accent": "#956220",
+  "accent_dark": "#ecc185",
+  "tint": "#f9f2e7",
+  "links": {
+    "Paper": "https://doi.org/10.1145/3626242",
+    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
+    "Code": "https://github.com/Nousphera/FedLN"
+  },
+  "figure": {
+    "src": "assets/projects/fedln/schematic.svg",
+    "width": 1200,
+    "height": 500,
+    "alt": "Three alternative FedLN interventions shown side by side: Nearest Neighbor Correction at initialization, Adaptive Knowledge Distillation during local training, and noise-aware averaging at server aggregation. The alternatives are not a sequential pipeline.",
+    "caption": "FedLN offers three alternative ways to handle noisy labels, chosen to suit client resources: correct labels before training, guide local training with a teacher, or reduce the influence of noisier client updates during aggregation.",
+    "source_label": "Explanatory schematic based on the paper",
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
+    "page": 10
+  },
+  "method": [
+    {
+      "title": "Correct before training",
+      "text": "Nearest Neighbor Correction uses a pre-trained model to embed local examples. A vote among nearby examples identifies label mismatches and replaces their labels before federated training."
+    },
+    {
+      "title": "Guide local learning",
+      "text": "Adaptive Knowledge Distillation adds supervision from a teacher when a client’s estimated noise exceeds a threshold. This helps the local model learn without relying only on its noisy labels."
+    },
+    {
+      "title": "Weight the aggregation",
+      "text": "For devices with less compute, NA-FedAvg estimates noise using energy scores in a single federated round. The server then reduces the contribution of updates from noisier clients."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Robustness across tasks",
+      "text": "Experiments on vision and audio classification show improved recognition under synthetic label noise. The three approaches provide different trade-offs between noise handling, local computation, and available pre-trained representations."
+    },
+    {
+      "title": "Human annotation errors",
+      "text": "Evaluation on CIFAR-10N and CIFAR-100N extends the study to real human label errors. Adaptive distillation is especially effective on the harder CIFAR-100N task when longer federated training is available."
+    }
+  ],
+  "abstract": "Federated Learning (FL) is a distributed machine learning paradigm that enables learning models from decentralized private datasets where the labeling effort is entrusted to the clients. While most existing FL approaches assume high-quality labels are readily available on users’ devices, in reality, label noise can naturally occur in FL and is closely related to clients’ characteristics. Due to scarcity of available data and significant label noise variations among clients in FL, existing state-of-the-art centralized approaches exhibit unsatisfactory performance, whereas prior FL studies rely on excessive on-device computational schemes or additional clean data available on the server. We propose FedLN, a framework to deal with label noise across different FL training stages, namely FL initialization, on-device model training, and server model aggregation, able to accommodate the diverse computational capabilities of devices in an FL system. Specifically, FedLN computes per-client noise level estimation in a single federated round and improves the models’ performance by either correcting or mitigating the effect of noisy samples. Our evaluation on various publicly available vision and audio datasets demonstrates a 22% improvement on average compared to other existing methods for a label noise level of 60%. We further validate the efficiency of FedLN in human-annotated real-world noisy datasets and report a 4.8% increase on average in models’ recognition performance, highlighting that FedLN can be useful for improving FL services provided to everyday users.",
+  "bibtex": "@article{tsouvalas2024fedln,\n  author = {Tsouvalas, Vasileios and Saeed, Aaqib and Ozcelebi, Tanir and Meratnia, Nirvana},\n  title = {Labeling Chaos to Learning Harmony: Federated Learning with Noisy Labels},\n  journal = {ACM Transactions on Intelligent Systems and Technology},\n  year = {2024},\n  volume = {15},\n  number = {2},\n  articleno = {22},\n  numpages = {26},\n  doi = {10.1145/3626242},\n  url = {https://doi.org/10.1145/3626242}\n}",
+  "related": [
+    {
+      "label": "Earlier workshop version · INTERPOLATE @ NeurIPS 2022",
+      "url": "https://openreview.net/pdf?id=gNHMC4I0Pva"
+    }
+  ],
+  "provenance": {
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
+    "figure_note": "The primary figure is an original explanatory schematic based on Section 4.3 of the published paper (PDF pages 10–14). It presents NNC, AKD, and NA-FedAvg as alternative intervention stages, not a sequential pipeline. The secondary figure is an unchanged crop of Figure 4, PDF page 14 (article page 22:13; the PDF includes a cover page). Content and abstract are verified against the 2024 journal version.",
+    "content_pages": [
+      2,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      18,
+      19,
+      23,
+      24
+    ]
+  },
+  "abstract_source": {
+    "url": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
+    "label": "Published paper"
+  },
+  "keywords": [
+    "FedLN",
+    "noisy labels",
+    "label noise",
+    "noise estimation",
+    "label correction",
+    "robust learning",
+    "federated learning",
+    "audio classification",
+    "image classification"
+  ],
+  "secondary_figure": {
+    "src": "assets/projects/fedln/overview.webp",
+    "width": 1605,
+    "height": 1716,
+    "alt": "NA-FedAvg sends client model updates to a central server, with an additional energy-score path for one-time estimation of each client’s label noise.",
+    "caption": "The lightweight NA-FedAvg route: estimate each client’s noise level once, then use that estimate to weight its contribution to the global model. FedLN also offers label correction and adaptive distillation.",
+    "source_label": "Figure 4 · ACM TIST article, p. 22:13",
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
+    "page": 14
+  },
+  "social_image": "assets/projects/fedln/overview.webp"
+}

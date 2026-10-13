@@ -1,0 +1,92 @@
+{
+  "slug": "plix",
+  "library_id": "2023-plix",
+  "name": "PLiX",
+  "title": "Plug-and-Play Multilingual Few-shot Spoken Words Recognition",
+  "year": 2023,
+  "venue": "arXiv:2305.03058",
+  "type": "Preprint",
+  "authors": [
+    "Aaqib Saeed",
+    "Vasileios Tsouvalas"
+  ],
+  "tagline": "Recognize a new spoken word from a few examples",
+  "summary": "Adding new voice commands usually requires new labeled data and task-specific training. PLiX learns a multilingual audio embedding from millions of one-second clips across 20 languages, then recognizes unseen spoken words by comparing them with prototypes formed from a few support examples, without retraining the model for each new vocabulary.",
+  "category": "Speech & audio",
+  "topics": [
+    "Few-shot learning",
+    "Multilingual speech",
+    "Keyword spotting"
+  ],
+  "accent": "#365faa",
+  "accent_dark": "#9bbcff",
+  "tint": "#edf2fc",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2305.03058",
+    "PDF": "https://arxiv.org/pdf/2305.03058"
+  },
+  "figure": {
+    "src": "assets/projects/plix/overview.webp",
+    "width": 1977,
+    "height": 757,
+    "alt": "PLiX converts support and query audio into log-mel spectrograms, extracts embeddings, compares queries with class prototypes, and predicts a spoken word.",
+    "caption": "A shared acoustic encoder maps support examples and incoming speech into the same space. Distances to the support-set prototypes determine which word was spoken.",
+    "source_label": "Figure 2 · public preprint, p. 4",
+    "source_url": "https://arxiv.org/pdf/2305.03058",
+    "page": 4
+  },
+  "method": [
+    {
+      "title": "Learn across languages",
+      "text": "Train a prototypical network through episodes of support and query examples. Multilingual episodes teach the acoustic encoder to distinguish words across 20 training languages."
+    },
+    {
+      "title": "Build word prototypes",
+      "text": "Convert one-second audio clips into log-mel spectrograms and extract embeddings. Average the support embeddings for each requested word to form its prototype."
+    },
+    {
+      "title": "Recognize without retraining",
+      "text": "Embed an incoming query and compare it with the word prototypes using squared Euclidean distance. The nearest prototype supplies the predicted word for the current vocabulary."
+    }
+  ],
+  "findings": [
+    {
+      "title": "New words and languages",
+      "text": "The multilingual model recognizes novel words with as little as one support example and transfers to five unseen low-resource languages. Generalization varies across languages, with Tamil more challenging in the reported one-shot evaluation."
+    },
+    {
+      "title": "A smaller deployment option",
+      "text": "The paper evaluates a compact TinyNet-E encoder alongside the larger EfficientNet-v2 model. Hardware measurements on Raspberry Pi, Jetson Nano, and Google Pixel examine latency and energy, including the gains available through quantization."
+    }
+  ],
+  "abstract": "As technology advances and digital devices become prevalent, seamless human-machine communication is increasingly gaining significance. The growing adoption of mobile, wearable, and other Internet of Things (IoT) devices has changed how we interact with these smart devices, making accurate spoken words recognition a crucial component for effective interaction. However, building robust spoken words detection system that can handle novel keywords remains challenging, especially for low-resource languages with limited training data. Here, we propose PLiX, a multilingual and plug-and-play keyword spotting system that leverages few-shot learning to harness massive real-world data and enable the recognition of unseen spoken words at test-time. Our few-shot deep models are learned with millions of one-second audio clips across 20 languages, achieving state-of-the-art performance while being highly efficient. Extensive evaluations show that PLiX can generalize to novel spoken words given as few as just one support example and performs well on unseen languages out of the box. We release models and inference code to serve as a foundation for future research and voice-enabled user interface development for emerging devices.",
+  "bibtex": "@misc{saeed2023plix,\n  author = {Saeed, Aaqib and Tsouvalas, Vasileios},\n  title = {Plug-and-Play Multilingual Few-shot Spoken Words Recognition},\n  year = {2023},\n  eprint = {2305.03058},\n  archivePrefix = {arXiv},\n  primaryClass = {eess.AS},\n  url = {https://arxiv.org/abs/2305.03058}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/abs/2305.03058",
+    "figure_note": "Crop from the public arXiv PDF, Figure 2, page 4; no figure labels or data modified. The preprint is available under CC BY 4.0. The abstract retains the paper’s historical release statement; no currently verified public code link is asserted.",
+    "content_pages": [
+      1,
+      3,
+      4,
+      5,
+      11,
+      12,
+      14
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/abs/2305.03058",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "PLiX",
+    "keyword spotting",
+    "KWS",
+    "few-shot learning",
+    "one-shot learning",
+    "multilingual speech",
+    "spoken word recognition",
+    "low-resource languages",
+    "audio classification"
+  ]
+}

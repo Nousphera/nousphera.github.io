@@ -1,0 +1,101 @@
+{
+  "slug": "deltamask",
+  "library_id": "2024-deltamask",
+  "name": "DeltaMask",
+  "title": "DeltaMask: Minimizing Communication in Federated Fine-Tuning of Vision Foundation Models",
+  "year": 2024,
+  "venue": "IEEE BigData 2024",
+  "type": "Conference",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Yuki M. Asano",
+    "Aaqib Saeed"
+  ],
+  "tagline": "Adapt foundation models by communicating sparse mask changes.",
+  "summary": "Large vision models make federated updates costly, even when compressed to one bit per parameter. DeltaMask keeps pre-trained weights fixed and learns stochastic masks, then communicates selected changes through compact probabilistic filters so clients can collaborate at a fraction of the bitrate of a full binary mask.",
+  "category": "Efficient learning",
+  "topics": [
+    "Federated fine-tuning",
+    "Stochastic masking",
+    "Communication compression"
+  ],
+  "accent": "#087977",
+  "accent_dark": "#89d6cf",
+  "tint": "#eaf7f5",
+  "links": {
+    "Paper": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "Preprint": "https://arxiv.org/abs/2311.17299",
+    "Publication": "https://doi.org/10.1109/BigData62323.2024.10825398"
+  },
+  "figure": {
+    "src": "assets/projects/deltamask/overview.webp",
+    "width": 1626,
+    "height": 1217,
+    "alt": "DeltaMask pipeline: a client compares server and local binary masks, ranks changed positions, encodes them with a probabilistic filter and grayscale image, and the server reconstructs masks for Bayesian aggregation.",
+    "caption": "The update is a compact record of changed mask positions. Clients rank those changes and encode them with a probabilistic filter; the server queries the filter to reconstruct and aggregate local masks.",
+    "source_label": "Figure 2 in the accepted manuscript",
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=4",
+    "page": 4
+  },
+  "method": [
+    {
+      "title": "Learn a stochastic subnetwork",
+      "text": "Hold pre-trained backbone weights fixed and optimize mask probabilities using local data. Sample binary masks to select which weights participate in the downstream task."
+    },
+    {
+      "title": "Encode the important differences",
+      "text": "Compare the local mask with the shared server mask. Rank changed positions by relative entropy, retain selected updates and store their fingerprints in a binary fuse filter compressed as a grayscale image."
+    },
+    {
+      "title": "Reconstruct and aggregate masks",
+      "text": "The server uses filter membership queries to reconstruct client masks, then updates global mask probabilities through Bayesian aggregation for the next round."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Below one bit per parameter",
+      "text": "The paper reports bitrates as low as 0.09 bits per parameter across its experiments on eight image datasets. This is the lowest reported setting, rather than a uniform bitrate for every task."
+    },
+    {
+      "title": "Tested across different pre-trained models",
+      "text": "Table I covers CLIP, DINOv2 and ConvMixer variants under IID data. Average bitrates range from 0.197 to 0.251 bits per parameter, with accuracy differences from full fine-tuning ranging from +0.41 to -3.21 percentage points."
+    }
+  ],
+  "abstract": "Foundation Models (FMs) have revolutionized machine learning with their adaptability and high performance across tasks; yet, their integration into Federated Learning (FL) is challenging due to substantial communication overhead from their extensive parameterization. Current communication-efficient FL strategies, such as gradient compression, reduce bitrates to around 1 bit-per-parameter (bpp). However, these approaches fail to harness the characteristics of FMs, with their large number of parameters still posing a challenge to communication efficiency, even at these bitrate regimes. In this work, we present DeltaMask, a novel method that efficiently fine-tunes FMs in FL at an ultra-low bitrate, well below 1 bpp. DeltaMask employs stochastic masking to detect highly effective subnetworks within FMs and leverage stochasticity and sparsity in client masks to compress updates into a compact grayscale image using probabilistic filters, deviating from traditional weight training approaches. Our comprehensive evaluations across various datasets and architectures demonstrate DeltaMask efficiently achieves bitrates as low as 0.09 bpp, enhancing communication efficiency while maintaining FMs performance, as measured on 8 datasets and 5 pre-trained models of various network architectures.",
+  "bibtex": "@inproceedings{tsouvalas2025deltamask,\n  title = {DeltaMask: Minimizing Communication in Federated Fine-Tuning of Vision Foundation Models},\n  author = {Vasileios Tsouvalas and Yuki M. Asano and Aaqib Saeed},\n  booktitle = {2024 IEEE International Conference on Big Data (BigData)},\n  year = {2025},\n  pages = {8042--8051},\n  publisher = {IEEE},\n  doi = {10.1109/BigData62323.2024.10825398},\n  url = {https://doi.org/10.1109/BigData62323.2024.10825398}\n}",
+  "provenance": {
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "figure_note": "Crop from the public TU/e accepted manuscript, Figure 2, PDF page 4 (including the repository cover); no labels or data modified. Abstract is from PDF page 2 and results are from Table I on PDF page 9. The catalog groups this paper under the 2024 conference; BibTeX follows the repository publication date of 16 January 2025. Accepted manuscript DOI: 10.1109/BigData62323.2024.10825398.",
+    "content_pages": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "related": [
+    {
+      "label": "Federated Fine-Tuning of Vision Foundation Models via Probabilistic Masking · FM-Wild @ ICML 2024 · Workshop",
+      "url": "https://openreview.net/forum?id=VDgx8JLtid"
+    }
+  ],
+  "abstract_source": {
+    "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "label": "Accepted manuscript"
+  },
+  "keywords": [
+    "DeltaMask",
+    "vision foundation models",
+    "federated fine-tuning",
+    "stochastic masking",
+    "probabilistic masking",
+    "sparse subnetworks",
+    "probabilistic filters",
+    "communication efficiency",
+    "bits per parameter"
+  ]
+}

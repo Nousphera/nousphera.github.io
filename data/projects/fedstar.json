@@ -1,0 +1,102 @@
+{
+  "slug": "fedstar",
+  "library_id": "2022-fedstar",
+  "name": "FedSTAR",
+  "title": "Federated Self-training for Semi-supervised Audio Recognition",
+  "year": 2022,
+  "venue": "ACM TECS",
+  "type": "Journal",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Aaqib Saeed",
+    "Tanir Ozcelebi"
+  ],
+  "tagline": "Turn unlabeled audio into shared learning",
+  "summary": "Most audio collected on personal devices has no labels, limiting what supervised federated learning can use. FedSTAR combines local self-training with federated aggregation: clients learn from labeled clips and confident predictions on unlabeled clips, while optional self-supervised pre-training supplies a stronger starting point for faster convergence across training rounds.",
+  "category": "Speech & audio",
+  "topics": [
+    "Semi-supervised learning",
+    "Federated learning",
+    "Audio recognition"
+  ],
+  "accent": "#19776d",
+  "accent_dark": "#82d6c8",
+  "tint": "#eaf7f3",
+  "links": {
+    "Paper": "https://doi.org/10.1145/3520128",
+    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
+    "Code": "https://github.com/Nousphera/FedSTAR"
+  },
+  "figure": {
+    "src": "assets/projects/fedstar/overview.webp",
+    "width": 1820,
+    "height": 1440,
+    "alt": "Federated server coordinates several clients, each combining labeled audio and confidence-filtered pseudo-labels from unlabeled audio in local self-training.",
+    "caption": "Each device learns from the labels it has and the confident predictions it can make. The server combines local model updates into a shared audio recognition model.",
+    "source_label": "Figure 1 · ACM TECS article, p. 74:3",
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
+    "page": 4
+  },
+  "method": [
+    {
+      "title": "Learn from available labels",
+      "text": "Each participating client begins with the shared model and trains on its labeled audio. An optional self-supervised pre-trained initialization improves the starting representation."
+    },
+    {
+      "title": "Select useful pseudo-labels",
+      "text": "The local model predicts labels for unlabeled audio. Temperature scaling and an increasing confidence threshold select predictions used alongside labeled examples for self-training."
+    },
+    {
+      "title": "Share model updates",
+      "text": "Clients send their updated model parameters to the server for federated aggregation. Repeated rounds distribute what is learned from each client’s labeled and unlabeled audio."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Useful even with 3% labels",
+      "text": "Across Speech Commands, Ambient Context, and VoxForge, FedSTAR improves accuracy over supervised federated training using the same scarce labeled subsets. The benefit is most pronounced when labels are limited."
+    },
+    {
+      "title": "A better starting point",
+      "text": "With 15 clients, self-supervised initialization yields higher accuracy after 10 federated rounds in almost all evaluated settings. The effect is particularly strong when labeled examples per client are very scarce."
+    }
+  ],
+  "abstract": "Federated Learning is a distributed machine learning paradigm dealing with decentralized and personal datasets. Since data reside on devices such as smartphones and virtual assistants, labeling is entrusted to the clients or labels are extracted in an automated way. Specifically, in the case of audio data, acquiring semantic annotations can be prohibitively expensive and time-consuming. As a result, an abundance of audio data remains unlabeled and unexploited on users’ devices. Most existing federated learning approaches focus on supervised learning without harnessing the unlabeled data. In this work, we study the problem of semi-supervised learning of audio models via self-training in conjunction with federated learning. We propose FedSTAR to exploit large-scale on-device unlabeled data to improve the generalization of audio recognition models. We further demonstrate that self-supervised pre-trained models can accelerate the training of on-device models, significantly improving convergence within fewer training rounds. We conduct experiments on diverse public audio classification datasets and investigate the performance of our models under varying percentages of labeled and unlabeled data. Notably, we show that with as little as 3% labeled data available, FedSTAR on average can improve the recognition rate by 13.28% compared to the fully supervised federated model.",
+  "bibtex": "@article{tsouvalas2022fedstar,\n  author = {Tsouvalas, Vasileios and Saeed, Aaqib and Ozcelebi, Tanir},\n  title = {Federated Self-training for Semi-supervised Audio Recognition},\n  journal = {ACM Transactions on Embedded Computing Systems},\n  year = {2022},\n  volume = {21},\n  number = {6},\n  articleno = {74},\n  numpages = {26},\n  doi = {10.1145/3520128},\n  url = {https://doi.org/10.1145/3520128}\n}",
+  "related": [
+    {
+      "label": "Related conference paper · IEEE ICASSP 2022",
+      "url": "https://ieeexplore.ieee.org/document/9746356"
+    }
+  ],
+  "provenance": {
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
+    "figure_note": "Crop from the public publisher PDF, Figure 1, PDF page 4 (article page 74:3; the PDF includes a cover page); no figure labels or data modified. Published under CC BY 4.0. Content and abstract verified against the 2022 journal version.",
+    "content_pages": [
+      2,
+      4,
+      10,
+      11,
+      14,
+      15,
+      16,
+      20,
+      21
+    ]
+  },
+  "abstract_source": {
+    "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
+    "label": "Published paper"
+  },
+  "keywords": [
+    "FedSTAR",
+    "federated learning",
+    "semi-supervised learning",
+    "self-training",
+    "pseudo-labeling",
+    "audio recognition",
+    "audio classification",
+    "unlabeled data",
+    "self-supervised pre-training"
+  ]
+}

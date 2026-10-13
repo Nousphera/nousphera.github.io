@@ -1,98 +1,170 @@
 [
   {
-    "id": "fedstar",
-    "title": "🌟 FedSTAR — Federated Self-Training for Audio Recognition",
-    "focus": "🧭 Adaptivity",
-    "year": 2022,
-    "venue": "ACM TECS 2022 · ICASSP 2022",
-    "description": "Federated self-training that uses labeled and unlabeled audio on client devices.",
+    "id": "ae-psl",
+    "title": "AutoEncoder-Compressed Parallel Split Learning for Pre-Trained Model Fine-Tuning",
+    "focus": "Efficient learning",
+    "year": 2026,
+    "venue": "WAFL @ ECML-PKDD",
+    "description": "Split learning moves computation off edge devices, but exchanging activations and gradients at every step can overwhelm the network. AE-PSL aligns a lightweight autoencoder with a pre-trained vision model and then with each client’s data, so distributed fine-tuning can exchange compact representations while preserving useful features.",
     "link": {
-      "href": "https://github.com/Nousphera/FedSTAR",
-      "label": "Code & paper"
-    }
-  },
-  {
-    "id": "fedln",
-    "title": "🧩 FedLN — Federated Learning under Label Noise",
-    "focus": "🧭 Adaptivity",
-    "year": 2024,
-    "venue": "ACM TIST 2024 · NeurIPS 2022 Workshop",
-    "description": "FL under label noise.",
-    "link": {
-      "href": "https://github.com/Nousphera/FedLN",
-      "label": "Code & paper"
-    }
-  },
-  {
-    "id": "fedcompress",
-    "title": "⚡ FedCompress — Task-Adaptive Model Compression for FL",
-    "focus": "⚡ Efficiency",
-    "year": 2024,
-    "venue": "ICASSP 2024",
-    "description": "Task-adaptive model compression for efficient FL.",
-    "link": {
-      "href": "https://github.com/Nousphera/FedCompress",
-      "label": "Code & paper"
-    }
-  },
-  {
-    "id": "enccluster",
-    "title": "🔒 EncCluster — Scalable Encrypted Aggregation",
-    "focus": "🔒 Privacy",
-    "year": 2024,
-    "venue": "NeurIPS 2024 Workshop",
-    "description": "Scalable FM secure aggregation through weight clustering.",
-    "link": {
-      "href": "https://arxiv.org/pdf/2406.09152",
-      "label": "Read Paper"
-    }
-  },
-  {
-    "id": "deltamask",
-    "title": "🧩 DeltaMask — Communication-Efficient FM Fine-Tuning",
-    "focus": "⚡ Efficiency / 🛰️ Edge FMs",
-    "year": 2024,
-    "venue": "ICML 2024 Workshop",
-    "description": "Communication-efficient federated FM fine-tuning via masking.",
-    "link": {
-      "href": "https://arxiv.org/pdf/2311.17299",
-      "label": "Read Paper"
-    }
-  },
-  {
-    "id": "mpsl",
-    "title": "🛰️ MPSL — Multimodal FM Fine-Tuning via Parallel SL",
-    "focus": "🛰️ Edge FMs / ⚡ Efficiency",
-    "year": 2025,
-    "venue": "IJCAI 2025 Workshop",
-    "description": "Multimodal FM fine-tuning via parallel SL.",
-    "link": {
-      "href": "https://github.com/Nousphera/MPSL",
-      "label": "View Repo"
-    }
-  },
-  {
-    "id": "matu",
-    "title": "🧠 MaTU — Many-Task Federated Fine-Tuning via Unified Task Vectors",
-    "focus": "🧭 Adaptivity / 🛰️ Edge FMs",
-    "year": 2025,
-    "venue": "IJCAI 2025",
-    "description": "Many-task federated FM fine-tuning via unified task vectors.",
-    "link": {
-      "href": "https://arxiv.org/pdf/2502.06376",
-      "label": "Read Paper"
+      "href": "https://nousphera.github.io/projects/ae-psl/",
+      "label": "Project page"
     }
   },
   {
     "id": "efu",
-    "title": "🔒 EFU — Enforceable Federated Unlearning",
-    "focus": "🔒 Privacy",
+    "title": "EFU: Enforcing Federated Unlearning via Functional Encryption",
+    "focus": "Private learning",
     "year": 2025,
-    "venue": "CIKM 2025",
-    "description": "Enforceable Federated Unlearning.",
+    "venue": "ACM CIKM",
+    "description": "Removing data from a federated model should not require exposing who asked to forget it. EFU binds encrypted client updates to an agreed aggregation function and adds unlearning objectives that limit observable changes, allowing clients to submit learning or unlearning updates through the same protocol while preserving useful model behavior.",
     "link": {
-      "href": "https://arxiv.org/pdf/2502.06376",
-      "label": "Read Paper"
+      "href": "https://nousphera.github.io/projects/efu/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "enccluster",
+    "title": "EncCluster: Scalable Functional Encryption in Federated Learning through Weight Clustering and Probabilistic Filters",
+    "focus": "Private learning",
+    "year": 2025,
+    "venue": "Pervasive and Mobile Computing",
+    "description": "Secure aggregation can make federated learning expensive for devices with limited compute and bandwidth. EncCluster clusters model weights before functional encryption, then encodes the weight-to-cluster mappings with probabilistic filters, reducing the amount of data that must be encrypted and transmitted while allowing the server to reconstruct encrypted updates for aggregation.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/enccluster/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "matu",
+    "title": "Many-Task Federated Fine-Tuning via Unified Task Vectors",
+    "focus": "Reliable learning",
+    "year": 2025,
+    "venue": "FedGenAI @ IJCAI",
+    "description": "Federated clients may work on several different tasks, making a single averaged model a poor fit. MaTU combines each client’s task updates into one unified vector with lightweight masks and scaling factors, then uses task similarity to share useful updates across clients while limiting interference between unrelated tasks.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/matu/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "mpsl",
+    "title": "Fine-Tuning Multimodal Transformers on Edge: A Parallel Split Learning Approach",
+    "focus": "Efficient learning",
+    "year": 2025,
+    "venue": "FedGenAI @ IJCAI",
+    "description": "Multimodal transformers are expensive to fine-tune on edge devices, even when only a small fraction of their parameters changes. MPSL keeps modality-specific tokenizers on clients and moves a shared encoder to the server, coordinating learning through aggregated local losses while supporting different combinations of images, audio and text.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/mpsl/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "deltamask",
+    "title": "DeltaMask: Minimizing Communication in Federated Fine-Tuning of Vision Foundation Models",
+    "focus": "Efficient learning",
+    "year": 2024,
+    "venue": "IEEE BigData 2024",
+    "description": "Large vision models make federated updates costly, even when compressed to one bit per parameter. DeltaMask keeps pre-trained weights fixed and learns stochastic masks, then communicates selected changes through compact probabilistic filters so clients can collaborate at a fraction of the bitrate of a full binary mask.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/deltamask/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fedcode",
+    "title": "FedCode: Communication-Efficient Federated Learning via Transferring Codebooks",
+    "focus": "Efficient learning",
+    "year": 2024,
+    "venue": "IEEE EDGE",
+    "description": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models and reduce communication in both directions with limited extra client computation.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fedcode/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fedcompress",
+    "title": "Communication-Efficient Federated Learning through Adaptive Weight Clustering and Server-Side Distillation",
+    "focus": "Efficient learning",
+    "year": 2024,
+    "venue": "IEEE ICASSP",
+    "description": "Compressing client updates alone leaves the aggregated server model expensive to send back. FedCompress clusters weights during local training and restores a compact global model through server-side distillation, using unlabeled data and a representation-quality signal to adapt compression as learning progresses without changing the underlying aggregation rule.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fedcompress/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fedln",
+    "title": "Labeling Chaos to Learning Harmony: Federated Learning with Noisy Labels",
+    "focus": "Reliable learning",
+    "year": 2024,
+    "venue": "ACM TIST",
+    "description": "Federated clients have different amounts of label noise and different computational budgets. FedLN estimates noise on each client and offers three ways to limit its influence: correcting labels before training, adding adaptive knowledge distillation during local learning, or adjusting server aggregation to place more weight on reliable updates.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fedln/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fiba",
+    "title": "On the Effectiveness of Invisible Backdoor Attacks in Federated Learning",
+    "focus": "Reliable learning",
+    "year": 2024,
+    "venue": "UbiSec 2024 · Proceedings published 2025",
+    "description": "A visually subtle trigger does not behave the same way in centralized and federated training. This study examines how limited local training, competing client updates, and server-side defenses affect invisible backdoor attacks, then investigates whether placing triggers in regions receiving little model attention changes attack success and detectability.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fiba/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "da-mldg",
+    "title": "On efficacy of Meta-Learning for Domain Generalization in Speech Emotion Recognition",
+    "focus": "Reliable learning",
+    "year": 2023,
+    "venue": "PerFail @ IEEE PerCom",
+    "description": "Speech emotion models often lose accuracy when speakers, languages, or recording datasets change. DA-MLDG studies whether meta-learning can improve that transfer by weighting training episodes according to estimated domain shift; its evaluation exposes the limits of log-mel representations and motivates stronger features and more varied speech emotion datasets.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/da-mldg/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "plix",
+    "title": "Plug-and-Play Multilingual Few-shot Spoken Words Recognition",
+    "focus": "Speech & audio",
+    "year": 2023,
+    "venue": "arXiv:2305.03058",
+    "description": "Adding new voice commands usually requires new labeled data and task-specific training. PLiX learns a multilingual audio embedding from millions of one-second clips across 20 languages, then recognizes unseen spoken words by comparing them with prototypes formed from a few support examples, without retraining the model for each new vocabulary.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/plix/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fedser",
+    "title": "Privacy-preserving Speech Emotion Recognition through Semi-Supervised Federated Learning",
+    "focus": "Speech & audio",
+    "year": 2022,
+    "venue": "EmotionAware @ IEEE PerCom",
+    "description": "Speech emotion recognition depends on sensitive audio that is costly to annotate. This work combines an attention-based speech model with federated self-training, using labeled clips and confident predictions on unlabeled clips while keeping raw audio on each device, then studies label scarcity and speaker distribution in IEMOCAP experiments.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fedser/",
+      "label": "Project page"
+    }
+  },
+  {
+    "id": "fedstar",
+    "title": "Federated Self-training for Semi-supervised Audio Recognition",
+    "focus": "Speech & audio",
+    "year": 2022,
+    "venue": "ACM TECS",
+    "description": "Most audio collected on personal devices has no labels, limiting what supervised federated learning can use. FedSTAR combines local self-training with federated aggregation: clients learn from labeled clips and confident predictions on unlabeled clips, while optional self-supervised pre-training supplies a stronger starting point for faster convergence across training rounds.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/fedstar/",
+      "label": "Project page"
     }
   }
 ]

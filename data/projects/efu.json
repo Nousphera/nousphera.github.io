@@ -1,0 +1,102 @@
+{
+  "library_id": "2025-efu",
+  "name": "EFU",
+  "category": "Private learning",
+  "tagline": "Enforce unlearning while keeping the request private",
+  "summary": "Removing data from a federated model should not require exposing who asked to forget it. EFU binds encrypted client updates to an agreed aggregation function and adds unlearning objectives that limit observable changes, allowing clients to submit learning or unlearning updates through the same protocol while preserving useful model behavior.",
+  "authors": [
+    "Samaneh Mohammadi",
+    "Vasileios Tsouvalas",
+    "Iraklis Symeonidis",
+    "Ali Balador",
+    "Tanir Ozcelebi",
+    "Francesco Flammini",
+    "Nirvana Meratnia"
+  ],
+  "accent": "#5948a6",
+  "accent_dark": "#baadff",
+  "tint": "#f2effc",
+  "topics": [
+    "Federated unlearning",
+    "Functional encryption",
+    "Unlearning privacy"
+  ],
+  "method": [
+    {
+      "title": "Choose what to forget",
+      "text": "Clients train on retained data or compute targeted unlearning updates locally. The proposed objective combines gradient ascent on forgotten data with adversarial examples and parameter-importance regularization."
+    },
+    {
+      "title": "Bind updates to aggregation",
+      "text": "Weight clustering compresses each update before functional encryption. Clients submit encrypted centroids, their weight mappings, and partial decryption keys tied to the round and aggregation function."
+    },
+    {
+      "title": "Reveal only the aggregate",
+      "text": "The server expands the encrypted centroids and combines the clients’ functional keys to recover the agreed aggregate. Learning and unlearning follow the same encrypted update protocol."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Forgetting with retained utility",
+      "text": "Experiments on CIFAR-10, LFW, and FEMNIST evaluate sample- and class-wise unlearning with ResNet-18 and ViT-B/32. A separate LFW experiment removes identity classification while retaining gender classification, with EFU reporting results close to full retraining."
+    },
+    {
+      "title": "A wrapper for existing unlearning methods",
+      "text": "The paper integrates EFU with PGD, FedOSD, and SGA-EWC. Reported differences from the original methods are small and attributed to weight clustering; CIFAR-10 experiments also examine parameter drift, execution time, and message size as possible signals of unlearning."
+    }
+  ],
+  "figure": {
+    "page": 2,
+    "source_label": "Figure 1 in the public preprint",
+    "alt": "Comparison of standard federated unlearning and EFU: local learning and unlearning clients send plaintext updates on the left, or functionally encrypted updates and partial decryption keys on the right.",
+    "caption": "EFU carries learning and unlearning through the same encrypted aggregation protocol. Client updates are bound to a specified function, while the server recovers the aggregate.",
+    "source_url": "https://arxiv.org/pdf/2508.07873",
+    "src": "assets/projects/efu/overview.webp",
+    "width": 1432,
+    "height": 804
+  },
+  "provenance": {
+    "source_url": "https://arxiv.org/abs/2508.07873",
+    "figure_note": "Crop from the public arXiv v1 PDF, page 2; no labels or data modified. Method, findings, and abstract follow this preprint. Venue and BibTeX identify the published CIKM 2025 paper.",
+    "content_pages": [
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "bibtex": "@inproceedings{mohammadi2025efu,\n  title = {{EFU}: Enforcing Federated Unlearning via Functional Encryption},\n  author = {Mohammadi, Samaneh and Tsouvalas, Vasileios and Symeonidis, Iraklis and Balador, Ali and Ozcelebi, Tanir and Flammini, Francesco and Meratnia, Nirvana},\n  booktitle = {Proceedings of the 34th ACM International Conference on Information and Knowledge Management},\n  year = {2025},\n  pages = {2148--2158},\n  publisher = {Association for Computing Machinery},\n  doi = {10.1145/3746252.3761091},\n  url = {https://doi.org/10.1145/3746252.3761091}\n}",
+  "slug": "efu",
+  "title": "EFU: Enforcing Federated Unlearning via Functional Encryption",
+  "year": 2025,
+  "venue": "ACM CIKM",
+  "type": "Conference",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2508.07873",
+    "Published version": "https://doi.org/10.1145/3746252.3761091",
+    "Code": "https://github.com/SamaneMohammadi/EFU"
+  },
+  "abstract": "Federated unlearning (FU) algorithms allow clients in federated settings to exercise their “right to be forgotten” by removing the influence of their data from a collaboratively trained model. Existing FU methods maintain data privacy by performing unlearning locally on the client-side and sending targeted updates to the server without exposing forgotten data; yet they often rely on server-side cooperation, revealing the client's intent and identity without enforcement guarantees - compromising autonomy and unlearning privacy. In this work, we propose EFU (Enforced Federated Unlearning), a cryptographically enforced FU framework that enables clients to initiate unlearning while concealing its occurrence from the server. Specifically, EFU leverages functional encryption to bind encrypted updates to specific aggregation functions, ensuring the server can neither perform unauthorized computations nor detect or skip unlearning requests. To further mask behavioral and parameter shifts in the aggregated model, we incorporate auxiliary unlearning losses based on adversarial examples and parameter importance regularization. Extensive experiments show that EFU achieves near-random accuracy on forgotten data while maintaining performance comparable to full retraining across datasets and neural architectures - all while concealing unlearning intent from the server. Furthermore, we demonstrate that EFU is agnostic to the underlying unlearning algorithm, enabling secure, function-hiding, and verifiable unlearning for any client-side FU mechanism that issues targeted updates.",
+  "abstract_source": {
+    "url": "https://arxiv.org/abs/2508.07873",
+    "label": "Public preprint",
+    "note": "Abstract and overview follow the public preprint; the citation identifies the published version."
+  },
+  "keywords": [
+    "EFU",
+    "federated unlearning",
+    "FU",
+    "machine unlearning",
+    "functional encryption",
+    "unlearning privacy",
+    "encrypted aggregation",
+    "adversarial examples",
+    "parameter importance"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "library_id": "2025-enccluster",
+  "name": "EncCluster",
+  "category": "Private learning",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Samaneh Mohammadi",
+    "Ali Balador",
+    "Tanir Ozcelebi",
+    "Francesco Flammini",
+    "Nirvana Meratnia"
+  ],
+  "accent": "#177874",
+  "accent_dark": "#70d5cb",
+  "tint": "#edf8f6",
+  "topics": [
+    "Secure aggregation",
+    "Functional encryption",
+    "Weight clustering"
+  ],
+  "tagline": "Encrypt fewer values. Keep federated updates protected.",
+  "summary": "Secure aggregation can make federated learning expensive for devices with limited compute and bandwidth. EncCluster clusters model weights before functional encryption, then encodes the weight-to-cluster mappings with probabilistic filters, reducing the amount of data that must be encrypted and transmitted while allowing the server to reconstruct encrypted updates for aggregation.",
+  "method": [
+    {
+      "title": "Cluster local model weights",
+      "text": "After local training, clients replace individual weight values with a compact set of cluster centroids and a mapping from weights to those centroids."
+    },
+    {
+      "title": "Encrypt and encode",
+      "text": "Decentralized multi-client functional encryption protects the centroids. Binary Fuse filters encode the cluster-to-weight mappings as compact fingerprints, adding protection under the paper’s inference threat model."
+    },
+    {
+      "title": "Reconstruct for secure aggregation",
+      "text": "The server queries the filters to recover the mappings and substitutes encrypted centroids for individual weights. Functional decryption then returns the aggregate model update."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Lower encryption and communication costs",
+      "text": "The reported CIFAR-10 key-size study finds lower encryption time than SEFL and DeTrust-FL while keeping upstream communication below standard FedAvg. Compressing weights before encryption makes the number of encrypted values depend on the cluster count."
+    },
+    {
+      "title": "A visible privacy–efficiency tradeoff",
+      "text": "Binary Fuse filters add communication compared with the variant that uses Huffman coding for mappings, but provide extra protection in the studied threat model. The component analysis reports little additional encryption time and similar model performance."
+    }
+  ],
+  "figure": {
+    "page": 5,
+    "source_label": "Figure 1 in the public preprint",
+    "alt": "EncCluster pipeline: clients train a model, cluster weights, encrypt centroids, and encode mappings into Binary Fuse fingerprints; the server reconstructs encrypted weights and securely aggregates them.",
+    "caption": "Weight clustering separates values from their positions. EncCluster encrypts the centroids, encodes the mappings, and reconstructs the encrypted updates only for secure aggregation.",
+    "source_url": "https://arxiv.org/pdf/2406.09152",
+    "src": "assets/projects/enccluster/overview.webp",
+    "width": 1499,
+    "height": 764
+  },
+  "provenance": {
+    "source_url": "https://arxiv.org/abs/2406.09152",
+    "figure_note": "Crop from the public arXiv v1 PDF, page 5; no labels or data modified. Method, findings, and abstract follow this preprint. Venue and BibTeX identify the 2025 journal article; the NeurIPS 2024 workshop paper is linked separately.",
+    "content_pages": [
+      1,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14
+    ]
+  },
+  "related": [
+    {
+      "label": "Related workshop paper · NeurIPS 2024 Workshop on Federated Foundation Models",
+      "url": "https://openreview.net/forum?id=7bgJ7t5kkW"
+    }
+  ],
+  "bibtex": "@article{tsouvalas2025enccluster,\n  title = {{EncCluster}: Scalable functional encryption in federated learning through weight clustering and probabilistic filters},\n  author = {Tsouvalas, Vasileios and Mohammadi, Samaneh and Balador, Ali and Ozcelebi, Tanir and Flammini, Francesco and Meratnia, Nirvana},\n  journal = {Pervasive and Mobile Computing},\n  volume = {108},\n  pages = {102021},\n  year = {2025},\n  publisher = {Elsevier},\n  doi = {10.1016/j.pmcj.2025.102021},\n  url = {https://doi.org/10.1016/j.pmcj.2025.102021}\n}",
+  "slug": "enccluster",
+  "title": "EncCluster: Scalable Functional Encryption in Federated Learning through Weight Clustering and Probabilistic Filters",
+  "year": 2025,
+  "venue": "Pervasive and Mobile Computing",
+  "type": "Journal",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2406.09152",
+    "Published version": "https://www.sciencedirect.com/science/article/pii/S1574119225000100",
+    "Code": "https://github.com/SamaneMohammadi/EncCluster"
+  },
+  "abstract": "Federated Learning (FL) enables model training across decentralized devices by communicating solely local model updates to an aggregation server. Although such limited data sharing makes FL more secure than centralized approached, FL remains vulnerable to inference attacks during model update transmissions. Existing secure aggregation approaches rely on differential privacy or cryptographic schemes like Functional Encryption (FE) to safeguard individual client data. However, such strategies can reduce performance or introduce unacceptable computational and communication overheads on clients running on edge devices with limited resources. In this work, we present EncCluster, a novel method that integrates model compression through weight clustering with recent decentralized FE and privacy-enhancing data encoding using probabilistic filters to deliver strong privacy guarantees in FL without affecting model performance or adding unnecessary burdens to clients. We performed a comprehensive evaluation, spanning various datasets and architectures, to demonstrate EncCluster's scalability across encryption levels. Our findings reveal that EncCluster significantly reduces communication costs - below even conventional FedAvg - and accelerates encryption by more than four times over all baselines; at the same time, it maintains high model accuracy and enhanced privacy assurances.",
+  "abstract_source": {
+    "url": "https://arxiv.org/abs/2406.09152",
+    "label": "Public preprint",
+    "note": "Abstract and overview follow the public preprint; the citation identifies the published version."
+  },
+  "keywords": [
+    "EncCluster",
+    "functional encryption",
+    "secure aggregation",
+    "weight clustering",
+    "model compression",
+    "probabilistic filters",
+    "Binary Fuse filters",
+    "inference attacks",
+    "federated learning"
+  ]
+}

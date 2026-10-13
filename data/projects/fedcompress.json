@@ -1,0 +1,93 @@
+{
+  "slug": "fedcompress",
+  "library_id": "2024-fedcompress",
+  "name": "FedCompress",
+  "title": "Communication-Efficient Federated Learning through Adaptive Weight Clustering and Server-Side Distillation",
+  "year": 2024,
+  "venue": "IEEE ICASSP",
+  "type": "Conference",
+  "authors": [
+    "Vasileios Tsouvalas",
+    "Aaqib Saeed",
+    "Tanir Ozcelebi",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Compress both directions of federated training.",
+  "summary": "Compressing client updates alone leaves the aggregated server model expensive to send back. FedCompress clusters weights during local training and restores a compact global model through server-side distillation, using unlabeled data and a representation-quality signal to adapt compression as learning progresses without changing the underlying aggregation rule.",
+  "category": "Efficient learning",
+  "topics": [
+    "Federated learning",
+    "Weight clustering",
+    "Knowledge distillation"
+  ],
+  "accent": "#8d5b15",
+  "accent_dark": "#e8bf79",
+  "tint": "#faf3e7",
+  "links": {
+    "Paper": "https://arxiv.org/abs/2401.14211",
+    "Code": "https://github.com/Nousphera/FedCompress"
+  },
+  "figure": {
+    "src": "assets/projects/fedcompress/overview.webp",
+    "width": 1994,
+    "height": 927,
+    "alt": "FedCompress diagram showing local training with clustered weights, server aggregation, self-compression through teacher-student distillation on out-of-distribution data, and dynamic adjustment of cluster counts.",
+    "caption": "Weight clustering compresses client uploads. After aggregation, server-side distillation restores a clustered global model for the return trip, while a representation-quality score adjusts the number of clusters.",
+    "source_label": "Figure 1 in the public preprint",
+    "source_url": "https://arxiv.org/pdf/2401.14211v3#page=2",
+    "page": 2
+  },
+  "method": [
+    {
+      "title": "Cluster weights during local training",
+      "text": "Train client models while encouraging weights to share a small set of learnable centroids. Send the resulting compressed models for standard federated aggregation."
+    },
+    {
+      "title": "Compress the aggregated model again",
+      "text": "Use the aggregated global model as a teacher. Train a clustered student to match its predictions on unlabeled, out-of-distribution data held by the server."
+    },
+    {
+      "title": "Adjust compression as learning progresses",
+      "text": "Clients estimate representation quality from the effective rank of local embeddings. The server increases the cluster count when this signal plateaus, balancing model capacity and communication."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Savings across five vision and audio datasets",
+      "text": "Table 1 reports communication reductions of 3.80× to 5.41× relative to FedAvg, with test accuracy 0.31 to 1.88 percentage points lower. The evaluation includes CIFAR-10/100, PathMNIST, SpeechCommands and VoxForge."
+    },
+    {
+      "title": "Measured inference gains on edge devices",
+      "text": "For ResNet-20 and MobileNet on Pixel 6, Jetson Nano and Coral TPU, Table 2 reports approximately 1.10× to 1.15× faster float32 inference than FedAvg models. Results depend on the model, device and numeric format."
+    }
+  ],
+  "abstract": "Federated Learning (FL) is a promising technique for the collaborative training of deep neural networks across multiple devices while preserving data privacy. Despite its potential benefits, FL is hindered by excessive communication costs due to repeated server-client communication during training. To address this challenge, model compression techniques, such as sparsification and weight clustering are applied, which often require modifying the underlying model aggregation schemes or involve cumbersome hyperparameter tuning, with the latter not only adjusts the model's compression rate but also limits model's potential for continuous improvement over growing data. In this paper, we propose FedCompress, a novel approach that combines dynamic weight clustering and server-side knowledge distillation to reduce communication costs while learning highly generalizable models. Through a comprehensive evaluation on diverse public datasets, we demonstrate the efficacy of our approach compared to baselines in terms of communication costs and inference speed.",
+  "bibtex": "@inproceedings{tsouvalas2024fedcompress,\n  title = {Communication-Efficient Federated Learning through Adaptive Weight Clustering and Server-Side Distillation},\n  author = {Vasileios Tsouvalas and Aaqib Saeed and Tanir Ozcelebi and Nirvana Meratnia},\n  booktitle = {ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},\n  year = {2024},\n  pages = {5805--5809},\n  doi = {10.1109/ICASSP48485.2024.10447174},\n  url = {https://arxiv.org/abs/2401.14211},\n  eprint = {2401.14211},\n  archivePrefix = {arXiv}\n}",
+  "provenance": {
+    "source_url": "https://arxiv.org/pdf/2401.14211v3",
+    "figure_note": "Crop from the public arXiv v3 PDF, Figure 1, page 2; no labels or data modified. Abstract follows public arXiv metadata. Quantitative findings use Tables 1 and 2 rather than inconsistent averages in the surrounding prose. Venue and public code link follow the current publication catalog.",
+    "content_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "abstract_source": {
+    "url": "https://arxiv.org/pdf/2401.14211v3",
+    "label": "Public preprint"
+  },
+  "keywords": [
+    "FedCompress",
+    "adaptive weight clustering",
+    "dynamic clustering",
+    "knowledge distillation",
+    "server-side distillation",
+    "model compression",
+    "communication efficiency",
+    "federated learning",
+    "inference efficiency"
+  ]
+}
