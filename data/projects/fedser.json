@@ -28,7 +28,8 @@
     "PDF": "https://arxiv.org/pdf/2202.02611",
     "Repository": "https://github.com/Nousphera/FedSER",
     "Poster": "https://nousphera.github.io/assets/posters/fedser-a0-landscape.pdf",
-    "Preprint": "https://arxiv.org/abs/2202.02611"
+    "Preprint": "https://arxiv.org/abs/2202.02611",
+    "Code": "https://github.com/Nousphera/FedSER"
   },
   "figure": {
     "src": "assets/projects/fedser/overview.webp",

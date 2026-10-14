@@ -28,7 +28,8 @@
     "Publication": "https://doi.org/10.1109/BigData62323.2024.10825398",
     "Repository": "https://github.com/Nousphera/DeltaMask",
     "Poster": "https://nousphera.github.io/assets/posters/deltamask-a0-landscape.pdf",
-    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf"
+    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "Code": "https://github.com/Nousphera/DeltaMask"
   },
   "figure": {
     "src": "assets/projects/deltamask/overview.webp",

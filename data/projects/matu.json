@@ -25,7 +25,8 @@
   "links": {
     "Paper": "https://arxiv.org/abs/2502.06376",
     "Repository": "https://github.com/Nousphera/MaTU",
-    "Poster": "https://nousphera.github.io/assets/posters/matu-a0-landscape.pdf"
+    "Poster": "https://nousphera.github.io/assets/posters/matu-a0-landscape.pdf",
+    "Code": "https://github.com/Nousphera/MaTU"
   },
   "figure": {
     "src": "assets/projects/matu/overview.webp",
