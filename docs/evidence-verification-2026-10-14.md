@@ -1,6 +1,6 @@
 # Evidence and rendering verification — 14 October 2026
 
-All 14 paper project pages have source-bound evidence records, native method compositions and four accessible reading tabs. This report records local verification before publication; deployment and live-page verification remain pending.
+All 14 paper project pages have source-bound evidence records, native method compositions and four accessible reading tabs. Local and live verification are complete for release `1a7420e1c8d71e4031a793edba699cfc72ba9c87`.
 
 ## Paper evidence
 
@@ -49,3 +49,9 @@ No further actionable implementation defects were found in the reviewed panel st
 ## Asset boundary
 
 The public site contains the original research icon exports and their JSON inventory. The larger reusable collection stays outside the repository as asset folders and manifests, preserving source bytes, provenance and license information. The separate asset website and its generator were removed at the user's request; no asset browsing website is part of this release.
+
+## Deployment
+
+The release was pushed to `main`. Both [validation](https://github.com/Nousphera/nousphera.github.io/actions/runs/38537628302) and [GitHub Pages deployment](https://github.com/Nousphera/nousphera.github.io/actions/runs/38537627924) completed successfully for that commit. Live HTTP responses for all 14 paper pages, the research stylesheet, tab script and original icon inventory matched the local files byte for byte.
+
+The live FedLN page was also checked in the browser: Method and Results selected the expected single panel; Results at 390 × 844 had no horizontal overflow and kept its tab bar at the top; Overview at 1280 × 900 rendered correctly in dark mode. The theme was returned to automatic and the temporary viewport override removed.

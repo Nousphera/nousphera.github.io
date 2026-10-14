@@ -9,8 +9,8 @@ Design: preserve the static generator and public article URLs. Add one evidence 
 - [x] Integrate evidence into all 14 pages with source-linked context and limitations.
 - [x] Validate numeric fidelity, source URLs, responsive layouts, both themes and accessible interactions.
 - [x] Independently review evidence and implementation, then fix the identified issues.
-- [ ] Publish and verify the live pages.
+- [x] Publish and verify the live pages.
 
-Verification is recorded in [the evidence and rendering report](../../evidence-verification-2026-10-14.md). Publishing remains pending at the time of this checklist update.
+Verification, including successful deployment and live byte comparisons, is recorded in [the evidence and rendering report](../../evidence-verification-2026-10-14.md).
 
 Review focus: compare only like-for-like experimental settings; preserve uncertainty and units; distinguish alternatives from sequential stages; prevent overclaiming privacy guarantees; make dense data readable on phones and keep charts interpretable without color or JavaScript.
