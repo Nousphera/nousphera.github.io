@@ -2,7 +2,7 @@
 
 Public paper project pages for research in collaborative and efficient machine learning.
 
-- [Project collection](https://nousphera.github.io/projects/)
+- [Project collection](https://nousphera.github.io/#collection)
 - [Vasileios Tsouvalas](https://vtsouval.github.io/)
 
 ## Edit and preview
@@ -17,9 +17,11 @@ node --test tests/*.test.cjs
 python3 -m http.server 60660 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:60660/projects/`. Use an HTTP server because asset paths are relative to the site root. Python 3.10+ and Node.js 18+ are sufficient; there are no build dependencies. Main-branch pushes publish through GitHub Pages; the validation workflow checks content and rebuild consistency.
+Open `http://127.0.0.1:60660/`. Use an HTTP server because asset paths are relative to the site root. Python 3.10+ and Node.js 18+ are sufficient; there are no build dependencies. Main-branch pushes publish through GitHub Pages; the validation workflow checks content and rebuild consistency.
 
 Reusable original SVGs and their JSON inventory are in `assets/research/`. The separate folder-based research asset catalog lives outside this repository; keep source manifests, license notices and adaptations together there. See [the visual system guide](docs/visual-system.md) for composition and evidence rules.
+
+The landing page and searchable catalog share `/`; `/projects/` preserves existing query links and redirects to the collection. Edit research-area membership in `data/research-areas.json`, homepage copy/layout in `scripts/research_home.py`, and compact vector thumbnails in `scripts/catalog_art.py`. Agentic AI is presented as an emerging direction; unpublished manuscripts do not enter the public catalog.
 
 ## Structure
 

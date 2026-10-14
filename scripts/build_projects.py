@@ -212,13 +212,9 @@ def card(p):
     return f'''<article class="project-card" data-category="{esc(p['category'])}" data-search="{esc(keywords)}" style="--card-accent:{p['accent']};--card-tint:{p['tint']};--card-accent-dark:{p['accent_dark']}"><a href="/projects/{p['slug']}/" class="card-link"><div class="card-visual">{visual}</div><div class="card-content"><div class="card-meta"><span>{esc(p['category'])}</span><span>{p['year']}</span></div><h2>{esc(p['name'])}{icon('arrow')}</h2><p>{esc(p['tagline'])}</p><span class="card-venue">{esc(p['venue'])}</span></div></a></article>'''
 
 def gallery_page(projects, home=False):
-    categories = list(dict.fromkeys(p['category'] for p in projects))
-    buttons = ''.join(f'<button type="button" data-filter="{esc(c)}" aria-pressed="false">{esc(c)}</button>' for c in categories)
-    title = 'Learning together.<br><span>With less.</span>' if home else 'Research projects<span>.</span>'
-    intro = 'Methods for efficient, reliable and private learning across devices, tasks and data.' if home else 'The ideas, methods and results behind our papers.'
-    body = f'''<main id="main" class="gallery-main"><section class="gallery-hero"><p class="eyebrow">Nousphera · Research &amp; open source</p><h1>{title}</h1><p>{intro}</p><a class="text-link" href="https://github.com/Nousphera">Explore the code {icon('arrow')}</a></section>
-<section aria-label="Research project collection"><div class="collection-heading"><h2>Paper projects <span>{len(projects):02d}</span></h2><label class="project-search">{icon('search')}<span class="sr-only">Search projects</span><input type="search" id="project-search" placeholder="Search projects" autocomplete="off"></label></div><div class="filter-bar" aria-label="Filter projects"><button type="button" data-filter="all" aria-pressed="true">All projects</button>{buttons}</div><p class="sr-only" id="filter-status" role="status">{len(projects)} projects</p><div class="project-grid">{''.join(card(p) for p in projects)}</div><p class="no-results" hidden>No matching projects. Try another topic or clear the filters.</p></section></main>'''
-    return shell('Research projects' if not home else 'Collaborative machine learning', intro, '/' if home else '/projects/', body)
+    from research_home import home_page
+    return home_page(projects, icon, theme_control, asset_url)
+
 
 def build():
     projects = load_projects()
@@ -229,12 +225,13 @@ def build():
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(project_page(p, projects))
         (folder / 'citation.bib').write_text(p['bibtex'].strip() + '\n')
-    (ROOT / 'projects/index.html').write_text(gallery_page(projects))
+    from research_home import legacy_gallery
+    (ROOT / 'projects/index.html').write_text(legacy_gallery(asset_url))
     (ROOT / 'index.html').write_text(gallery_page(projects, home=True))
     # Keep the former landing-page data endpoint useful for existing consumers.
     compatibility = [{'id': p['slug'], 'title': p['title'], 'focus': p['category'], 'year': p['year'], 'venue': p['venue'], 'description': p['summary'], 'link': {'href': f'{ORIGIN}/projects/{p["slug"]}/', 'label': 'Project page'}} for p in projects]
     (ROOT / 'assets/publications.json').write_text(json.dumps(compatibility, indent=2, ensure_ascii=False) + '\n')
-    urls = ['/', '/projects/'] + [f'/projects/{p["slug"]}/' for p in projects]
+    urls = ['/'] + [f'/projects/{p["slug"]}/' for p in projects]
     (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{ORIGIN}{path}</loc></url>\n' for path in urls) + '</urlset>\n')
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {ORIGIN}/sitemap.xml\n')
     (ROOT / '.nojekyll').touch()

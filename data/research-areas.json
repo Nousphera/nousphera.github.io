@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "areas": [
+    {
+      "id": "foundation",
+      "title": "Foundation models",
+      "description": "Efficient adaptation of vision and multimodal foundation models.",
+      "icon": "area-foundation",
+      "papers": [
+        "ae-psl",
+        "matu",
+        "mpsl",
+        "deltamask",
+        "enccluster"
+      ]
+    },
+    {
+      "id": "decentralized",
+      "title": "Collaborative learning",
+      "description": "Federated and split learning across clients and devices.",
+      "icon": "area-federated",
+      "papers": [
+        "ae-psl",
+        "matu",
+        "mpsl",
+        "enccluster",
+        "deltamask",
+        "fedln",
+        "fedcompress",
+        "fedcode",
+        "fedstar",
+        "fedser",
+        "efu",
+        "fiba"
+      ]
+    },
+    {
+      "id": "reliable",
+      "title": "Reliable learning",
+      "description": "Learning from limited labels, label noise and shifting domains.",
+      "icon": "area-reliable",
+      "papers": [
+        "fedln",
+        "fedstar",
+        "plix",
+        "da-mldg",
+        "fedser"
+      ]
+    },
+    {
+      "id": "privacy",
+      "title": "Privacy & security",
+      "description": "Secure aggregation, federated unlearning and backdoor analysis.",
+      "icon": "area-privacy",
+      "papers": [
+        "efu",
+        "enccluster",
+        "fiba"
+      ]
+    }
+  ],
+  "mapping_notes": {
+    "enccluster": "Foundation-model membership includes the related NeurIPS 2024 Federated Foundation Models workshop paper; the main project page distinguishes that version from the general FL study.",
+    "fedser": "Classified under collaborative learning. Retaining raw speech locally alone does not establish secure aggregation or differential privacy.",
+    "ae-psl": "Parallel split learning belongs to decentralized learning and foundation-model adaptation; it is not federated averaging.",
+    "mpsl": "Multimodal parallel split learning belongs to decentralized learning and foundation-model adaptation; it is not federated averaging.",
+    "decentralized": "Federated and parallel split learning are distinct collaborative paradigms. PLiX and DA-MLDG are listed under reliable learning because their training is not distributed.",
+    "foundation": "Includes vision-only and multimodal adaptation. EncCluster includes its related federated foundation models workshop version, distinguished on its project page."
+  }
+}
