@@ -15,15 +15,17 @@ function setup(reduced = false) {
     getBoundingClientRect() { return this.bounds || {top:100,bottom:650,left:10,right:900}; }
     closest() { let n = this; while (n) { if (n.hidden || n.attrs['aria-hidden'] === 'true') return n; n = n.parentElement; } return null; }
   }
-  const root = new El({active:'network', running:'false', nncPhase:'complete'});
+  const root = new El({active:'network', running:'false', nncPhase:'complete', akdPhase:'complete', naPhase:'complete'});
   root.parentElement = new El();
   const nodes = Object.fromEntries(['controls','toggle','toggle-label','play-icon','progress','status','title','description'].map(s => [s,new El()]));
   const stages = ['nnc','akd','na'].map(name => new El({tourStage:name}));
   const panels = ['network','nnc','akd','na'].map(name => new El({tourScene:name}));
   const parts = ['embedding','neighbors','vote','corrected'].map(name => new El({tourNncPart:name,visible:'true'}));
+  const akdParts = ['teacher','guidance','update'].map(name => new El({tourAkdPart:name,visible:'true'}));
+  const naParts = ['scores','noise','aggregation'].map(name => new El({tourNaPart:name,visible:'true'}));
   const neighbors = Array.from({length:5}, (_, i) => new El({tourNeighbor:String(i+1),visible:'true'}));
   root.querySelector = selector => nodes[selector.slice(11,-1)];
-  root.querySelectorAll = selector => ({'[data-tour-stage]':stages,'[data-tour-scene]':panels,'[data-tour-nnc-part]':parts,'[data-tour-neighbor]':neighbors})[selector] || [];
+  root.querySelectorAll = selector => ({'[data-tour-stage]':stages,'[data-tour-scene]':panels,'[data-tour-nnc-part]':parts,'[data-tour-akd-part]':akdParts,'[data-tour-na-part]':naParts,'[data-tour-neighbor]':neighbors})[selector] || [];
   const document = new El(); document.hidden = false; document.readyState = 'complete'; document.querySelectorAll = () => [root];
   let id = 0; const frames = new Map(); const observers = [];
   const motion = {matches:reduced,addEventListener(name,handler){this.handler = handler;}};
@@ -35,7 +37,7 @@ function setup(reduced = false) {
   class MutationObserver { constructor(callback) { this.callback = callback; observers.push(this); } observe() {} }
   window.IntersectionObserver = IntersectionObserver; window.MutationObserver = MutationObserver;
   vm.runInNewContext(source,{window,document,IntersectionObserver,MutationObserver});
-  return {root,nodes,stages,panels,parts,neighbors,frames,document,window,motion,observers,
+  return {root,nodes,stages,panels,parts,akdParts,naParts,neighbors,frames,document,window,motion,observers,
     tick(time) { const list = [...frames.values()]; frames.clear(); list.forEach(callback => callback(time)); },
     event(target,name) { for (const cb of target.events[name] || []) cb(); }};
 }
@@ -65,12 +67,12 @@ function setup(reduced = false) {
  assert.equal(t.parts.find(p=>p.dataset.tourNncPart==='corrected').attrs['aria-hidden'],'false');
  t.tick(24500); assert.equal(t.root.dataset.active,'network','Return to the network separates alternatives');
  t.tick(26600); assert.equal(t.root.dataset.active,'akd');
- t.tick(32100); assert.equal(t.root.dataset.active,'network');
- t.tick(34100); assert.equal(t.root.dataset.active,'na');
- t.tick(40000);
+ t.tick(36100); assert.equal(t.root.dataset.active,'network');
+ t.tick(38100); assert.equal(t.root.dataset.active,'na');
+ t.tick(48000);
  assert.equal(t.frames.size,0,'Tour stops after one bounded run');
  assert.equal(t.root.dataset.running,'false');
- assert.equal(t.nodes['toggle-label'].textContent,'Replay overview');
+ assert.equal(t.nodes.toggle.attrs['aria-label'],'Replay overview');
  t.nodes.toggle.click();
  assert.equal(t.root.dataset.active,'network','The single playback button also replays');
  assert.equal(t.frames.size,1,'Replay creates only one frame loop');
@@ -80,7 +82,37 @@ function setup(reduced = false) {
  assert.ok(t.parts.every(p=>p.dataset.visible==='true' && p.attrs['aria-hidden']==='false'));
  assert.equal(t.panels.filter(p => !p.hidden).length,1);
  assert.equal(t.stages.filter(p=>p.attrs['aria-pressed']==='true').length,1);
- t.nodes.toggle.click(); assert.equal(t.root.dataset.active,'network','Play after manual exploration starts at the overview');
+ t.nodes.toggle.click(); assert.equal(t.root.dataset.active,'nnc','Play after choosing a method animates that method directly');
+}
+// Omitting phase reveals or resetting to the network would make these fail.
+for (const [name,stageIndex,partKey,phaseKey,firstPhase] of [
+ ['akd',1,'akdParts','akdPhase','example'],
+ ['na',2,'naParts','naPhase','warmup']
+]) {
+ const t = setup();
+ t.stages[stageIndex].click();
+ assert.ok(t[partKey].every(p=>p.dataset.visible==='true'),'Manual exploration shows the complete method');
+ t.nodes.toggle.click(); t.tick(0);
+ assert.equal(t.root.dataset.active,name,'Method playback stays in the selected method');
+ assert.equal(t.root.dataset[phaseKey],firstPhase);
+ assert.ok(t[partKey].every(p=>p.attrs['aria-hidden']==='true'),'The outcome is withheld until its explanation');
+ t.tick(2100);
+ assert.equal(t[partKey][0].attrs['aria-hidden'],'false');
+ assert.equal(t[partKey][2].attrs['aria-hidden'],'true');
+ t.tick(4600);
+ assert.equal(t[partKey][1].attrs['aria-hidden'],'false');
+ assert.equal(t[partKey][2].attrs['aria-hidden'],'true');
+ t.tick(7400);
+ assert.ok(t[partKey].every(p=>p.attrs['aria-hidden']==='false'));
+ t.tick(10000);
+ assert.equal(t.root.dataset.active,name,'Single-method playback does not move to another alternative');
+ assert.equal(t.root.dataset.running,'false');assert.equal(t.frames.size,0);
+ t.nodes.toggle.click(); t.tick(11000);
+ assert.equal(t.root.dataset[phaseKey],firstPhase,'Replay restarts this method at its first step');
+ t.motion.matches=true;t.motion.handler();
+ assert.equal(t.root.dataset[phaseKey],'complete');
+ assert.ok(t[partKey].every(p=>p.attrs['aria-hidden']==='false'),'Reduced motion reveals the entire active method');
+ assert.equal(t.frames.size,0);
 }
 for (const reason of ['document','intersection','ancestor','removed']) {
  const t = setup(); t.nodes.toggle.click(); t.tick(0); t.tick(4000);
@@ -111,4 +143,4 @@ for (const reason of ['document','intersection','ancestor','removed']) {
  t.motion.matches = false; t.motion.handler();
  assert.equal(t.frames.size,0,'Changing preferences never starts playback');
 }
-console.log('PASS: opt-in playback, camera focus, NNC progressive explanation, pause/resume, alternatives, one-shot replay, manual views, visibility lifecycle, reduced motion.');
+console.log('PASS: opt-in playback, camera focus, three progressive explanations, selected-method playback, pause/resume, alternatives, one-shot replay, manual views, visibility lifecycle, reduced motion.');

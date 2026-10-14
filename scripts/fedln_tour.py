@@ -51,10 +51,10 @@ def tour_markup():
             ('#d9d8d0', '#92928c'), ('#f0dfc1', '#bd9465')
         ], 1)
     )
-    return f'''<section class="fl-tour" data-fl-tour data-active="network" data-running="false" data-nnc-phase="complete" aria-labelledby="fedln-tour-heading">
+    return f'''<section class="fl-tour" data-fl-tour data-active="network" data-running="false" data-nnc-phase="complete" data-akd-phase="complete" data-na-phase="complete" aria-labelledby="fedln-tour-heading">
   <header class="fl-tour-head">
     <p id="fedln-tour-heading">Three alternative interventions</p>
-    <button class="fl-tour-toggle" type="button" data-tour-toggle hidden aria-label="Play the 28-second overview"><span data-tour-play-icon aria-hidden="true"><svg class="fl-tour-icon-play" viewBox="0 0 20 20"><path d="m6 3 11 7-11 7Z"/></svg><svg class="fl-tour-icon-pause" viewBox="0 0 20 20"><rect x="4" y="3" width="4" height="14" rx="1"/><rect x="12" y="3" width="4" height="14" rx="1"/></svg></span><span data-tour-toggle-label>Play overview</span></button>
+    <button class="fl-tour-toggle" type="button" data-tour-toggle hidden aria-label="Play the 36-second overview"><span data-tour-play-icon aria-hidden="true"><svg class="fl-tour-icon-play" viewBox="0 0 20 20"><path d="m6 3 11 7-11 7Z"/></svg><svg class="fl-tour-icon-pause" viewBox="0 0 20 20"><rect x="4" y="3" width="4" height="14" rx="1"/><rect x="12" y="3" width="4" height="14" rx="1"/></svg></span><span data-tour-toggle-label>Play overview</span></button>
   </header>
   <div class="fl-tour-controls" data-tour-controls hidden>
     <nav class="fl-tour-stages" aria-label="Explore a FedLN intervention">
@@ -111,28 +111,78 @@ def tour_markup():
       </div>
     </div>
     <div class="fl-tour-scene fl-tour-akd" data-tour-scene="akd" hidden>
-      <div class="fl-tour-local-chip">Client B · during local training</div>
-      <div class="fl-tour-noise-gate"><span class="fl-tour-gate-dot"></span>High estimated local noise activates teacher guidance</div>
-      <div class="fl-tour-loss-branches">
-        <div class="fl-tour-loss-branch"><span class="fl-tour-micro">Observed labels</span><span class="fl-tour-loss-icon" aria-hidden="true">y</span><strong>Supervised loss</strong></div>
-        <div class="fl-tour-loss-branch fl-tour-teacher-branch"><span class="fl-tour-micro">Teacher guidance</span>{_model()}<span class="fl-tour-gate">Noise-gated</span><strong>Distillation loss</strong></div>
+      <div class="fl-tour-local-chip">Client B · embedding-teacher variant</div>
+      <div class="fl-tour-akd-story">
+        <div class="fl-tour-akd-example">
+          <span class="fl-tour-step-label">1 · Same local example</span>
+          {_dog(accessible=True)}
+          <span class="fl-tour-image-caption">Stored label</span>
+          <span class="fl-tour-label fl-tour-label-wrong">Cat</span>
+        </div>
+        <div class="fl-tour-akd-models" data-tour-akd-part="teacher" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">2 · Two views of the image</span>
+          <svg class="fl-tour-akd-fork" viewBox="0 0 28 142" preserveAspectRatio="none" aria-hidden="true"><path d="M0 71h10V22h18M10 71v49h18"/><path d="m23 18 5 4-5 4m0 90 5 4-5 4"/></svg>
+          <div class="fl-tour-teacher-model">{_encoder()}<div><strong>Frozen teacher</strong><span>Pre-trained encoder</span></div><div class="fl-tour-mini-features" aria-label="Teacher embedding"><i></i><i></i><i></i><i></i></div></div>
+          <div class="fl-tour-local-model">{_model()}<div><strong>Local model</strong><span>Trainable features<br>+ label prediction</span></div><div class="fl-tour-mini-features fl-tour-local-features" aria-label="Local model features"><i></i><i></i><i></i><i></i></div></div>
+          <span class="fl-tour-image-caption">Same image enters both</span>
+        </div>
+        <div class="fl-tour-akd-guidance" data-tour-akd-part="guidance" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">3 · Add teacher guidance</span>
+          <span class="fl-tour-causal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h17m-6-6 6 6-6 6"/></svg></span>
+          <div class="fl-tour-client-gate"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h6m4 0h6M10 7v10M14 5v14"/><circle cx="20" cy="12" r="2"/></svg><span>Client noise detected<br><strong>Teacher signal enabled</strong></span></div>
+          <div class="fl-tour-teacher-signal"><span>Teacher signal</span><strong>Match image features</strong><svg class="fl-tour-feature-match" viewBox="0 0 170 43" role="img" aria-label="The local model learns to bring its features closer to the fixed teacher features"><g class="fl-tour-feature-labels"><text x="2" y="14">Teacher</text><text x="2" y="36">Local</text></g><path class="fl-tour-feature-guide" d="M75 11V32M110 11V32M145 11V32"/><g class="fl-tour-reference-features"><circle cx="75" cy="11" r="4"/><circle cx="110" cy="11" r="4"/><circle cx="145" cy="11" r="4"/></g><g class="fl-tour-learning-features"><circle cx="63" cy="32" r="4"/><circle cx="117" cy="32" r="4"/><circle cx="158" cy="32" r="4"/></g></svg></div>
+          <div class="fl-tour-label-signal"><span>Label signal</span><strong>Stored label ↔ prediction</strong></div>
+        </div>
+        <div class="fl-tour-akd-update" data-tour-akd-part="update" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">4 · Train with both signals</span>
+          <span class="fl-tour-causal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h17m-6-6 6 6-6 6"/></svg></span>
+          <div class="fl-tour-updated-model">{_model()}<svg class="fl-tour-update-loop" viewBox="0 0 68 68" aria-hidden="true"><path d="M12 23A25 25 0 0 1 56 18m0 0V8m0 10H46M56 45A25 25 0 0 1 12 50m0 0v10m0-10h10"/></svg></div>
+          <strong>Local weights update</strong>
+          <span class="fl-tour-image-caption">Labels stay unchanged</span>
+          <span class="fl-tour-label fl-tour-label-wrong">Cat</span>
+        </div>
       </div>
-      <div class="fl-tour-loss-join" aria-hidden="true"><svg viewBox="0 0 400 48" preserveAspectRatio="none"><path d="M95 0V20H200V48M305 0V20H200"/><path class="fl-tour-guidance" d="M305 0V20H200V48"/></svg></div>
-      <div class="fl-tour-student">{_model()}<div><strong>Local model</strong><span>Supervised loss + gated teacher loss</span></div></div>
     </div>
     <div class="fl-tour-scene fl-tour-na" data-tour-scene="na" hidden>
-      <div class="fl-tour-local-chip">Server · after warm-up</div>
-      <div class="fl-tour-reliability-clients">
-        <div>{_device()}<strong>Client A</strong><span>Lower noise</span></div>
-        <div class="fl-tour-noisy-client">{_device()}<strong>Client B</strong><span>Higher noise</span></div>
-        <div>{_device()}<strong>Client C</strong><span>Lower noise</span></div>
+      <div class="fl-tour-local-chip">NA-FedAvg · equal-size client example</div>
+      <div class="fl-tour-na-story">
+        <div class="fl-tour-na-warmup">
+          <span class="fl-tour-step-label">1 · Warm up normally</span>
+          <svg class="fl-tour-warmup-art" viewBox="0 0 120 132" role="img" aria-label="Ordinary federated learning exchanges a global model and updates with clients A, B and C"><g class="fl-tour-warmup-lines"><path d="M60 40v23H20v28M60 63v28M60 63h40v28"/></g><g class="fl-tour-warmup-server"><rect x="38" y="9" width="44" height="14" rx="4"/><rect x="38" y="27" width="44" height="14" rx="4"/><path d="M46 16h1m8 0h18M46 34h1m8 0h18"/></g><g class="fl-tour-warmup-devices"><rect x="9" y="89" width="22" height="30" rx="5"/><rect x="49" y="89" width="22" height="30" rx="5"/><rect x="89" y="89" width="22" height="30" rx="5"/></g><g class="fl-tour-warmup-letters"><text x="20" y="109">A</text><text x="60" y="109">B</text><text x="100" y="109">C</text></g></svg>
+          <strong>Ordinary FedAvg</strong><span class="fl-tour-image-caption">Local training + aggregation</span>
+        </div>
+        <div class="fl-tour-na-scores" data-tour-na-part="scores" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">2 · Score locally, once</span>
+          <span class="fl-tour-causal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h17m-6-6 6 6-6 6"/></svg></span>
+          <strong>Global + local models</strong><span class="fl-tour-image-caption">Confidence on local samples</span>
+          <div class="fl-tour-score-rows">
+            <div><b>Client A</b><svg viewBox="0 0 72 30" aria-hidden="true"><rect x="2" y="2" width="30" height="26" rx="4"/><rect x="40" y="2" width="30" height="26" rx="4"/><path d="M8 10h18M8 15h12M8 20h15M46 10h18M46 15h12M46 20h15"/></svg></div>
+            <div><b>Client B</b><svg viewBox="0 0 72 30" aria-hidden="true"><rect x="2" y="2" width="30" height="26" rx="4"/><rect x="40" y="2" width="30" height="26" rx="4"/><path d="M8 10h18M8 15h12M8 20h15M46 10h18M46 15h12M46 20h15"/></svg></div>
+            <div><b>Client C</b><svg viewBox="0 0 72 30" aria-hidden="true"><rect x="2" y="2" width="30" height="26" rx="4"/><rect x="40" y="2" width="30" height="26" rx="4"/><path d="M8 10h18M8 15h12M8 20h15M46 10h18M46 15h12M46 20h15"/></svg></div>
+          </div>
+          <span class="fl-tour-score-transfer">Send score sets to server</span><span class="fl-tour-image-caption">Raw data stay local</span>
+        </div>
+        <div class="fl-tour-na-noise" data-tour-na-part="noise" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">3 · Estimate client noise</span>
+          <span class="fl-tour-causal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h17m-6-6 6 6-6 6"/></svg></span>
+          <div class="fl-tour-noise-server">{_server()}<strong>At the server</strong></div>
+          <div class="fl-tour-noise-rows"><div><b>A</b><span>Lower noise</span></div><div class="fl-tour-noise-high"><b>B</b><span>Higher noise</span></div><div><b>C</b><span>Lower noise</span></div></div>
+          <span class="fl-tour-image-caption">Estimate once</span>
+        </div>
+        <div class="fl-tour-na-aggregation" data-tour-na-part="aggregation" data-visible="true" aria-hidden="false">
+          <span class="fl-tour-step-label">4 · Weight future updates</span>
+          <span class="fl-tour-causal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h17m-6-6 6 6-6 6"/></svg></span>
+          <strong>Data share × reliability</strong><span class="fl-tour-image-caption">1 − estimated noise</span>
+          <div class="fl-tour-contributions" role="img" aria-label="For equally sized clients, higher estimated noise gives client B less influence than clients A and C"><div><b>A</b><span><i></i></span></div><div class="fl-tour-contribution-noisy"><b>B</b><span><i></i></span></div><div><b>C</b><span><i></i></span></div></div>
+          <svg class="fl-tour-merge-updates" viewBox="0 0 120 22" aria-hidden="true"><path d="M20 1v6h40v13M60 1v19M100 1v6H60m-4 9 4 4 4-4"/></svg>
+          <div class="fl-tour-na-result">{_model()}<strong>Shared model</strong></div>
+          <span class="fl-tour-image-caption">Reuse estimates in later rounds</span>
+        </div>
       </div>
-      <div class="fl-tour-weighted-links" aria-hidden="true"><svg viewBox="0 0 600 82" preserveAspectRatio="none"><path class="fl-tour-strong-update" d="M95 0V35H300V82M505 0V35H300"/><path class="fl-tour-weak-update" d="M300 0V82"/><path class="fl-tour-weighted-packets" d="M95 0V35H300V82M505 0V35H300V82"/></svg></div>
-      <div class="fl-tour-weighted-server">{_server()}<div><strong>Weighted global model</strong><span>Noisier updates have less influence</span></div></div>
     </div>
   </div>
   <p class="fl-tour-status fl-tour-sr-only" data-tour-status role="status" aria-live="polite" aria-atomic="true">Select a method or play the overview.</p>
   <div class="fl-tour-fallback">
-    <dl><div><dt>NNC · before training</dt><dd>A frozen encoder finds other local examples with similar image features. A vote among their stored labels corrects the sample’s label.</dd></div><div><dt>AKD · during training</dt><dd>A teacher loss is activated according to estimated local noise, alongside the supervised loss.</dd></div><div><dt>NA-FedAvg · at the server</dt><dd>After warm-up, estimated noise levels reduce the aggregation weight of noisier clients.</dd></div></dl>
+    <dl><div><dt>NNC · before training</dt><dd>A frozen encoder finds other local examples with similar image features. A vote among their stored labels corrects the sample’s label.</dd></div><div><dt>AKD · during training</dt><dd>For clients with detected noise, an embedding teacher guides local features alongside the original-label signal. The labels stay unchanged.</dd></div><div><dt>NA-FedAvg · at the server</dt><dd>After ordinary warm-up, clients send global- and local-model confidence scores once. The server estimates each client’s noise and reuses it to weight later updates by data share times estimated reliability.</dd></div></dl>
   </div>
 </section>'''

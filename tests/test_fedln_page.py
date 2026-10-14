@@ -13,13 +13,20 @@ import build_projects as build
 class Markup(HTMLParser):
     def __init__(self, text):
         super().__init__(); self.bars = []; self.ids = []; self.panels = []
+        self.svg_depth = 0; self.orphan_svg_shapes = []
         self.feed(text)
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if tag == 'svg': self.svg_depth += 1
+        if tag in {'path','rect','circle','ellipse','polygon','polyline','line','use'} and not self.svg_depth:
+            self.orphan_svg_shapes.append(tag)
         if 'id' in a: self.ids.append(a['id'])
         if 'data-tab-panel' in a: self.panels.append(a)
         if 'data-value' in a: self.bars.append(a)
+
+    def handle_endtag(self, tag):
+        if tag == 'svg': self.svg_depth -= 1
 
 
 class FedLNPageTests(unittest.TestCase):
@@ -60,6 +67,14 @@ class FedLNPageTests(unittest.TestCase):
         self.assertIn('tied votes are broken randomly', self.html)
         self.assertIn('mean absolute error', self.html)
         self.assertIn('without adding a normalization term', self.html)
+
+    def test_vector_art_has_valid_svg_containers(self):
+        # Missing an SVG wrapper silently erased a selector icon in an earlier revision.
+        import re
+        self.assertEqual(self.markup.orphan_svg_shapes, [])
+        self.assertEqual(self.markup.svg_depth, 0)
+        for svg in re.findall(r'<svg\b.*?</svg>', self.html, re.S):
+            self.assertEqual(ElementTree.fromstring(svg).tag, 'svg')
 
 
 if __name__ == '__main__': unittest.main()
