@@ -51,8 +51,8 @@ def overview_markup(p):
     <p class="fl-lead">Federated learning keeps data on clients, but <strong>incorrect labels can affect the shared model.</strong> FedLN estimates client noise and offers three places to intervene.</p>
   </div>
   <!-- FEDLN_TOUR -->
-  <div class="fl-overview-note"><p><strong>Choose an intervention to fit the data and device.</strong> Label patterns, pretrained representations and available computation determine which route is useful.</p></div>
-  <details class="fl-details fl-abstract"><summary>Read the published abstract</summary><div class="fl-details-body"><p>{abstract}</p><p>{_source(p, 'Published article · abstract', 2)}</p></div></details>
+  <div class="fl-overview-note"><p><strong>Choose an intervention to fit the data and device.</strong></p><p><strong>Label patterns</strong>, <strong>pretrained representations</strong> and <strong>available computation</strong> determine which route is useful.</p></div>
+  <details class="fl-details fl-abstract"><summary>Abstract</summary><div class="fl-details-body"><p>{abstract}</p><p>{_source(p, 'Read more', 2)}</p></div></details>
 </section>'''
 
 
@@ -71,7 +71,7 @@ def method_markup(p):
         "Client m's aggregation weight equals its estimated clean-label fraction times its share of all training samples.",
         '''<mrow><msub><mi>γ</mi><mi>m</mi></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><msubsup><mi>n</mi><mi>l</mi><mi>m</mi></msubsup><mo>)</mo><mfrac><msub><mi>N</mi><mi>m</mi></msub><mi>N</mi></mfrac></mrow>''')
     return f'''<section id="method" data-tab-panel class="fl-panel fl-method" aria-labelledby="fl-method-title">
-  <div class="fl-intro"><p class="fl-eyebrow">The method</p><h2 id="fl-method-title">How it works</h2><p class="fl-lead">NNC changes labels, AKD changes local training, and NA-FedAvg changes server aggregation. Each uses a client-specific estimate of label noise.</p></div>
+  <div class="fl-intro"><p class="fl-eyebrow">The method</p><h2 id="fl-method-title">How it works</h2></div>
   <article class="fl-method-card fl-method-nnc" aria-labelledby="fl-nnc-title">
     <header class="fl-method-heading"><span class="fl-method-code">NNC</span><div><h3 id="fl-nnc-title">Nearest Neighbor-based Correction</h3><p class="fl-stage">At initialization · correct the labels</p></div></header>
     <div class="fl-method-grid"><div class="fl-method-copy"><p>A <strong>pretrained encoder</strong> maps each client’s examples into an embedding space. Nearby examples vote on the label. When that vote disagrees with the stored label, NNC <strong>replaces the label</strong> before federated training.</p><p>Examples and embeddings stay fixed. The fraction of disagreements also supplies a local noise estimate.</p></div><div class="fl-formula-card">{nnc}<p class="fl-formula-meaning">Count one vote per neighbor; keep the most frequent class.</p><dl class="fl-definitions"><div><dt><var>g</var></dt><dd>Pretrained feature encoder.</dd></div><div><dt><var>N</var><sub>k</sub></dt><dd>Indices of the <var>k</var> nearest other local embeddings by Euclidean distance.</dd></div><div><dt><var>y</var><sub>j</sub></dt><dd>The neighbor’s observed label; tied votes are broken randomly.</dd></div></dl></div></div>
@@ -124,20 +124,31 @@ def _paired_charts(key, headings, rows):
             '<span class="fl-legend-item"><i class="fl-legend-swatch fl-swatch-akd" aria-hidden="true"></i>AKD</span>'
             '<span class="fl-legend-item"><i class="fl-legend-swatch fl-swatch-na" aria-hidden="true"></i>NA-FedAvg</span>'
             '<span>Shared 0–100% scale.</span></p>'
-            f'<details class="fl-details fl-chart-data"><summary>View exact values</summary>'
-            f'{_table(("Method", *headings), rows, "Test accuracy (%); higher is better")}</details>')
+            f'<div class="fl-chart-data fl-sr-only">'
+            f'{_table(("Method", *headings), rows, "Test accuracy (%); higher is better")}</div>')
 
 
 def _more_experiments(p):
+    """Compact comparisons, with full experimental scope available on demand."""
     experiments = p.get("insight", {}).get("results", [])[1:]
     if not experiments:
         return ''
+    summaries = (
+        ('Audio', 'Speech Commands v2 · 70% label noise on 80% of clients.',
+         'NNC leads under random noise; NA-FedAvg under class flipping.',
+         'Speech Commands v2 · test accuracy (%)'),
+        ('Noisy clients', 'CIFAR-10 · 40% label noise per noisy client.',
+         'NA-FedAvg loses accuracy as clients with clean labels disappear.',
+         'Share of noisy clients · test accuracy (%)'),
+    )
     parts = []
-    for result in experiments:
+    for index, result in enumerate(experiments):
         rows = [(r['label'], *r['values']) for r in result['rows']]
         source = result['source']
-        parts.append(f'''<section class="fl-extra-experiment"><h3>{escape(result['title'])}</h3><p class="fl-context">{escape(result['context'])}</p>{_table(result['columns'], rows, result['title'])}<p>{escape(result['interpretation'])}</p><p class="fl-context">{escape(result['caveat'])}</p><a class="fl-source" href="{escape(source['url'], quote=True)}">{escape(source['label'])}</a></section>''')
-    return f'<details class="fl-details fl-more"><summary>More experiments · audio and noisy-client populations</summary><div class="fl-details-body">{"".join(parts)}</div></details>'
+        title, context, insight, caption = summaries[index] if index < len(summaries) else (
+            result['title'], result['context'], result['interpretation'], result['title'])
+        parts.append(f'''<section class="fl-extra-experiment" aria-labelledby="fl-extra-{index}"><div class="fl-extra-heading"><h3 id="fl-extra-{index}">{escape(title)}</h3><span>Accuracy (%)</span></div><p class="fl-extra-context">{escape(context)}</p>{_table(result['columns'], rows, caption)}<p class="fl-extra-insight">{escape(insight)}</p><div class="fl-extra-footer"><a class="fl-source" href="{escape(source['url'], quote=True)}">{escape(source['label'])}</a><details class="fl-details fl-extra-setup"><summary>Setup</summary><div class="fl-details-body"><p>{escape(result['context'])}</p><p>{escape(result['caveat'])}</p></div></details></div></section>''')
+    return f'<div class="fl-extra-grid">{"".join(parts)}</div>'
 
 
 def _algorithm_markup(p):
@@ -186,7 +197,7 @@ def _algorithm_markup(p):
 def results_markup(p):
     """Comparable results, label illustration and a visual rendering of Algorithm 1."""
     return f'''<section id="findings" data-tab-panel class="fl-panel fl-results" aria-labelledby="fl-results-title">
-  <div class="fl-intro"><p class="fl-eyebrow">The evidence</p><h2 id="fl-results-title">Different noise, different strengths</h2><p class="fl-lead">The strongest intervention changes with the dataset and the pattern of label errors.</p></div>
+  <h2 id="fl-results-title" class="fl-sr-only">Results</h2>
   <section class="fl-result-block" aria-labelledby="fl-human-title"><div class="fl-result-heading"><div><p class="fl-eyebrow">Human annotation errors</p><h3 id="fl-human-title">NNC leads on CIFAR-10N; AKD on CIFAR-100N</h3></div><span class="fl-result-unit">Test accuracy (%)</span></div>
     {_paired_charts('human', ('CIFAR-10N', 'CIFAR-100N'), _HUMAN)}
     <p class="fl-result-insight"><strong>+10.14 percentage points</strong> for AKD over FedAvg on CIFAR-100N (57.39% vs 47.25%).</p>

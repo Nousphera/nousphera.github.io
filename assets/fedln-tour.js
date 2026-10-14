@@ -1,4 +1,4 @@
-/* An opt-in, one-shot overview. Manual method views never start a timer. */
+/* One-shot overview: delayed visible autoplay, explicit controls, motion-safe fallback. */
 (function () {
   'use strict';
   const SCENES = {
@@ -19,6 +19,7 @@
     {scene: 'network', camera: 'na', duration: 500},
     {scene: 'na', duration: 9500}
   ];
+  const AUTOPLAY_DELAY = 1500;
   const TOTAL = TIMELINE.reduce((sum, step) => sum + step.duration, 0);
   const NNC_PHASES = [
     {name: 'sample', at: 0, text: 'This dog image has the wrong stored label: “Cat”.'},
@@ -47,6 +48,7 @@
   function initialize(root) {
     if (root.dataset.tourReady === 'true') return;
     const query = selector => root.querySelector(selector);
+    const viewport = query('.fl-tour-viewport') || root;
     const controls = query('[data-tour-controls]');
     const toggle = query('[data-tour-toggle]');
     const toggleLabel = query('[data-tour-toggle-label]');
@@ -72,13 +74,22 @@
     let selectedMethod = null;
     let playbackStart = 0;
     let playbackEnd = TOTAL;
+    let autoplayPending = true;
+    let resumeWhenVisible = false;
+    let autoplayTimer = null;
+    let pageActive = true;
+    let windowFocused = true;
 
     function isVisible() {
-      if (document.hidden || !root.isConnected || !intersecting) return false;
+      if (document.hidden || !pageActive || !windowFocused || !root.isConnected || !intersecting) return false;
       if (root.closest('[hidden], [aria-hidden="true"]')) return false;
       if (!root.getClientRects().length || window.getComputedStyle(root).visibility === 'hidden') return false;
-      const bounds = root.getBoundingClientRect();
-      return bounds.bottom > 0 && bounds.top < window.innerHeight && bounds.right > 0 && bounds.left < window.innerWidth;
+      const bounds = viewport.getBoundingClientRect();
+      // Measure the illustration, not its controls; a sliver must not start playback.
+      // Base the threshold on the smaller of diagram and viewport, including phones.
+      const visibleHeight = Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0);
+      const requiredHeight = Math.min(bounds.bottom - bounds.top, window.innerHeight) * 0.35;
+      return visibleHeight >= requiredHeight && requiredHeight > 0 && bounds.right > 0 && bounds.left < window.innerWidth;
     }
 
     function updateControls() {
@@ -169,7 +180,7 @@
 
     function tick(time) {
       if (!playing) return;
-      if (!isVisible()) { pause('Overview paused while out of view. Resume when ready.'); return; }
+      if (!isVisible()) { visibilityChanged(); return; }
       if (lastTime !== null) elapsed += Math.max(0, time - lastTime);
       lastTime = time;
       elapsed = Math.min(elapsed, playbackEnd);
@@ -205,7 +216,10 @@
     }
 
     function play() {
-      if (motion.matches) return;
+      if (motion.matches || playing) return;
+      cancelAutoplay();
+      autoplayPending = false;
+      resumeWhenVisible = false;
       if (finished || manual) reset(selectedMethod);
       if (!isVisible()) { pause('The overview is paused while out of view.'); return; }
       playing = true;
@@ -218,30 +232,60 @@
     }
 
     toggle.addEventListener('click', () => {
+      takeControl();
       if (playing) pause('Overview paused. Resume or select a method.');
       else play();
     });
     stages.forEach(button => button.addEventListener('click', () => {
+      takeControl();
       reset(button.dataset.tourStage);
       manual = true;
       showScene(button.dataset.tourStage);
       updateControls();
     }));
 
+    function cancelAutoplay() {
+      if (autoplayTimer !== null) window.clearTimeout(autoplayTimer);
+      autoplayTimer = null;
+    }
+
+    function takeControl() {
+      cancelAutoplay();
+      autoplayPending = false;
+      resumeWhenVisible = false;
+    }
+
     function visibilityChanged() {
-      if (playing && !isVisible()) pause('Overview paused while out of view. Resume when ready.');
+      if (!isVisible()) {
+        cancelAutoplay();
+        if (playing) {
+          resumeWhenVisible = true;
+          pause('Overview paused while out of view. It will resume when visible.');
+        }
+        return;
+      }
+      if (motion.matches || playing || finished || autoplayTimer !== null ||
+          (!autoplayPending && !resumeWhenVisible)) return;
+      autoplayTimer = window.setTimeout(() => {
+        autoplayTimer = null;
+        if (isVisible() && !motion.matches && !finished && (autoplayPending || resumeWhenVisible)) play();
+      }, AUTOPLAY_DELAY);
     }
     document.addEventListener('visibilitychange', visibilityChanged);
-    window.addEventListener('pagehide', () => pause());
+    window.addEventListener('pagehide', () => { pageActive = false; visibilityChanged(); });
+    window.addEventListener('pageshow', () => { pageActive = true; visibilityChanged(); });
+    window.addEventListener('blur', () => { windowFocused = false; visibilityChanged(); });
+    window.addEventListener('focus', () => { windowFocused = true; visibilityChanged(); });
+    // Scroll/resize also catch the viewport-relative visibility threshold for
+    // tall diagrams; an intersection-ratio observer alone cannot do that.
+    window.addEventListener('scroll', visibilityChanged, {passive: true});
+    window.addEventListener('resize', visibilityChanged, {passive: true});
     if ('IntersectionObserver' in window) {
       const intersection = new IntersectionObserver(entries => {
         intersecting = entries[0].isIntersecting;
         visibilityChanged();
-      }, {threshold: 0});
+      }, {threshold: [0, 0.15, 0.35, 0.5]});
       intersection.observe(root);
-    } else {
-      window.addEventListener('scroll', visibilityChanged, {passive: true});
-      window.addEventListener('resize', visibilityChanged, {passive: true});
     }
     if ('MutationObserver' in window) {
       const visibility = new MutationObserver(visibilityChanged);
@@ -252,6 +296,8 @@
       }
     }
     function motionChanged() {
+      cancelAutoplay();
+      if (motion.matches) takeControl();
       pause();
       root.classList.remove('is-touring');
       panels.forEach(panel => panel.classList.remove('is-arriving'));
@@ -263,6 +309,7 @@
         updateControls();
       }
       status.textContent = motion.matches ? 'Reduced motion is enabled. Select a method to explore at your own pace.' : 'Select a method or play the overview.';
+      visibilityChanged();
     }
     if (motion.addEventListener) motion.addEventListener('change', motionChanged);
     else if (motion.addListener) motion.addListener(motionChanged);

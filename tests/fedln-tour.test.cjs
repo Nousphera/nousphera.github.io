@@ -5,7 +5,7 @@ const path = require('path');
 const vm = require('vm');
 const assert = require('assert/strict');
 const source = fs.readFileSync(path.join(__dirname, '..', 'assets', 'fedln-tour.js'), 'utf8');
-function setup(reduced = false) {
+function setup(reduced = false, options = {}) {
   class El {
     constructor(dataset = {}) { this.dataset = dataset; this.hidden = false; this.style = {}; this.attrs = {}; this.textContent = ''; this.events = {}; this.isConnected = true; this.parentElement = null; const values = new Set(); this.classList = {add: c => values.add(c), remove: c => values.delete(c), contains: c => values.has(c), toggle: (c, on) => on ? values.add(c) : values.delete(c)}; }
     setAttribute(name, value) { this.attrs[name] = value; }
@@ -17,6 +17,9 @@ function setup(reduced = false) {
   }
   const root = new El({active:'network', running:'false', nncPhase:'complete', akdPhase:'complete', naPhase:'complete'});
   root.parentElement = new El();
+  root.parentElement.hidden = Boolean(options.hidden);
+  root.bounds = options.bounds;
+  const viewport = new El(); viewport.getBoundingClientRect = () => viewport.bounds || root.getBoundingClientRect();
   const nodes = Object.fromEntries(['controls','toggle','toggle-label','play-icon','progress','status','title','description'].map(s => [s,new El()]));
   const stages = ['nnc','akd','na'].map(name => new El({tourStage:name}));
   const panels = ['network','nnc','akd','na'].map(name => new El({tourScene:name}));
@@ -24,26 +27,29 @@ function setup(reduced = false) {
   const akdParts = ['teacher','guidance','update'].map(name => new El({tourAkdPart:name,visible:'true'}));
   const naParts = ['scores','noise','aggregation'].map(name => new El({tourNaPart:name,visible:'true'}));
   const neighbors = Array.from({length:5}, (_, i) => new El({tourNeighbor:String(i+1),visible:'true'}));
-  root.querySelector = selector => nodes[selector.slice(11,-1)];
+  root.querySelector = selector => selector === '.fl-tour-viewport' ? viewport : nodes[selector.slice(11,-1)];
   root.querySelectorAll = selector => ({'[data-tour-stage]':stages,'[data-tour-scene]':panels,'[data-tour-nnc-part]':parts,'[data-tour-akd-part]':akdParts,'[data-tour-na-part]':naParts,'[data-tour-neighbor]':neighbors})[selector] || [];
   const document = new El(); document.hidden = false; document.readyState = 'complete'; document.querySelectorAll = () => [root];
-  let id = 0; const frames = new Map(); const observers = [];
+  let id = 0; let now = 0; const frames = new Map(); const timers = new Map(); const observers = [];
   const motion = {matches:reduced,addEventListener(name,handler){this.handler = handler;}};
   const window = new El(); window.innerHeight = 1000; window.innerWidth = 1200;
   window.matchMedia = () => motion; window.getComputedStyle = el => ({visibility:el.visibility || 'visible'});
   window.requestAnimationFrame = callback => { frames.set(++id,callback); return id; };
   window.cancelAnimationFrame = key => frames.delete(key);
+  window.setTimeout = (callback,delay) => { timers.set(++id,{callback,at:now+delay}); return id; };
+  window.clearTimeout = key => timers.delete(key);
   class IntersectionObserver { constructor(callback) { this.callback = callback; observers.push(this); } observe() {} }
   class MutationObserver { constructor(callback) { this.callback = callback; observers.push(this); } observe() {} }
-  window.IntersectionObserver = IntersectionObserver; window.MutationObserver = MutationObserver;
+  if (!options.noIntersection) window.IntersectionObserver = IntersectionObserver; window.MutationObserver = MutationObserver;
   vm.runInNewContext(source,{window,document,IntersectionObserver,MutationObserver});
-  return {root,nodes,stages,panels,parts,akdParts,naParts,neighbors,frames,document,window,motion,observers,
+  return {root,viewport,nodes,stages,panels,parts,akdParts,naParts,neighbors,frames,timers,document,window,motion,observers,
+    advance(ms) { now += ms; for (const [key,timer] of [...timers]) { if (timer.at<=now) { timers.delete(key); timer.callback(); } } },
     tick(time) { const list = [...frames.values()]; frames.clear(); list.forEach(callback => callback(time)); },
     event(target,name) { for (const cb of target.events[name] || []) cb(); }};
 }
 {
  const t = setup();
- assert.equal(t.frames.size,0,'Initial view must not autoplay');
+ assert.equal(t.frames.size,0,'Playback must wait for the visibility delay');
  assert.equal(t.root.dataset.active,'network');
  assert.equal(t.nodes['toggle-label'].textContent,'Play overview');
  t.nodes.toggle.click(); t.tick(0); t.tick(3100);
@@ -124,7 +130,8 @@ for (const reason of ['document','intersection','ancestor','removed']) {
  assert.equal(t.root.dataset.running,'false');
  t.document.hidden = false; t.root.parentElement.hidden = false; t.root.isConnected = true;
  t.observers[0].callback([{isIntersecting:true}]);
- assert.equal(t.frames.size,0,'Returning to view must not auto-resume');
+ assert.equal(t.frames.size,0,'Returning to view waits before resuming');
+ t.advance(1500); assert.equal(t.frames.size,1,'Visibility-paused playback resumes after the delay');
 }
 {
  const t = setup(true);
@@ -143,4 +150,67 @@ for (const reason of ['document','intersection','ancestor','removed']) {
  t.motion.matches = false; t.motion.handler();
  assert.equal(t.frames.size,0,'Changing preferences never starts playback');
 }
-console.log('PASS: opt-in playback, camera focus, three progressive explanations, selected-method playback, pause/resume, alternatives, one-shot replay, manual views, visibility lifecycle, reduced motion.');
+
+// The reader must actually have time to see the diagram, not just pass over it.
+{
+ const t = setup();
+ assert.equal(t.timers.size,1,'One delayed start is armed for a visible overview');
+ t.advance(1499); assert.equal(t.frames.size,0);
+ t.advance(1); assert.equal(t.frames.size,1,'Autoplay starts after 1.5 seconds');
+ t.tick(0); t.tick(4000); const saved = t.nodes.progress.style.transform;
+ t.root.bounds={top:-540,bottom:10,left:10,right:900};
+ t.event(t.window,'scroll');
+ assert.equal(t.frames.size,0,'A tiny remaining sliver is not in focus');
+ t.tick(30000); assert.equal(t.nodes.progress.style.transform,saved);
+ t.root.bounds=undefined;t.event(t.window,'scroll');
+ t.event(t.window,'resize'); t.observers[0].callback([{isIntersecting:true}]);
+ assert.equal(t.timers.size,1,'Repeated observer and scroll events do not duplicate the timer');
+ t.advance(1500); t.tick(30001); assert.equal(t.nodes.progress.style.transform,saved,'No time jump on return');
+ t.tick(31001); assert.notEqual(t.nodes.progress.style.transform,saved);
+ t.nodes.toggle.click(); t.event(t.window,'scroll'); t.advance(5000);
+ assert.equal(t.frames.size,0,'Manual pause suppresses automatic resumption');
+}
+for (const noIntersection of [false,true]) {
+ const t = setup(false,{noIntersection}); t.advance(900);
+ t.root.bounds={top:1100,bottom:1650,left:10,right:900};t.event(t.window,'scroll');
+ assert.equal(t.timers.size,0,'Leaving before the delay cancels autoplay');t.advance(3000);
+ assert.equal(t.frames.size,0);
+ t.root.bounds=undefined;t.event(t.window,'scroll');t.advance(1499);
+ assert.equal(t.frames.size,0,'Returning requires a new uninterrupted delay');
+ t.advance(1);assert.equal(t.frames.size,1,'Scroll fallback also starts autoplay');
+}
+{
+ const t = setup(false,{hidden:true});t.advance(5000);
+ assert.equal(t.timers.size,0);assert.equal(t.frames.size,0,'Deep links into other panels must not autoplay');
+ t.root.parentElement.hidden=false;t.observers[1].callback([]);t.advance(1500);
+ assert.equal(t.frames.size,1);
+ t.tick(0);t.tick(40000);t.event(t.window,'scroll');t.advance(5000);
+ assert.equal(t.frames.size,0,'Finished tours do not restart automatically');
+}
+{
+ const t = setup();t.advance(700);t.stages[1].click();t.advance(5000);
+ assert.equal(t.frames.size,0,'Selecting a method cancels pending autoplay');
+ assert.equal(t.root.dataset.akdPhase,'complete');
+}
+for (const [out,back] of [['blur','focus'],['pagehide','pageshow']]) {
+ const t=setup();t.advance(1500);t.tick(0);t.tick(2000);
+ t.event(t.window,out);assert.equal(t.frames.size,0);
+ t.event(t.window,back);t.advance(1500);assert.equal(t.frames.size,1);
+}
+{
+ const t=setup(true);t.advance(5000);
+ assert.equal(t.timers.size,0);assert.equal(t.frames.size,0,'Reduced motion never autoplays');
+ const p=setup();p.advance(700);p.motion.matches=true;p.motion.handler();p.advance(5000);
+ assert.equal(p.frames.size,0,'Reduced motion also cancels a pending start');
+ p.motion.matches=false;p.motion.handler();p.advance(5000);
+ assert.equal(p.frames.size,0,'Removing reduced motion does not unexpectedly start a tour');
+}
+
+{
+ const t=setup();t.viewport.bounds={top:1000,bottom:1400,left:10,right:900};
+ t.event(t.window,'scroll');t.advance(5000);
+ assert.equal(t.frames.size,0,'Visible controls alone must not start an offscreen illustration');
+ t.viewport.bounds={top:300,bottom:700,left:10,right:900};t.event(t.window,'scroll');t.advance(1500);
+ assert.equal(t.frames.size,1);
+}
+console.log('PASS: delayed visible autoplay, camera focus, three progressive explanations, selected-method playback, pause/resume, alternatives, one-shot replay, manual views, visibility lifecycle, reduced motion.');

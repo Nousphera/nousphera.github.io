@@ -39,7 +39,7 @@ def _encoder():
 
 
 def tour_markup():
-    """Return a static overview with three opt-in intervention selectors."""
+    """Return a static fallback with three manual intervention selectors."""
     clients = ''.join(
         f'<div class="fl-tour-client fl-tour-client-{letter.lower()}">{_device()}<strong>Client {letter}</strong><span>Local data</span></div>'
         for letter in 'ABC'
