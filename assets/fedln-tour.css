@@ -1,0 +1,213 @@
+/* Self-contained FedLN tour. All method colors are shared tokens. */
+.fl-tour {
+  --fl-nnc:#0f766e;
+  --fl-akd:#6750a4;
+  --fl-na:#a35d19;
+  --fl-tour-bg:var(--surface,#fff);
+  --fl-tour-soft:var(--soft,#f3f4f5);
+  --fl-tour-text:var(--text,#22262d);
+  --fl-tour-muted:var(--muted,#626974);
+  --fl-tour-line:var(--line,#e1e4e7);
+  --fl-active:var(--fl-tour-muted);
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid var(--fl-tour-line);
+  border-radius:22px;
+  background:var(--fl-tour-bg);
+  color:var(--fl-tour-text);
+  margin-block:24px;
+  font-family:'Open Sans',system-ui,sans-serif;
+}
+:root[data-theme='dark'] .fl-tour { --fl-nnc:#66d4c3;--fl-akd:#b8a3ec;--fl-na:#f0b76c; }
+@media(prefers-color-scheme:dark) {
+  :root:not([data-theme='light']) .fl-tour { --fl-nnc:#66d4c3;--fl-akd:#b8a3ec;--fl-na:#f0b76c; }
+}
+.fl-tour[data-active='nnc'] { --fl-active:var(--fl-nnc); }
+.fl-tour[data-active='akd'] { --fl-active:var(--fl-akd); }
+.fl-tour[data-active='na'] { --fl-active:var(--fl-na); }
+.fl-tour [hidden] { display:none!important; }
+.fl-tour-head { padding:19px 24px 13px; }
+.fl-tour-eyebrow,.fl-tour-scene-kicker,.fl-tour-micro { display:block;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;line-height:1.6; }
+.fl-tour-eyebrow { display:none; }
+.fl-tour-head h2 { font-size:20px;line-height:1.3;letter-spacing:-.5px;margin:0; }
+.fl-tour-head p { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap; }
+.fl-tour-controls { padding:0 24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 20px;align-items:center; }
+.fl-tour-playback { display:flex;align-items:center;flex-wrap:wrap;gap:10px; }
+.fl-tour button { font:inherit;border:0;cursor:pointer;line-height:1.3;min-height:44px; }
+.fl-tour button:focus-visible { outline:3px solid var(--fl-active);outline-offset:3px; }
+.fl-tour-toggle,.fl-tour-replay { display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:10px 16px;border-radius:10px;font-size:13px!important;font-weight:600!important; }
+.fl-tour-toggle { background:var(--fl-tour-text);color:var(--fl-tour-bg);min-width:119px; }
+.fl-tour-toggle [data-tour-play-icon] { font-size:13px;width:14px; }
+.fl-tour-replay { background:var(--fl-tour-soft);color:var(--fl-tour-muted); }
+.fl-tour-replay>span:first-child { font-size:22px;line-height:1; }
+.fl-tour-duration { display:none; }
+.fl-tour-stages { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:0; }
+.fl-tour-stages button { display:flex;justify-content:center;align-items:center;gap:7px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--fl-tour-muted);font-size:12px;font-weight:600;padding:8px 7px;white-space:nowrap; }
+.fl-tour-stages button:hover { background:var(--fl-tour-soft); }
+.fl-tour-stages button[aria-pressed='true'] { background:var(--fl-tour-soft);border-color:var(--fl-tour-line);color:var(--fl-tour-text); }
+.fl-tour-stage-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+.fl-tour-dot-network { background:var(--fl-tour-muted); }
+.fl-tour-dot-nnc { background:var(--fl-nnc); }
+.fl-tour-dot-akd { background:var(--fl-akd); }
+.fl-tour-dot-na { background:var(--fl-na); }
+.fl-tour-progress { height:2px;background:var(--fl-tour-line);margin-top:10px;overflow:hidden;grid-column:1/-1; }
+.fl-tour-progress>span { display:block;height:100%;width:100%;background:var(--fl-active);transform:scaleX(0);transform-origin:left; }
+.fl-tour-scene-heading { padding:16px 24px 5px;min-height:89px;text-align:center; }
+.fl-tour-scene-kicker { color:var(--fl-active);margin-bottom:5px; }
+.fl-tour-scene-heading h3 { font-size:19px;line-height:1.4;letter-spacing:-.5px;margin:0 0 4px; }
+.fl-tour-scene-heading p { font-size:13px;line-height:1.6;color:var(--fl-tour-muted);max-width:600px;margin:0 auto; }
+.fl-tour-viewport { position:relative;min-height:342px;padding:9px 24px 17px;overflow:hidden; }
+.fl-tour-scene { max-width:650px;margin:auto; }
+.fl-tour-scene.is-arriving { animation:fl-tour-arrive .42s ease both; }
+.fl-tour-network-camera { transform-origin:50% 50%;transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .45s ease; }
+.fl-tour[data-camera='nnc'] .fl-tour-network-camera { transform-origin:15% 83%;transform:scale(1.35);opacity:.42; }
+.fl-tour[data-camera='akd'] .fl-tour-network-camera { transform-origin:50% 83%;transform:scale(1.35);opacity:.42; }
+.fl-tour[data-camera='na'] .fl-tour-network-camera { transform-origin:50% 10%;transform:scale(1.3);opacity:.42; }
+.fl-tour svg { display:block;overflow:visible; }
+.fl-tour-client svg,.fl-tour-server svg,.fl-tour-student svg,.fl-tour-loss-branch>svg,.fl-tour-weighted-server svg,.fl-tour-reliability-clients svg { width:39px;height:39px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+.fl-tour-server,.fl-tour-student,.fl-tour-weighted-server { display:flex;align-items:center;justify-content:center;gap:13px;width:max-content;max-width:100%;padding:14px 20px;margin:auto;border:1px solid var(--fl-tour-line);border-radius:14px;background:var(--fl-tour-soft); }
+.fl-tour-server strong,.fl-tour-student strong,.fl-tour-weighted-server strong { display:block;font-size:15px;line-height:1.5; }
+.fl-tour-server span,.fl-tour-student span,.fl-tour-weighted-server span { display:block;font-size:12px;line-height:1.6;color:var(--fl-tour-muted); }
+.fl-tour-network-links { height:73px;position:relative; }
+.fl-tour-network-links svg,.fl-tour-loss-join svg,.fl-tour-weighted-links svg { width:100%;height:100%;fill:none;stroke-linecap:round;stroke-linejoin:round; }
+.fl-tour-link-base { stroke:var(--fl-tour-line);stroke-width:2; }
+.fl-tour-packets { stroke:var(--fl-tour-muted);stroke-width:2;stroke-dasharray:3 24;opacity:.5; }
+.fl-tour-network-links>span { position:absolute;top:34px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--fl-tour-muted);background:var(--fl-tour-bg);padding:3px 10px;white-space:nowrap; }
+.fl-tour-clients { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px; }
+.fl-tour-client { min-height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--fl-tour-line);background:var(--fl-tour-bg);border-radius:13px;padding:12px 8px; }
+.fl-tour-client strong { font-size:14px;margin-top:5px; }
+.fl-tour-client>span { font-size:11px;color:var(--fl-tour-muted); }
+.fl-tour[data-camera='nnc'] .fl-tour-client-a { border-color:var(--fl-nnc);color:var(--fl-nnc); }
+.fl-tour[data-camera='akd'] .fl-tour-client-b { border-color:var(--fl-akd);color:var(--fl-akd); }
+.fl-tour[data-camera='na'] .fl-tour-server { border-color:var(--fl-na);color:var(--fl-na); }
+.fl-tour-local-chip { width:max-content;max-width:100%;padding:5px 12px;margin:0 auto 13px;border-radius:99px;background:var(--fl-tour-soft);color:var(--fl-active);font-size:12px;font-weight:600;text-align:center; }
+.fl-tour-nnc-layout { display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);align-items:center;gap:24px; }
+.fl-tour-embedding { text-align:center; }
+.fl-tour-visual-label { font-size:12px;color:var(--fl-tour-muted); }
+.fl-tour-embedding svg { width:100%;max-width:330px;margin:8px auto 0; }
+.fl-tour-neighborhood { fill:var(--fl-tour-soft);stroke:var(--fl-tour-line);stroke-width:1.5;stroke-dasharray:3 6; }
+.fl-tour-vote-lines { stroke:var(--fl-nnc);stroke-width:1.5;stroke-dasharray:3 5;opacity:.45; }
+.fl-tour-neighbors circle { fill:var(--fl-tour-bg);stroke:var(--fl-nnc);stroke-width:1.5; }
+.fl-tour-sample-labels { font-size:20px;font-weight:600;fill:var(--fl-nnc);text-anchor:middle; }
+.fl-tour-target { fill:var(--fl-nnc);stroke:var(--fl-tour-bg);stroke-width:4; }
+.fl-tour-old-label,.fl-tour-new-label { font-size:24px;font-weight:700;fill:var(--fl-tour-bg);text-anchor:middle; }
+.fl-tour-old-label { opacity:0; }
+.fl-tour-new-label { opacity:1; }
+.fl-tour-conceptual { display:block;color:var(--fl-tour-muted);font-size:10px;text-align:center;line-height:1.6; }
+.fl-tour-vote-summary { text-align:center; }
+.fl-tour-micro { color:var(--fl-tour-muted);font-size:10px;letter-spacing:.06em; }
+.fl-tour-vote-summary>strong { color:var(--fl-nnc);font-size:21px;letter-spacing:3px;display:block;margin-top:8px; }
+.fl-tour-correction { display:flex;align-items:center;justify-content:center;gap:13px;font-size:25px;margin:18px 0 12px; }
+.fl-tour-correction>span:first-child { text-decoration:line-through;color:var(--fl-tour-muted);font-size:21px; }
+.fl-tour-correction>b { color:var(--fl-nnc);width:44px;height:44px;line-height:44px;border:1px solid var(--fl-nnc);border-radius:11px; }
+.fl-tour-vote-summary p { color:var(--fl-tour-muted);font-size:13px;line-height:1.6; }
+.fl-tour-noise-gate { display:flex;justify-content:center;align-items:center;gap:7px;font-size:12px;margin:0 0 16px;color:var(--fl-tour-muted); }
+.fl-tour-gate-dot { width:7px;height:7px;border-radius:50%;background:var(--fl-akd); }
+.fl-tour-loss-branches { display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:480px;margin:auto; }
+.fl-tour-loss-branch { min-height:131px;border:1px solid var(--fl-tour-line);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:11px 7px;position:relative;gap:8px; }
+.fl-tour-loss-branch>strong { font-size:13px; }
+.fl-tour-loss-icon { font:italic 32px/1.2 Georgia,serif;width:39px;height:39px;text-align:center; }
+.fl-tour-teacher-branch { border-color:var(--fl-akd);color:var(--fl-akd); }
+.fl-tour-gate { position:absolute;right:8px;top:-10px;background:var(--fl-tour-bg);color:var(--fl-akd);border:1px solid var(--fl-akd);padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600; }
+.fl-tour-loss-join { height:36px;max-width:480px;margin:auto; }
+.fl-tour-loss-join path { stroke:var(--fl-tour-line);stroke-width:2; }
+.fl-tour-loss-join .fl-tour-guidance { stroke:var(--fl-akd);stroke-width:2.5;stroke-dasharray:4 9; }
+.fl-tour-student { padding:9px 16px; }
+.fl-tour-student svg { width:33px;height:33px; }
+.fl-tour-reliability-clients { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px; }
+.fl-tour-reliability-clients>div { text-align:center;color:var(--fl-na);display:flex;flex-direction:column;align-items:center; }
+.fl-tour-reliability-clients svg { margin-bottom:5px;width:31px;height:31px; }
+.fl-tour-reliability-clients strong { font-size:13px;color:var(--fl-tour-text); }
+.fl-tour-reliability-clients span { color:var(--fl-tour-muted);font-size:11px; }
+.fl-tour-reliability-clients>.fl-tour-noisy-client { color:var(--fl-tour-muted); }
+.fl-tour-weighted-links { height:69px; }
+.fl-tour-strong-update { stroke:var(--fl-na);stroke-width:3;opacity:.5; }
+.fl-tour-weak-update { stroke:var(--fl-tour-muted);stroke-width:1;stroke-dasharray:2 5;opacity:.7; }
+.fl-tour-weighted-packets { stroke:var(--fl-na);stroke-width:3;stroke-dasharray:3 27; }
+.fl-tour-weighted-server { padding:9px 16px;border-color:var(--fl-na); }
+.fl-tour-weighted-server svg { color:var(--fl-na);width:33px;height:33px; }
+.fl-tour-na>.fl-tour-conceptual { margin-top:12px; }
+.fl-tour-status { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;margin:0; }
+.fl-tour-footer { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 18px;padding:9px 24px;border-top:1px solid var(--fl-tour-line);color:var(--fl-tour-muted);font-size:10px;line-height:1.6; }
+.fl-tour-footer a { color:inherit; }
+.fl-tour-fallback { margin:0 24px 25px; }
+.fl-tour-fallback dl { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0; }
+.fl-tour-fallback dt { font-size:13px;font-weight:700;margin-bottom:7px; }
+.fl-tour-fallback dd { margin:0;font-size:12px;line-height:1.6;color:var(--fl-tour-muted); }
+.fl-tour.is-enhanced .fl-tour-fallback { display:none; }
+.fl-tour:not(.is-enhanced) .fl-tour-status { display:none; }
+.fl-tour.is-touring .fl-tour-packets { animation:fl-tour-packets 2.4s linear infinite; }
+.fl-tour.is-touring .fl-tour-guidance,.fl-tour.is-touring .fl-tour-weighted-packets { animation:fl-tour-packets 2.2s linear infinite; }
+.fl-tour.is-touring[data-active='nnc'] .fl-tour-vote-lines { animation:fl-tour-vote 2.8s ease both; }
+.fl-tour.is-touring[data-active='nnc'] .fl-tour-old-label { animation:fl-tour-old-label 2.8s steps(1,end) both; }
+.fl-tour.is-touring[data-active='nnc'] .fl-tour-new-label { animation:fl-tour-new-label 2.8s steps(1,end) both; }
+.fl-tour.is-touring[data-active='akd'] .fl-tour-teacher-branch { animation:fl-tour-teacher 2s ease both; }
+.fl-tour[data-running='false'] * { animation-play-state:paused!important; }
+.fl-tour[data-running='false'] .fl-tour-network-camera { transition-duration:0s; }
+@keyframes fl-tour-arrive { from { opacity:0;transform:scale(.97) translateY(5px); } to { opacity:1;transform:scale(1) translateY(0); } }
+@keyframes fl-tour-packets { to { stroke-dashoffset:-60; } }
+@keyframes fl-tour-vote { 0%,20% { opacity:.12; } 65%,100% { opacity:.65; } }
+@keyframes fl-tour-old-label { 0%,69% { opacity:1; } 70%,100% { opacity:0; } }
+@keyframes fl-tour-new-label { 0%,69% { opacity:0; } 70%,100% { opacity:1; } }
+@keyframes fl-tour-teacher { from { opacity:.35; } to { opacity:1; } }
+@media(max-width:760px) {
+  .fl-tour-controls { display:block; }
+  .fl-tour-stages { margin-top:14px; }
+}
+@media(max-width:560px) {
+  .fl-tour { border-radius:17px; }
+  .fl-tour-head { padding:19px 17px 13px; }
+  .fl-tour-head h2 { font-size:18px; }
+  .fl-tour-controls { padding:0 16px;display:block; }
+  .fl-tour-duration { display:none; }
+  .fl-tour-stages { gap:2px;margin-top:15px; }
+  .fl-tour-stages button { font-size:11px;padding:7px 3px;gap:5px; }
+  .fl-tour-scene-heading { padding:17px 17px 8px;min-height:170px; }
+  .fl-tour-scene-heading h3 { font-size:18px; }
+  .fl-tour-scene-heading p { font-size:12px; }
+  .fl-tour-viewport { min-height:350px;padding:9px 17px 16px; }
+  .fl-tour-server { padding:11px 15px; }
+  .fl-tour-network-links { height:97px; }
+  .fl-tour-clients { gap:10px; }
+  .fl-tour-client { padding:10px 3px;min-height:106px; }
+  .fl-tour-client strong { font-size:12px; }
+  .fl-tour-client>span { font-size:10px; }
+  .fl-tour-client svg { width:31px;height:31px; }
+  .fl-tour-nnc-layout { grid-template-columns:1fr;gap:3px; }
+  .fl-tour-embedding svg { max-width:245px;margin:3px auto 0; }
+  .fl-tour-nnc .fl-tour-local-chip { margin-bottom:9px; }
+  .fl-tour-vote-summary { display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:13px;max-width:280px;width:100%;margin:4px auto 0;text-align:left; }
+  .fl-tour-vote-summary>.fl-tour-micro { grid-column:1; }
+  .fl-tour-vote-summary>strong { grid-column:1;margin-top:0;font-size:19px; }
+  .fl-tour-correction { grid-column:2;grid-row:1/3;margin:0;font-size:20px;gap:10px; }
+  .fl-tour-correction>b { width:36px;height:36px;line-height:36px;border-radius:9px; }
+  .fl-tour-vote-summary>p { grid-column:1/3;font-size:11px;margin:9px 0 0;text-align:center; }
+  .fl-tour-vote-summary>p br { display:none; }
+  .fl-tour-loss-branches { gap:12px; }
+  .fl-tour-loss-branch>.fl-tour-micro { font-size:9px;letter-spacing:.02em; }
+  .fl-tour-loss-branch>strong { font-size:11px; }
+  .fl-tour-noise-gate { font-size:10px;gap:5px; }
+  .fl-tour-student,.fl-tour-weighted-server { gap:9px;padding:9px 11px; }
+  .fl-tour-student strong,.fl-tour-weighted-server strong { font-size:13px; }
+  .fl-tour-student span,.fl-tour-weighted-server span { font-size:10px; }
+  .fl-tour-reliability-clients { gap:6px; }
+  .fl-tour-reliability-clients strong { font-size:12px; }
+  .fl-tour-reliability-clients span { font-size:10px; }
+  .fl-tour-local-chip { font-size:11px; }
+  .fl-tour-footer { padding:12px 17px;font-size:9px; }
+  .fl-tour-fallback dl { grid-template-columns:1fr;gap:15px; }
+}
+@media(max-width:440px) {
+  .fl-tour-stages { grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; }
+  .fl-tour-stages button { font-size:12px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .fl-tour *, .fl-tour *::before,.fl-tour *::after { animation:none!important;transition:none!important; }
+  .fl-tour .fl-tour-network-camera { transform:none!important;opacity:1!important; }
+}
+@media print {
+  .fl-tour { break-inside:avoid; }
+  .fl-tour .fl-tour-controls,.fl-tour .fl-tour-status { display:none!important; }
+  .fl-tour.is-enhanced .fl-tour-fallback { display:block; }
+}

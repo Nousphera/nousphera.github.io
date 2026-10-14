@@ -206,10 +206,13 @@
 /* One visible reading section with real tabs; static HTML remains the fallback. */
 .section-nav { margin-top:0; border-top:1px solid var(--line); padding:10px 0; }
 .section-nav.tabs-ready { justify-content:center; gap:6px; }
-.section-nav.tabs-ready a { padding:9px 22px; min-height:42px; border-radius:7px; border:1px solid transparent; transition:none; }
+.section-nav.tabs-ready a { flex:1; max-width:140px; justify-content:center; padding:9px 16px; min-height:42px; border-radius:7px; border:1px solid transparent; font-weight:600; transition:none; }
 .section-nav.tabs-ready a:hover { background:var(--soft); }
 .section-nav.tabs-ready a[aria-selected='true'] { color:var(--accent); background:var(--tint); border-color:color-mix(in srgb,var(--accent) 22%,transparent); font-weight:600; }
 [data-tab-panel] { scroll-margin-top:75px; min-height:300px; }
+.project-panels { overflow-anchor:none; min-height:calc(100svh - 64px); }
+.section-nav { isolation:isolate; }
+:root { scrollbar-gutter:stable; }
 [data-tab-panel]:focus-visible { outline:2px solid var(--accent); outline-offset:5px; }
 .overview-panel { padding-top:24px; }
 .overview-panel .research-brief { border-top:0; padding-top:0; }

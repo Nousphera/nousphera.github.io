@@ -21,8 +21,12 @@ class ResearchVisualTests(unittest.TestCase):
             self.assertNotIn('/Users/',json.dumps(p['insight']))
             self.assertTrue(p['insight']['limitations'])
             html=build.project_page(p,projects)
-            self.assertIn('class="method-diagram ',html)
-            self.assertIn('Scope &amp; limitations',html)
+            if p['slug'] == 'fedln':
+                self.assertIn('data-fl-tour',html)
+                self.assertIn('How to interpret these results',html)
+            else:
+                self.assertIn('class="method-diagram ',html)
+                self.assertIn('Scope &amp; limitations',html)
             for r in p['insight']['results']:
                 self.assertIn(build.esc(r['source']['label']),html)
                 for row in r['rows']:

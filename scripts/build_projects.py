@@ -1,5 +1,6 @@
 """Build public project pages without external dependencies. Run from any directory."""
 from html import escape as esc
+from hashlib import sha256
 import json
 from pathlib import Path
 import re
@@ -25,11 +26,18 @@ ICONS = {
     'expand': '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
     'close': '<path d="m6 6 12 12M6 18 18 6"/>',
     'back': '<path d="m12 5-7 7 7 7M5 12h14"/>',
+    'person': '<circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',
     'search': '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>'
 }
 
 def icon(name):
     return f'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>'
+
+def asset_url(path):
+    # HTML and assets deploy independently across the paper repositories.
+    # Content versions prevent stale cached interaction and theme files.
+    version = sha256((ROOT / path).read_bytes()).hexdigest()[:12]
+    return f'/{path}?v={version}'
 
 def public_url(value):
     u = urlparse(value)
@@ -87,7 +95,7 @@ def theme_control():
 def header():
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="Nousphera home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Nousphera</a>
-<nav aria-label="Main navigation"><a href="/projects/">Projects</a><a class="wide-nav" href="https://github.com/Nousphera">GitHub {icon('arrow')}</a><a class="wide-nav" href="https://vtsouval.github.io/">Vasileios Tsouvalas {icon('arrow')}</a>{theme_control()}</nav></div></header>'''
+<nav aria-label="Main navigation"><a class="nav-projects" href="/projects/">Projects</a><a class="about-link" href="https://vtsouval.github.io/">{icon('person')}About me</a>{theme_control()}</nav></div></header>'''
 
 def footer():
     return '''<footer class="site-footer"><a class="brand" href="/">Nousphera</a><p>Research in collaborative and efficient machine learning.</p><div><a href="https://github.com/Nousphera">GitHub</a><a href="https://vtsouval.github.io/">Vasileios Tsouvalas</a><a href="mailto:nousphera@proton.me">Email</a></div></footer>'''
@@ -95,7 +103,10 @@ def footer():
 def shell(title, description, path, body, p=None):
     meta = ''
     css = ''
+    extras = ''
     if p:
+        if p['slug'] == 'fedln':
+            extras = f'<link rel="stylesheet" href="{asset_url("assets/fedln-content.css")}"><link rel="stylesheet" href="{asset_url("assets/fedln-tour.css")}"><script src="{asset_url("assets/fedln-tour.js")}" defer></script>'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)
         css = f'<style>:root{{--accent-light:{p["accent"]};--accent-dark:{p["accent_dark"]};--tint-light:{p["tint"]};}}</style>'
         for key, value in [('citation_title', p['title']), ('citation_publication_date', citation_year)] + [('citation_author', a) for a in p['authors']]:
@@ -110,8 +121,8 @@ def shell(title, description, path, body, p=None):
 <meta name="color-scheme" content="light dark"><link rel="canonical" href="{ORIGIN}{path}">
 <meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="{ORIGIN}{path}">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<script src="/assets/theme.js"></script><link rel="stylesheet" href="/assets/projects.css"><link rel="stylesheet" href="/assets/research.css">{css}{meta}
-<script src="/assets/projects.js" defer></script><script src="/assets/project-tabs.js" defer></script></head><body>{header()}{body}{footer()}</body></html>\n'''
+<script src="{asset_url('assets/theme.js')}"></script><link rel="stylesheet" href="{asset_url('assets/projects.css')}"><link rel="stylesheet" href="{asset_url('assets/research.css')}">{css}{meta}
+<script src="{asset_url('assets/projects.js')}" defer></script><script src="{asset_url('assets/project-tabs.js')}" defer></script>{extras}</head><body>{header()}{body}{footer()}</body></html>\n'''
 
 def figure_markup(f, primary=False):
     return f'''<figure class="paper-figure {'primary-figure' if primary else 'result-figure'}"><a class="figure-open" href="/{esc(f['src'])}" data-figure data-caption="{esc(f['caption'])}" aria-label="Enlarge figure: {esc(f['alt'])}"><img src="/{esc(f['src'])}" width="{int(f['width'])}" height="{int(f['height'])}" style="aspect-ratio:{int(f['width'])}/{int(f['height'])}" alt="{esc(f['alt'])}" {'fetchpriority="high"' if primary else 'loading="lazy"'} decoding="async"><span class="expand-label">{icon('expand')}<span>Enlarge</span></span></a><figcaption>{esc(f['caption'])} <a href="{esc(f['source_url'])}">{esc(f['source_label'])} {icon('arrow')}</a></figcaption></figure>'''
@@ -160,15 +171,26 @@ def project_page(p, projects):
         originals = f'<details class="original-figures"><summary>Original paper figures &amp; sources</summary>{original_primary}{secondary}</details>'
     others = sorted((q for q in projects if q['slug'] != p['slug']), key=lambda q: (-len(set(p['topics']) & set(q['topics'])), q['category'] != p['category'], -q['year']))[:2]
     more = ''.join(f'<a href="/projects/{q["slug"]}/"><span>{esc(q["name"])}</span><p>{esc(q["tagline"])}</p>{icon("arrow")}</a>' for q in others)
-    body = f'''<main id="main" class="project-main"><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a><span>{esc(p['category'])}</span></div>
+    overview = f'''<div id="overview" data-tab-panel class="overview-panel">{visual}<section class="overview section"><div class="section-heading"><span class="kicker">The idea</span><h2>At a glance</h2></div><div><p class="overview-text">{esc(p['summary'])}</p>{takeaways}<ul class="topics">{''.join(f'<li>{esc(t)}</li>' for t in p['topics'])}</ul><details class="abstract"><summary>Read the abstract</summary><p>{esc(p['abstract'])}</p>{source_note}</details></div></section></div>'''
+    method = f'''<section id="method" data-tab-panel class="section method-section"><div class="section-heading"><span class="kicker">The approach</span><h2>How it works</h2></div><div><ol class="method-steps">{methods}</ol>{originals}</div></section>'''
+    category = f'<span>{esc(p["category"])}</span>'
+    page_class = ''
+    if p['slug'] == 'fedln':
+        from fedln_content import overview_markup, method_markup, results_markup
+        from fedln_tour import tour_markup
+        overview = overview_markup(p).replace('<!-- FEDLN_TOUR -->', tour_markup())
+        method = method_markup(p)
+        results = results_markup(p)
+        category = '<ul class="hero-topics" aria-label="Research topics">' + ''.join(f'<li>{esc(t)}</li>' for t in p['topics']) + '</ul>'
+        page_class = ' fedln-page'
+    body = f'''<main id="main" class="project-main{page_class}"><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
 <section class="paper-hero" aria-labelledby="paper-title"><div class="eyebrow"><span class="project-name">{esc(p['name'])}</span><span>{esc(venue)}</span></div>
 <h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}</section>
 <nav class="section-nav" data-project-tabs aria-label="On this page"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#findings">Results</a><a href="#citation">Citation</a></nav>
-<div id="overview" data-tab-panel class="overview-panel">{visual}<section class="overview section"><div class="section-heading"><span class="kicker">The idea</span><h2>At a glance</h2></div><div><p class="overview-text">{esc(p['summary'])}</p>{takeaways}<ul class="topics">{''.join(f'<li>{esc(t)}</li>' for t in p['topics'])}</ul><details class="abstract"><summary>Read the abstract</summary><p>{esc(p['abstract'])}</p>{source_note}</details></div></section></div>
-<section id="method" data-tab-panel class="section method-section"><div class="section-heading"><span class="kicker">The approach</span><h2>How it works</h2></div><div><ol class="method-steps">{methods}</ol>{originals}</div></section>
+<div class="project-panels">{overview}{method}
 {results}
 <section id="citation" data-tab-panel class="section citation-section"><div class="section-heading"><span class="kicker">Reference</span><h2>Cite this work</h2></div><div class="citation-content"><div class="citation-bar"><span>BibTeX</span><div><a href="citation.bib" download>Download .bib</a><button type="button" data-copy-citation>{icon('copy')}<span>Copy</span></button></div></div><pre tabindex="0" aria-label="BibTeX citation"><code id="bibtex">{esc(p['bibtex'].strip())}</code></pre><span class="copy-status sr-only" role="status"></span>{related}</div></section>
-<section class="more-projects" aria-label="Explore related projects"><h2>Keep exploring</h2><div>{more}</div></section></main>
+</div><section class="more-projects" aria-label="Explore related projects"><h2>Keep exploring</h2><div>{more}</div></section></main>
 <dialog class="figure-dialog" aria-label="Enlarged paper figure"><div class="dialog-toolbar"><span>Figure preview</span><button type="button" data-close-figure aria-label="Close figure">{icon('close')}</button></div><div class="dialog-scroll"><img alt=""></div><p class="dialog-caption"></p><a class="dialog-original" href="#" target="_blank" rel="noopener">Open full-size image {icon('arrow')}</a></dialog>'''
     return shell(p['name'] + ' — ' + p['title'], p['summary'], f'/projects/{p["slug"]}/', body, p)
 

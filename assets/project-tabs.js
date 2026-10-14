@@ -7,6 +7,7 @@
   const panels = [...document.querySelectorAll('[data-tab-panel]')];
   if (tabs.length !== panels.length || tabs.length === 0) return;
   const ids = panels.map(panel => panel.id);
+  let activeId;
   function hashTarget() {
     let id;
     try { id = decodeURIComponent(window.location.hash.slice(1)); } catch (_) { return null; }
@@ -17,22 +18,27 @@
   }
   function select(id, {focus = false, updateUrl = false, scroll = false} = {}) {
     if (!ids.includes(id)) return;
+    // Measure before hiding anything: collapsing a long panel can clamp the
+    // document scroll position. Ordinary tab switches keep their viewport.
+    const previous = panels[ids.indexOf(activeId)];
+    const startY = window.scrollY;
+    const nav = tabList.getBoundingClientRect();
+    const previousTop = previous ? previous.getBoundingClientRect().top : nav.bottom;
+    const deep = scroll && previous && activeId !== id && previousTop < nav.bottom - 2;
+    const destination = deep ? Math.max(0, startY + previousTop - nav.height) : startY;
     tabs.forEach((tab, index) => {
       const active = ids[index] === id;
       tab.setAttribute('aria-selected', String(active));
       tab.tabIndex = active ? 0 : -1;
       panels[index].hidden = !active;
-      if (active && focus) tab.focus();
+      if (active && focus) tab.focus({preventScroll: true});
     });
+    activeId = id;
     if (updateUrl && window.location.hash !== '#' + id) {
       window.history.pushState(null, '', '#' + id);
     }
-    if (scroll) {
-      // A sticky tab list has viewport top=0 after scrolling; use the panel's
-      // normal-flow position so switching always starts at its beginning.
-      const panel = panels[ids.indexOf(id)];
-      const top = Math.max(0, window.scrollY + panel.getBoundingClientRect().top - tabList.getBoundingClientRect().height);
-      window.scrollTo({top, behavior: 'instant'});
+    if (scroll && (deep || window.scrollY !== destination)) {
+      window.scrollTo({top: destination, behavior: 'instant'});
     }
   }
   tabList.setAttribute('role', 'tablist');
