@@ -1,0 +1,232 @@
+{
+  "slug": "plix",
+  "problem": "A fixed-vocabulary speech model must be retrained when users add new words, especially in languages with little labeled data.",
+  "contribution": "PLiX trains prototypical audio models across many words and languages so new vocabularies can be specified by a few support clips without updating the encoder.",
+  "reading_guide": "Recognition is evaluated through closed-set few-shot episodes; the numeric tables below measure only encoder latency and energy.",
+  "diagram": {
+    "type": "pipeline",
+    "title": "Recognize a new vocabulary",
+    "description": "At inference, labeled support clips and query audio share an encoder. Only support embeddings are averaged into word prototypes; query embeddings are compared directly with those prototypes.",
+    "stages": [
+      {
+        "title": "Support and queries",
+        "detail": "Provide labeled examples of each word and the audio clips to classify.",
+        "icon": "waveform",
+        "location": "Inference inputs"
+      },
+      {
+        "title": "Shared encoder",
+        "detail": "Convert clips to log-mel spectrograms and embed both sets with the same trained acoustic model.",
+        "icon": "encoder",
+        "location": "Feature extraction"
+      },
+      {
+        "title": "Support prototypes",
+        "detail": "Average support embeddings per word; retain each query embedding separately.",
+        "icon": "cluster",
+        "location": "Reference vocabulary"
+      },
+      {
+        "title": "Nearest word",
+        "detail": "Compare each query with all prototypes using squared Euclidean distance.",
+        "icon": "search",
+        "location": "Prediction"
+      }
+    ],
+    "connections": [
+      "One-second audio",
+      "Support and query embeddings",
+      "Prototypes plus query embeddings"
+    ],
+    "footnote": "This depicts inference after episodic training. Query embeddings are not averaged into prototypes. Predictions choose among the supplied vocabulary; no encoder retraining is required."
+  },
+  "results": [
+    {
+      "title": "Recognizing new words and languages",
+      "question": "What does the few-shot recognition evaluation demonstrate?",
+      "context": "Qualitative reading of the recognition figures, not values estimated from bar heights. Held-out-word tests use closed-set MSWC episodes; transfer tests use five unseen MSWC languages and FLEURS. Accuracy is averaged over 1,000 episodes without plotted uncertainty intervals.",
+      "source": {
+        "label": "Figures 6–7 and 10–11 · pages 9–12",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=9"
+      },
+      "columns": [
+        "Evaluation",
+        "Observed result",
+        "Evidence"
+      ],
+      "rows": [
+        {
+          "label": "Multilingual base · held-out words",
+          "values": [
+            "Recognizes new words with one support clip; accuracy varies by language and improves with more support.",
+            "Figure 6 · p. 9"
+          ]
+        },
+        {
+          "label": "English base · larger vocabulary",
+          "values": [
+            "More competing words reduce one-shot accuracy; more support clips improve recognition.",
+            "Figure 7 · pp. 9–10"
+          ]
+        },
+        {
+          "label": "Multilingual base · unseen languages",
+          "values": [
+            "Transfers without retraining to five languages; Tamil is the most difficult in the reported one-shot test.",
+            "Figure 10 · pp. 11–12"
+          ]
+        },
+        {
+          "label": "Multilingual base · language identification",
+          "values": [
+            "Transfers to FLEURS without retraining; the ten-language episodes are harder than the smaller tasks.",
+            "Figure 11 · p. 12"
+          ]
+        }
+      ],
+      "interpretation": "Support examples let the same encoder handle a new vocabulary or task, but recognition quality depends on the number of choices, support count and language.",
+      "caveat": "These are qualitative observations from separate experiments, not a pooled performance comparison. English-only and multilingual encoders have different training data. FLEURS contains 102 languages, but each reported episode distinguishes only 3, 5 or 10 languages."
+    },
+    {
+      "title": "Encoder latency",
+      "question": "How do encoder size and quantization change inference time on the measured devices?",
+      "context": "TinyNet-E (“Small”) and EfficientNet-v2 Medium (“Base”); average over 200 inference runs. Latency in milliseconds, lower is better; no dispersion reported.",
+      "source": {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14"
+      },
+      "columns": [
+        "Device and model format",
+        "Small (ms)",
+        "Base (ms)"
+      ],
+      "rows": [
+        {
+          "label": "Raspberry Pi 4 · standard",
+          "values": [
+            "240.17",
+            "4480"
+          ]
+        },
+        {
+          "label": "Jetson Nano · standard",
+          "values": [
+            "35.12",
+            "1954"
+          ]
+        },
+        {
+          "label": "Pixel 7 · quantized",
+          "values": [
+            "5.12",
+            "78.07"
+          ]
+        },
+        {
+          "label": "Raspberry Pi 4 · quantized",
+          "values": [
+            "6.92",
+            "107.13"
+          ]
+        },
+        {
+          "label": "Jetson Nano · quantized",
+          "values": [
+            "7.32",
+            "101.37"
+          ]
+        }
+      ],
+      "interpretation": "The small encoder is faster on every measured platform, and quantization substantially reduces latency on Raspberry Pi and Jetson Nano.",
+      "caveat": "Encoder-only timings exclude log-mel computation and the prototype classifier. Pixel 7 was tested only with quantized models; accuracy after quantization is not reported here."
+    },
+    {
+      "title": "Encoder energy",
+      "question": "Do lower-cost encoders also consume less energy per inference?",
+      "context": "Same encoders and device configurations as the latency panel; average over 200 inference runs measured with an external power monitor. Energy in millijoules, lower is better; no dispersion reported.",
+      "source": {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14"
+      },
+      "columns": [
+        "Device and model format",
+        "Small (mJ)",
+        "Base (mJ)"
+      ],
+      "rows": [
+        {
+          "label": "Raspberry Pi 4 · standard",
+          "values": [
+            "137.82",
+            "2011.44"
+          ]
+        },
+        {
+          "label": "Jetson Nano · standard",
+          "values": [
+            "133.53",
+            "1227.24"
+          ]
+        },
+        {
+          "label": "Pixel 7 · quantized",
+          "values": [
+            "3.55",
+            "39.71"
+          ]
+        },
+        {
+          "label": "Raspberry Pi 4 · quantized",
+          "values": [
+            "4.15",
+            "71.75"
+          ]
+        },
+        {
+          "label": "Jetson Nano · quantized",
+          "values": [
+            "4.92",
+            "64.37"
+          ]
+        }
+      ],
+      "interpretation": "The small encoder uses less measured energy in each configuration; quantized variants reduce energy on both platforms with full-precision comparisons.",
+      "caveat": "These are encoder costs under the reported measurement setup, not whole-application battery consumption or continuous listening cost."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "MSWC: over 12 million one-second clips; 16,665 training and 4,174 test keywords across 20 languages, with disjoint keyword splits."
+    },
+    {
+      "label": "Models",
+      "value": "EfficientNet-v2 Medium (52.8M parameters) for the base model; TinyNet-E (761,396 parameters) for language-specific small models; ImageNet initialization."
+    },
+    {
+      "label": "Transfer",
+      "value": "Five unseen languages: Frisian, Mongolian, Maltese, Slovenian and Tamil; separate few-shot language-identification episodes on FLEURS."
+    },
+    {
+      "label": "Protocol",
+      "value": "1,000 test episodes, normally 15 queries; number of classes and support examples varies. Hardware profiling uses Raspberry Pi 4, Jetson Nano and Pixel 7."
+    }
+  ],
+  "limitations": [
+    "Recognition results are closed-set episodes over segmented clips; open-set rejection, false-trigger rates and continuous streaming keyword detection are not evaluated.",
+    "Generalization varies by language, vocabulary size and support count; the unseen-language experiment covers five languages, not all languages.",
+    "Hardware measurements exclude preprocessing and prototype computation, and the paper does not report a corresponding quantized-accuracy comparison.",
+    "Recognition accuracy is presented graphically without uncertainty intervals; the small models are trained separately per language and are not the single multilingual base model."
+  ],
+  "takeaways": [
+    "New word support clips create new prototypes, so changing the vocabulary does not require fine-tuning.",
+    "A single multilingual base model transfers to held-out words and five unseen languages, while additional support examples help harder settings.",
+    "The deployment trade-off includes both representation quality and encoder cost; the hardware table alone does not establish end-to-end recognition performance."
+  ],
+  "evidence_inventory": {
+    "tables": 1,
+    "figures": 13,
+    "source_url": "https://arxiv.org/pdf/2305.03058v1",
+    "version": "arXiv:2305.03058v1, 3 May 2023; 18-page public preprint, no appendix."
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "slug": "efu",
+  "problem": "A client can compute an unlearning update, yet the server may identify or omit it during aggregation.",
+  "contribution": "EFU binds compressed learning and unlearning updates to authorized encrypted aggregation, with auxiliary losses intended to reduce observable unlearning traces.",
+  "reading_guide": "Read retained accuracy alongside forgotten-class or forgotten-task accuracy; neither metric establishes exact data erasure or universal undetectability.",
+  "diagram": {
+    "type": "cycle",
+    "title": "One aggregation route for learning and unlearning",
+    "description": "Clients independently choose learning or unlearning, then send encrypted centroids, mappings, and partial keys to one server; the decrypted aggregate returns to all clients.",
+    "stages": [
+      {
+        "title": "Choose local update",
+        "detail": "Learn retained data or compute an unlearning update; these are alternative client operations.",
+        "icon": "clients",
+        "location": "Clients",
+        "items": [
+          "Learning loss",
+          "Unlearning loss"
+        ]
+      },
+      {
+        "title": "Cluster and encrypt",
+        "detail": "Encrypt centroids under the round label; send mappings and partial functional keys alongside them.",
+        "icon": "encrypt",
+        "location": "Clients"
+      },
+      {
+        "title": "Expand encrypted weights",
+        "detail": "Use mappings to substitute encrypted centroids into each client model.",
+        "icon": "layers",
+        "location": "Server"
+      },
+      {
+        "title": "Decrypt authorized aggregate",
+        "detail": "Combine partial keys, evaluate the agreed aggregate, and return the updated model to clients.",
+        "icon": "aggregate",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Same encryption protocol",
+      "Centroids + mappings + keys",
+      "Authorized aggregation"
+    ],
+    "footnote": "The aggregate returns to the clients each round. Enforcement concerns permitted decryption; successful deployment and exact forgetting are separate properties."
+  },
+  "results": [
+    {
+      "title": "Class forgetting with retained utility",
+      "question": "How does EFU compare with retraining and the unlearning methods it wraps?",
+      "context": "CIFAR-10, ResNet-18, class-wise forgetting of 10% of classes; 10 clients, 1 unlearning client, 20% participation, 100 rounds. Accuracy in %; higher retain and lower forget are desired. Means of 3 runs; no dispersion reported.",
+      "source": {
+        "label": "Table 1(a), class-wise CIFAR-10 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2508.07873v1#page=9"
+      },
+      "columns": [
+        "Method",
+        "Retained accuracy (%)",
+        "Forgotten accuracy (%)"
+      ],
+      "rows": [
+        {
+          "label": "Full retrain",
+          "values": [
+            "94.82",
+            "13.72"
+          ]
+        },
+        {
+          "label": "SGA-EWC",
+          "values": [
+            "91.23",
+            "14.69"
+          ]
+        },
+        {
+          "label": "PGD",
+          "values": [
+            "91.82",
+            "14.31"
+          ]
+        },
+        {
+          "label": "FedOSD",
+          "values": [
+            "93.06",
+            "12.77"
+          ]
+        },
+        {
+          "label": "EFU + SGA-EWC",
+          "values": [
+            "90.91",
+            "14.71"
+          ]
+        },
+        {
+          "label": "EFU + PGD",
+          "values": [
+            "91.61",
+            "14.29"
+          ]
+        },
+        {
+          "label": "EFU + FedOSD",
+          "values": [
+            "92.73",
+            "12.54"
+          ]
+        },
+        {
+          "label": "EFU",
+          "values": [
+            "92.43",
+            "13.06"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "EFU is 2.39 percentage points below retraining on retained classes and has similar forgotten-class accuracy. Wrapping the baselines preserves broadly similar performance in this setting.",
+      "caveat": "The PGD and FedOSD integrations also add MAS regularization. These are not pure encryption-only ablations; low forgotten accuracy alone does not prove removal of data influence."
+    },
+    {
+      "title": "Remove identity, retain gender",
+      "question": "Can one task be suppressed while a shared backbone continues serving another?",
+      "context": "LFW, ViT-B/32 with separate identity and gender heads; all 30 clients unlearn identity after round 50 of 100, with full participation. Test accuracy in %; higher gender and lower identity are desired. Means of 3 runs; no dispersion reported.",
+      "source": {
+        "label": "Table 2 · PDF page 10",
+        "url": "https://arxiv.org/pdf/2508.07873v1#page=10"
+      },
+      "columns": [
+        "Method",
+        "Gender accuracy (%)",
+        "Identity accuracy (%)"
+      ],
+      "rows": [
+        {
+          "label": "Full retrain",
+          "values": [
+            "96.86",
+            "4.71"
+          ]
+        },
+        {
+          "label": "SGA-EWC",
+          "values": [
+            "93.54",
+            "19.47"
+          ]
+        },
+        {
+          "label": "PGD",
+          "values": [
+            "94.81",
+            "10.32"
+          ]
+        },
+        {
+          "label": "FedOSD",
+          "values": [
+            "95.02",
+            "5.01"
+          ]
+        },
+        {
+          "label": "EFU",
+          "values": [
+            "95.37",
+            "5.12"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "EFU retains gender accuracy within 1.49 percentage points of retraining and reduces identity accuracy to 5.12%, close to the retraining reference of 4.71%.",
+      "caveat": "This is a system-wide two-task LFW experiment, not evidence that arbitrary tasks or individual identities can always be removed without collateral loss."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data and models",
+      "value": "CIFAR-10, 30-identity LFW, and 62-class FEMNIST; pretrained ResNet-18 and ViT-B/32."
+    },
+    {
+      "label": "Federated setting",
+      "value": "Flower simulations with Dirichlet concentration 0.1, 64 weight clusters, and a 256-bit DMCFE key; 1 local learning epoch and 5 unlearning epochs."
+    },
+    {
+      "label": "Compared with",
+      "value": "Full retraining, SGA-EWC, PGD, FedOSD, and their EFU integrations; sample-, class-, and task-level experiments."
+    },
+    {
+      "label": "Privacy evidence",
+      "value": "DMCFE-based proof sketches plus CIFAR-10 plots of aggregate parameter drift, local execution time, and message size; no tabulated detector accuracy."
+    }
+  ],
+  "limitations": [
+    "The stated threat model trusts clients to generate keys and perform unlearning correctly. The decryption argument assumes the agreed function and no unauthorized alternative key; it does not force a server to continue training or deploy the returned model.",
+    "Encryption hides ciphertext contents under DMCFE assumptions. The server also sees mappings and aggregate outputs; the paper conditions update-type indistinguishability on indistinguishable function outputs, and its side-channel plots are not a general detection test.",
+    "The sample-wise rows report retained test accuracy but no forgotten-sample metric. Appendix C defines a prediction-gap proxy, but no numerical prediction-gap or membership-inference audit is reported.",
+    "The runtime comparison generates adversarial examples offline. Its measured local update time is not a complete accounting of unlearning preparation cost."
+  ],
+  "takeaways": [
+    "Treat secure aggregation and the unlearning objective as separate components: the former constrains computation, while the latter determines behavioral forgetting.",
+    "Retention and forgetting must be assessed together, using retraining as a reference rather than treating low accuracy as an erasure certificate.",
+    "The empirical privacy evidence concerns specific parameter, timing, and communication signals on CIFAR-10."
+  ],
+  "evidence_inventory": {
+    "tables": 2,
+    "figures": 3,
+    "source_url": "https://arxiv.org/pdf/2508.07873v1",
+    "version": "arXiv:2508.07873v1, 11 August 2025; 18-page public preprint, not the published CIKM version."
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "slug": "enccluster",
+  "problem": "Encrypting every federated model weight can dominate clients’ compute time and upstream communication.",
+  "contribution": "EncCluster encrypts a small codebook of weight centroids and encodes their positions with Binary Fuse filters before secure aggregation.",
+  "reading_guide": "Separate accuracy loss, upstream bytes, and client encryption time; efficiency results do not establish protection against every inference attack.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Compress values, encode positions, aggregate securely",
+    "description": "Each client splits clustered weights into centroids and mappings, encrypts the former and encodes the latter, then the server reconstructs encrypted weights and returns their aggregate.",
+    "stages": [
+      {
+        "title": "Train and cluster",
+        "detail": "Train locally, then split model weights into a small centroid set and a position mapping.",
+        "icon": "cluster",
+        "location": "Clients"
+      },
+      {
+        "title": "Protect two components",
+        "detail": "Encrypt centroids; independently encode mappings with Binary Fuse filters.",
+        "icon": "encrypt",
+        "location": "Clients",
+        "items": [
+          "Encrypted centroids",
+          "Mapping fingerprints"
+        ]
+      },
+      {
+        "title": "Reconstruct encrypted weights",
+        "detail": "Query the filters using shared seeds, then substitute encrypted centroids at the recovered positions.",
+        "icon": "layers",
+        "location": "Server"
+      },
+      {
+        "title": "Aggregate and return",
+        "detail": "Combine partial keys to decrypt the weighted aggregate and return the global model.",
+        "icon": "aggregate",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Centroids + mappings",
+      "Ciphertexts + fingerprints + partial keys",
+      "Weighted aggregation"
+    ],
+    "footnote": "The cycle returns the aggregate to clients. This preprint uses an honest-but-curious setup authority; filter encoding is distinct from cryptographic encryption."
+  },
+  "results": [
+    {
+      "title": "Less encryption work and upstream traffic",
+      "question": "What does clustering save relative to encrypting full updates?",
+      "context": "CIFAR-10, ResNet-20, 30 clients, full participation, 128 clusters, 256-bit key. IID uses Dir(10); non-IID uses Dir(0.1). Accuracy changes are percentage points versus FedAvg; upstream ratios and seconds are lower-is-better.",
+      "source": {
+        "label": "Table 3, CIFAR-10 with full participation · PDF page 12",
+        "url": "https://arxiv.org/pdf/2406.09152v1#page=12"
+      },
+      "columns": [
+        "Method",
+        "IID accuracy Δ (pp)",
+        "Non-IID accuracy Δ (pp)",
+        "Upstream / FedAvg",
+        "Encryption (s)"
+      ],
+      "rows": [
+        {
+          "label": "FedAvg + weight clustering",
+          "values": [
+            "-0.12",
+            "-0.71",
+            "0.034",
+            "—"
+          ]
+        },
+        {
+          "label": "DeTrust-FL",
+          "values": [
+            "-0.09",
+            "-0.10",
+            "3.743",
+            "329.53"
+          ]
+        },
+        {
+          "label": "SEFL",
+          "values": [
+            "-0.98",
+            "-1.74",
+            "2.581",
+            "7.64"
+          ]
+        },
+        {
+          "label": "EncCluster",
+          "values": [
+            "-0.32",
+            "-0.79",
+            "0.284",
+            "2.04"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "EncCluster sends 28.4% of FedAvg’s upstream volume in this comparison, with 2.04 seconds of reported client encryption time and less than one percentage point of accuracy loss.",
+      "caveat": "FedAvg + clustering is an unencrypted compression reference. The table provides one communication/time column across the two splits, no uncertainty, and no end-to-end training or server-cost measurement.",
+      "chart": {
+        "metric": "Upstream volume / FedAvg",
+        "column": 2,
+        "min": 0,
+        "max": 4,
+        "higher_is_better": false
+      }
+    },
+    {
+      "title": "Accuracy across four architectures",
+      "question": "Do the reported accuracy and encryption costs depend strongly on the backbone?",
+      "context": "IID CIFAR-10 and CIFAR-100, 10 clients, full participation, 100 rounds. Accuracy changes are percentage points versus each architecture’s own FedAvg baseline; encryption time is client-side seconds. No uncertainty is reported.",
+      "source": {
+        "label": "Table 5 · PDF page 15",
+        "url": "https://arxiv.org/pdf/2406.09152v1#page=15"
+      },
+      "columns": [
+        "Architecture",
+        "CIFAR-10 accuracy Δ (pp)",
+        "CIFAR-100 accuracy Δ (pp)",
+        "Encryption (s)"
+      ],
+      "rows": [
+        {
+          "label": "ConvNeXt-Tiny",
+          "values": [
+            "-0.36",
+            "-1.29",
+            "2.02"
+          ]
+        },
+        {
+          "label": "ResNet-20",
+          "values": [
+            "-0.32",
+            "-1.19",
+            "2.03"
+          ]
+        },
+        {
+          "label": "MobileNet",
+          "values": [
+            "-0.24",
+            "-0.97",
+            "2.08"
+          ]
+        },
+        {
+          "label": "ConvMixer-256/8",
+          "values": [
+            "-0.19",
+            "-1.02",
+            "2.12"
+          ]
+        }
+      ],
+      "interpretation": "Across these reported runs, encryption time spans 2.02–2.12 seconds, while accuracy losses are larger on CIFAR-100 than CIFAR-10.",
+      "caveat": "These are different model baselines, not a ranking of model quality. The table caption mentions only CIFAR-10, but the table itself also contains CIFAR-100; both rows are transcribed here."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data and models",
+      "value": "CIFAR-10/100; ResNet-20, MobileNet, ConvNeXt-Tiny, and ConvMixer-256/8 trained from scratch."
+    },
+    {
+      "label": "Federated setting",
+      "value": "Flower simulations; principal comparisons use 30 clients, 1 local epoch, 128 clusters, and 20% or 100% participation."
+    },
+    {
+      "label": "Compared with",
+      "value": "FedAvg, FedAvg with weight clustering, DeTrust-FL, SEFL, and an EncCluster variant using Huffman coding instead of Binary Fuse filters."
+    },
+    {
+      "label": "Privacy evidence",
+      "value": "Arguments for isolation/replay resistance and a cluster-reconstruction experiment measuring embedding MSE; no differential-privacy budget or general inference-attack bound."
+    }
+  ],
+  "limitations": [
+    "The preprint assumes an honest-but-curious server and setup authority, secure channels, and protected key provisioning. Colluding clients may disclose weights but do not poison updates; denial-of-service and poisoning are excluded.",
+    "Binary Fuse filters are not encryption and the paper explicitly disclaims equivalent cryptographic guarantees. Their reconstruction errors are not an established differential-privacy guarantee.",
+    "With all other clients colluding, the aggregate can reveal a target’s clustered contribution. Lossy compression prevents exact recovery of original weights but does not establish absence of sensitive information leakage.",
+    "Evaluation uses two small vision datasets and reports client encryption time and upstream volume. It does not establish wall-clock, energy, server scalability, or deployed edge-device gains."
+  ],
+  "takeaways": [
+    "The main efficiency gain comes from reducing the number of values encrypted to the centroid count.",
+    "Protecting centroid values and encoding their positions solve different problems; the server is intended to recover the mappings.",
+    "The no-filter variant is more compact, so the extra encoding has a visible communication cost that must be weighed against its narrower threat model."
+  ],
+  "evidence_inventory": {
+    "tables": 5,
+    "figures": 4,
+    "source_url": "https://arxiv.org/pdf/2406.09152v1",
+    "version": "arXiv:2406.09152v1, 13 June 2024; 22-page preprint. Separate from the 2025 journal article and NeurIPS 2024 workshop paper."
+  }
+}

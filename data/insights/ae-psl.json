@@ -1,0 +1,253 @@
+{
+  "slug": "ae-psl",
+  "problem": "Split fine-tuning exchanges activations and gradients at every step, making communication a bottleneck for edge clients.",
+  "contribution": "AE-PSL aligns an autoencoder with pretrained features and local client data before freezing it for compressed parallel split fine-tuning.",
+  "reading_guide": "Read global results with the autoencoder bypassed at inference separately from local FEMNIST results with compression still active.",
+  "diagram": {
+    "type": "pipeline",
+    "title": "Align twice, then fine-tune",
+    "description": "General alignment trains the autoencoder on public features. Clients adapt it locally and average only the decoders. Fine-tuning then uses local frozen encoders and one frozen server decoder, with compressed activations sent forward and latent gradients returned.",
+    "stages": [
+      {
+        "title": "General alignment",
+        "detail": "Train the autoencoder to reconstruct public split-layer features while the pretrained client partition stays frozen.",
+        "icon": "autoencoder",
+        "location": "Server · preparation",
+        "items": [
+          "Public ImageNet100 features",
+          "Reconstruction loss"
+        ]
+      },
+      {
+        "title": "Client alignment",
+        "detail": "Adapt locally; retain client encoders and average decoders into one server module.",
+        "icon": "clients",
+        "location": "Clients + server · preparation",
+        "items": [
+          "Local reconstruction",
+          "Decoder averaging"
+        ]
+      },
+      {
+        "title": "Split fine-tuning",
+        "detail": "Freeze compressors; exchange compact patch activations and gradients while adapting the split model.",
+        "icon": "exchange",
+        "location": "Clients ↔ server · training",
+        "items": [
+          "Local encoders",
+          "Shared decoder"
+        ]
+      }
+    ],
+    "connections": [
+      "Distribute the aligned autoencoder",
+      "Freeze the adapted compression modules"
+    ],
+    "footnote": "The classification token and its gradient remain uncompressed. Predictions return to clients for local loss computation; the server aggregates losses before returning cut-layer gradients."
+  },
+  "results": [
+    {
+      "title": "Global accuracy at about 10× reduction",
+      "question": "Can compressed training preserve accuracy when the compressor is removed for global inference?",
+      "context": "ViT-B/32, split layer 5, five clients, Dirichlet α=0.5; top-1 accuracy (%), higher is better. Mean ± standard deviation over three seeds. Compressed methods use R≈10; the reference uses R=1.",
+      "source": {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17"
+      },
+      "columns": [
+        "Method",
+        "CIFAR-100 (%)",
+        "Food101 (%)",
+        "SUN397 (%)"
+      ],
+      "rows": [
+        {
+          "label": "No compression · R=1",
+          "values": [
+            "82.7 ± 0.2",
+            "69.1 ± 0.9",
+            "67.0 ± 0.6"
+          ]
+        },
+        {
+          "label": "C3-SL",
+          "values": [
+            "50.9 ± 1.2",
+            "40.3 ± 1.2",
+            "41.3 ± 2.1"
+          ]
+        },
+        {
+          "label": "Rand-Top-K",
+          "values": [
+            "76.2 ± 0.4",
+            "60.2 ± 0.2",
+            "62.9 ± 1.0"
+          ]
+        },
+        {
+          "label": "ADC",
+          "values": [
+            "68.4 ± 0.4",
+            "54.6 ± 1.6",
+            "52.9 ± 1.1"
+          ]
+        },
+        {
+          "label": "AE-PSL",
+          "values": [
+            "82.7 ± 0.2",
+            "69.6 ± 1.2",
+            "66.7 ± 0.3"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "At this reduction and client count, AE-PSL stays within 0.5 percentage points of the uncompressed reference on all three global benchmarks.",
+      "caveat": "These are global tests after client-weight aggregation with the autoencoder bypassed. They do not measure compressed inference accuracy or full preparation cost.",
+      "chart": {
+        "metric": "CIFAR-100 accuracy (%)",
+        "column": 0,
+        "min": 0,
+        "max": 100,
+        "higher_is_better": true
+      }
+    },
+    {
+      "title": "Local inference under stronger compression",
+      "question": "What happens when the compression bottleneck remains active at test time?",
+      "context": "FEMNIST, ViT-B/32, 25 clients, writer-based partitions; local accuracy (%) averaged across clients, higher is better. Mean ± standard deviation over three seeds. Compressed methods use R≈20; reference R=1.",
+      "source": {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17"
+      },
+      "columns": [
+        "Method",
+        "Local accuracy (%)"
+      ],
+      "rows": [
+        {
+          "label": "No compression · R=1",
+          "values": [
+            "85.8 ± 0.6"
+          ]
+        },
+        {
+          "label": "C3-SL",
+          "values": [
+            "6.9 ± 1.8"
+          ]
+        },
+        {
+          "label": "Rand-Top-K",
+          "values": [
+            "82.2 ± 0.3"
+          ]
+        },
+        {
+          "label": "ADC",
+          "values": [
+            "73.8 ± 5.4"
+          ]
+        },
+        {
+          "label": "AE-PSL",
+          "values": [
+            "84.6 ± 1.0"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "AE-PSL has the highest reported accuracy among the compressed methods, 1.2 percentage points below the uncompressed reference.",
+      "caveat": "FEMNIST uses 10% subsamples per writer and local tests. Its scores are not interchangeable with the centralized global tests above."
+    },
+    {
+      "title": "Why alignment and freezing matter",
+      "question": "Does inserting an unaligned autoencoder fail in every evaluation mode?",
+      "context": "ViT-B/32, five clients; R≈15 for all AE variants, R=1 for the reference. Accuracy (%) with reported ± terms over three seeds. GA: general alignment; CSA: client alignment; FZ: frozen autoencoder.",
+      "source": {
+        "label": "Table 2 · PDF page 11",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=11"
+      },
+      "columns": [
+        "Configuration",
+        "CIFAR-100 · global (%)",
+        "FEMNIST · local (%)"
+      ],
+      "rows": [
+        {
+          "label": "No compression",
+          "values": [
+            "82.7 ± 0.4",
+            "87.6 ± 0.7"
+          ]
+        },
+        {
+          "label": "AE only",
+          "values": [
+            "1.4 ± 0.3",
+            "86.9 ± 2.0"
+          ]
+        },
+        {
+          "label": "AE + GA",
+          "values": [
+            "75.2 ± 0.4",
+            "87.1 ± 1.1"
+          ]
+        },
+        {
+          "label": "AE + GA + FZ",
+          "values": [
+            "79.6 ± 0.9",
+            "88.0 ± 0.6"
+          ]
+        },
+        {
+          "label": "AE + GA + CSA + FZ",
+          "values": [
+            "82.2 ± 0.7",
+            "88.0 ± 0.7"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "Alignment and freezing restore compatibility with uncompressed global inference. An unaligned AE does not cause the same collapse when it remains active locally.",
+      "caveat": "This is a separate ablation at R≈15. Its baseline values and reported spreads differ from Table 4, so the two tables should not be combined into one estimate."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "CIFAR-100, Food101, SUN397 and FEMNIST; public ImageNet100 for general alignment."
+    },
+    {
+      "label": "Model",
+      "value": "ImageNet-pretrained ViT-B/32, default split layer 5, two-layer MLP autoencoder; LoRA rank 16."
+    },
+    {
+      "label": "Training",
+      "value": "5 or 25 clients; 10 fine-tuning epochs, global batch 125; 30 general-alignment epochs and one local alignment epoch."
+    },
+    {
+      "label": "Compared with",
+      "value": "Uncompressed training, Rand-Top-K, C3-SL and ADC, adapted to the same aggregated parallel split framework."
+    }
+  ],
+  "limitations": [
+    "The evaluated downstream tasks are vision classification; non-vision, language-model and multimodal adaptation are not tested.",
+    "The design relies on an uncompressed classification token. Compressing it damages accuracy in the appendix ablation.",
+    "The principal global tests bypass the AE at inference; local FEMNIST uses a different evaluation protocol with it active.",
+    "Client GFLOP comparisons include local warm-up, but do not establish total system latency, energy savings or the amortized cost of 30-epoch public alignment."
+  ],
+  "takeaways": [
+    "Learned compression needs to preserve the pretrained feature space, particularly if the compressor will later be removed.",
+    "The result is a measured accuracy–communication trade-off: stronger compression can reduce accuracy, and the inference protocol matters."
+  ],
+  "evidence_inventory": {
+    "tables": 7,
+    "figures": 12,
+    "source_url": "https://arxiv.org/pdf/2607.17913v1",
+    "version": "arXiv:2607.17913v1, 20 July 2026; 28 pages including Appendix A.1–A.8"
+  }
+}

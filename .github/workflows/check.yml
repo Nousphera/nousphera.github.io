@@ -19,5 +19,6 @@ jobs:
       - run: python3 -m unittest discover -s tests
       - run: node --test tests/*.test.cjs
       - run: python3 scripts/build_projects.py
+      - run: python3 scripts/export_research_icons.py
       - name: Check committed pages match their sources
         run: git diff --exit-code

@@ -17,7 +17,7 @@
     "Federated learning"
   ],
   "tagline": "Exchange codebooks to make federated communication smaller",
-  "summary": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models and reduce communication in both directions with limited extra client computation.",
+  "summary": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models. Clients cluster all model weights together in a model-wide step.",
   "method": [
     {
       "title": "Turn weights into a codebook",
@@ -25,11 +25,11 @@
     },
     {
       "title": "Exchange centers in both directions",
-      "text": "The server sends a codebook for clients to update their weights using binary search. After local training, clients send their codebooks back for aggregation and a global weight update."
+      "text": "The server sends a codebook for clients to update their weights using binary search. After local training, clients return codebooks; the server concatenates their centers and maps its weights to the nearest centers."
     },
     {
       "title": "Recalibrate periodically",
-      "text": "Selected rounds also transmit compressed weight matrices with the codebook. These transfers realign cluster assignments as local training causes client and server weights to diverge."
+      "text": "Selected rounds also transmit compressed weight matrices with the codebook. Client-side calibration realigns local assignments; server-side calibration reconstructs client models and applies FedAvg."
     }
   ],
   "findings": [

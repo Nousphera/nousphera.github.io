@@ -1,0 +1,267 @@
+{
+  "slug": "deltamask",
+  "problem": "Even one-bit updates become expensive when many clients adapt large pretrained vision models.",
+  "contribution": "DeltaMask trains stochastic masks over fixed pretrained weights and encodes selected changes from a shared mask using compact probabilistic filters.",
+  "reading_guide": "Read accuracy together with bitrate: the tabulated averages are not the same as the paper’s lowest reported 0.09-bit setting.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Communicate changed mask positions",
+    "description": "Each client shares a seeded reference mask with the server, learns local mask probabilities over fixed backbone weights, and ranks changed positions. Binary fuse filters and lossless image compression carry selected positions. The server queries the filter, flips reference bits and aggregates reconstructed masks into the next global probability mask.",
+    "stages": [
+      {
+        "title": "Learn local masks",
+        "detail": "Train mask probabilities over fixed pretrained weights using local labeled data.",
+        "icon": "mask",
+        "location": "Client"
+      },
+      {
+        "title": "Select mask changes",
+        "detail": "Compare with the shared reference mask and rank changed positions by relative entropy.",
+        "icon": "filter",
+        "location": "Client"
+      },
+      {
+        "title": "Encode and transmit",
+        "detail": "Store selected positions in a binary fuse filter, then compress its fingerprints losslessly.",
+        "icon": "compress",
+        "location": "Client → server"
+      },
+      {
+        "title": "Reconstruct and aggregate",
+        "detail": "Query the filter, flip reference bits and aggregate reconstructed masks into global probabilities.",
+        "icon": "aggregate",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Local and reference masks",
+      "Selected change positions",
+      "Compressed fingerprints"
+    ],
+    "footnote": "The next global probability mask and shared sampling seed close the loop. Reconstruction is approximate because membership queries can return false positives; the pretrained backbone weights remain fixed."
+  },
+  "results": [
+    {
+      "title": "IID data with full participation",
+      "question": "How much bitrate is saved, and what accuracy is retained across eight tasks?",
+      "context": "CLIP ViT-B/32; eight image datasets, Dirichlet α=10, 30 clients, full participation, 100 rounds and one local epoch. Reported average accuracy (%) is higher-is-better; average bits per parameter (bpp) is lower-is-better.",
+      "source": {
+        "label": "Table II · ρ=1.0 · PDF page 11",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11"
+      },
+      "columns": [
+        "Method",
+        "Average accuracy (%)",
+        "Average bitrate (bpp)"
+      ],
+      "rows": [
+        {
+          "label": "Fine-tuning",
+          "values": [
+            "88.08",
+            "32"
+          ]
+        },
+        {
+          "label": "FedMask",
+          "values": [
+            "79.23",
+            "1.0"
+          ]
+        },
+        {
+          "label": "EDEN",
+          "values": [
+            "84.14",
+            "0.691"
+          ]
+        },
+        {
+          "label": "DeepReduce",
+          "values": [
+            "76.53",
+            "1.089"
+          ]
+        },
+        {
+          "label": "FedPM",
+          "values": [
+            "86.07",
+            "0.872"
+          ]
+        },
+        {
+          "label": "DeltaMask",
+          "values": [
+            "85.44",
+            "0.151"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "DeltaMask reports 0.151 bpp with accuracy 0.63 percentage points below FedPM and 2.64 below the fine-tuning reference.",
+      "caveat": "The table reports no uncertainty for the eight-task averages. The fine-tuning reference updates the same last five blocks targeted by masking, not the entire backbone.",
+      "chart": {
+        "metric": "Average accuracy across eight tasks (%)",
+        "column": 0,
+        "min": 0,
+        "max": 100,
+        "higher_is_better": true
+      }
+    },
+    {
+      "title": "Non-IID data with partial participation",
+      "question": "Does the bitrate advantage survive heterogeneous data and intermittent participation?",
+      "context": "CLIP ViT-B/32; eight image datasets, Dirichlet α=0.1, 30 clients with 20% participation, 300 rounds and one local epoch. Average accuracy (%) is higher-is-better; average bpp is lower-is-better.",
+      "source": {
+        "label": "Table III · ρ=0.2 · PDF page 11",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11"
+      },
+      "columns": [
+        "Method",
+        "Average accuracy (%)",
+        "Average bitrate (bpp)"
+      ],
+      "rows": [
+        {
+          "label": "Fine-tuning",
+          "values": [
+            "83.19",
+            "32"
+          ]
+        },
+        {
+          "label": "FedMask",
+          "values": [
+            "68.86",
+            "1.0"
+          ]
+        },
+        {
+          "label": "EDEN",
+          "values": [
+            "78.56",
+            "0.715"
+          ]
+        },
+        {
+          "label": "DeepReduce",
+          "values": [
+            "73.90",
+            "1.173"
+          ]
+        },
+        {
+          "label": "FedPM",
+          "values": [
+            "81.64",
+            "0.948"
+          ]
+        },
+        {
+          "label": "DeltaMask",
+          "values": [
+            "81.13",
+            "0.233"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "At 0.233 bpp, DeltaMask trails FedPM by 0.51 percentage points and fine-tuning by 2.06, while using fewer reported bits per parameter.",
+      "caveat": "These averages have no tabulated uncertainty. This setting uses three times as many rounds as the IID panel, so bitrate alone is not total training communication."
+    },
+    {
+      "title": "Architecture and pretraining variation",
+      "question": "Does mask-based adaptation work beyond the main CLIP backbone?",
+      "context": "CIFAR-100, IID Dirichlet α=10, ten clients. Accuracy (%) is higher-is-better; DeltaMask bitrate is lower-is-better. Entries retain the source’s ± terms; experiments average three runs, but the dispersion convention is not defined.",
+      "source": {
+        "label": "Table I · PDF page 9",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=9"
+      },
+      "columns": [
+        "Backbone",
+        "Fine-tuning accuracy (%)",
+        "DeltaMask accuracy (%)",
+        "DeltaMask bitrate (bpp)"
+      ],
+      "rows": [
+        {
+          "label": "CLIP ViT-B/32",
+          "values": [
+            "77.35 ± 0.009",
+            "75.82 ± 0.023",
+            "0.207 ± 0.001"
+          ]
+        },
+        {
+          "label": "CLIP ViT-L/14",
+          "values": [
+            "89.07 ± 0.012",
+            "89.48 ± 0.031",
+            "0.225 ± 0.002"
+          ]
+        },
+        {
+          "label": "DINOv2-Base",
+          "values": [
+            "75.01 ± 0.007",
+            "73.36 ± 0.027",
+            "0.197 ± 0.001"
+          ]
+        },
+        {
+          "label": "DINOv2-Small",
+          "values": [
+            "65.55 ± 0.019",
+            "63.01 ± 0.033",
+            "0.214 ± 0.001"
+          ]
+        },
+        {
+          "label": "ConvMixer-768/32",
+          "values": [
+            "78.52 ± 0.009",
+            "75.31 ± 0.021",
+            "0.251 ± 0.001"
+          ]
+        }
+      ],
+      "interpretation": "All five backbones operate near 0.2–0.25 bpp. Only CLIP ViT-L/14 exceeds its fine-tuning reference in this table.",
+      "caveat": "This is a separate ten-client experiment; its CLIP ViT-B/32 values should not be substituted into the thirty-client tables. Unusually small ± terms are reproduced without reinterpretation."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "CIFAR-10/100, SVHN, EMNIST, Fashion-MNIST, EuroSAT, Food-101 and Cars196; image classification only."
+    },
+    {
+      "label": "Models",
+      "value": "CLIP ViT-B/32 and ViT-L/14, DINOv2-Base and DINOv2-Small, and ConvMixer-768/32; masks target the last five blocks."
+    },
+    {
+      "label": "Compared with",
+      "value": "Linear probing, fine-tuning, FedMask, EDEN, DeepReduce and FedPM; additional CPU/traffic comparisons include DRIVE and FedCode."
+    },
+    {
+      "label": "Protocol",
+      "value": "Shared seeded reference masks; one initial linear-probing round for classifier initialization; BFuse8 by default, with ranking and filter-bitwidth ablations."
+    }
+  ],
+  "limitations": [
+    "The experiments cover image classification. Broader task support and personalization are proposals rather than evaluated outcomes.",
+    "The 0.09 bpp headline is a lowest reported setting; Tables II–III give eight-task average bitrates of 0.151–0.233 bpp for DeltaMask.",
+    "The CPU encoding/decoding study excludes aggregation and omits arithmetic coding for masking baselines; it is not an end-to-end device latency test.",
+    "Probabilistic filters permit false positives. Hashing and bit flips are not evaluated as a formal privacy mechanism."
+  ],
+  "takeaways": [
+    "Sparse changes to a shared mask can be much smaller than sending the complete binary mask.",
+    "The practical result is a bitrate–accuracy trade-off, not uniformly unchanged accuracy or a universal 0.09 bpp rate."
+  ],
+  "evidence_inventory": {
+    "tables": 3,
+    "figures": 6,
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "version": "TU/e accepted manuscript for IEEE BigData 2024, published 16 January 2025; 11 PDF pages including repository cover and Appendices A–B; downloaded 14 October 2026"
+  }
+}

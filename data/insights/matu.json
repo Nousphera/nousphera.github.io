@@ -1,0 +1,229 @@
+{
+  "slug": "matu",
+  "problem": "A client handling several tasks can produce conflicting updates, while separate task models increase communication and storage.",
+  "contribution": "MaTU combines local task vectors into one shared vector with per-task masks and scalars, then aggregates same-task and related-task updates.",
+  "reading_guide": "Compare single-task and multiple-task clients separately; the reported bitrate is per task per round, not total training traffic.",
+  "diagram": {
+    "type": "cycle",
+    "title": "One vector, task-specific updates",
+    "description": "Clients fine-tune each assigned task from a shared pretrained model, unify their updates, and send the unified vector plus masks and scalars. The server aggregates within tasks and transfers updates from similar tasks. Returned unified vectors are modulated into local task updates for the next round.",
+    "stages": [
+      {
+        "title": "Train local tasks",
+        "detail": "Fine-tune each assigned task and express its update relative to the shared pretrained weights.",
+        "icon": "task-vector",
+        "location": "Client"
+      },
+      {
+        "title": "Unify and modulate",
+        "detail": "Elect one vector; retain a binary mask and scalar for each task.",
+        "icon": "merge",
+        "location": "Client"
+      },
+      {
+        "title": "Aggregate related tasks",
+        "detail": "Combine same-task updates and transfer information from tasks with aligned update signs.",
+        "icon": "aggregate",
+        "location": "Server"
+      },
+      {
+        "title": "Recover task updates",
+        "detail": "Receive a unified vector and modulators; reconstruct the update for each local task.",
+        "icon": "mask",
+        "location": "Client"
+      }
+    ],
+    "connections": [
+      "Task vectors",
+      "Unified vector + modulators",
+      "Updated vector + modulators"
+    ],
+    "footnote": "Recovered task updates feed the next local-training round. “Stateless” means the server does not retain client-specific weights across rounds; task-level aggregation still occurs."
+  },
+  "results": [
+    {
+      "title": "One task per client",
+      "question": "How does MaTU compare before introducing intra-client task conflicts?",
+      "context": "Eight vision tasks, ImageNet-21k-pretrained ViT-B/32 with rank-16 LoRA, 30 clients, 20% participation, one local epoch. Mean task accuracy (%), higher is better; reported bitrate in millions of bits per task per round, lower is better.",
+      "source": {
+        "label": "Table 1 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6"
+      },
+      "columns": [
+        "Method",
+        "Average accuracy (%)",
+        "Bitrate (M bits/task/round)"
+      ],
+      "rows": [
+        {
+          "label": "Individual (centralized)",
+          "values": [
+            "90.21",
+            "—"
+          ]
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "64.60",
+            "6.32"
+          ]
+        },
+        {
+          "label": "NTK-FedAvg",
+          "values": [
+            "65.13",
+            "6.32"
+          ]
+        },
+        {
+          "label": "FedProx",
+          "values": [
+            "67.14",
+            "6.32"
+          ]
+        },
+        {
+          "label": "FedPer",
+          "values": [
+            "82.11",
+            "5.36"
+          ]
+        },
+        {
+          "label": "MaT-FL",
+          "values": [
+            "76.66",
+            "6.32"
+          ]
+        },
+        {
+          "label": "MaTU",
+          "values": [
+            "84.32",
+            "6.32"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "MaTU reaches 84.32% average accuracy, above the evaluated federated baselines and 5.89 percentage points below individual centralized fine-tuning.",
+      "caveat": "MaT-FL uses 300 rounds; the other federated methods use 100. The table supplies no uncertainty estimates, and per-round bitrate does not capture that round-count difference.",
+      "chart": {
+        "metric": "Average accuracy (%)",
+        "column": 0,
+        "min": 0,
+        "max": 100,
+        "higher_is_better": true
+      }
+    },
+    {
+      "title": "Several tasks per client",
+      "question": "Can one unified update handle task conflicts while reducing communication?",
+      "context": "Same eight-task ViT-B/32 benchmark; 30 clients, task concentration ζt=0.5, 20% participation and one local epoch. Accuracy (%) is averaged across tasks; bitrate is millions of bits per task per round.",
+      "source": {
+        "label": "Table 2 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6"
+      },
+      "columns": [
+        "Method",
+        "Average accuracy (%)",
+        "Bitrate (M bits/task/round)"
+      ],
+      "rows": [
+        {
+          "label": "Individual (centralized)",
+          "values": [
+            "90.21",
+            "—"
+          ]
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "51.63",
+            "20.43"
+          ]
+        },
+        {
+          "label": "NTK-FedAvg",
+          "values": [
+            "56.06",
+            "20.43"
+          ]
+        },
+        {
+          "label": "FedProx",
+          "values": [
+            "56.32",
+            "20.43"
+          ]
+        },
+        {
+          "label": "FedPer",
+          "values": [
+            "48.37",
+            "17.16"
+          ]
+        },
+        {
+          "label": "MaT-FL",
+          "values": [
+            "67.60",
+            "20.43"
+          ]
+        },
+        {
+          "label": "MaTU",
+          "values": [
+            "79.47",
+            "8.04"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "MaTU exceeds MaT-FL by 11.87 percentage points while reporting 8.04 versus 20.43 million bits per task per round. It remains 10.74 points below individual centralized fine-tuning.",
+      "caveat": "MaT-FL again uses 300 rounds versus 100 for the other methods. No seed count or uncertainty is specified for these table entries.",
+      "chart": {
+        "metric": "Average accuracy (%)",
+        "column": 0,
+        "min": 0,
+        "max": 100,
+        "higher_is_better": true
+      }
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "An eight-task vision benchmark and a larger 30-task vision benchmark; both class and task heterogeneity are simulated."
+    },
+    {
+      "label": "Model",
+      "value": "ImageNet-21k-pretrained ViT-B/32 with LoRA rank 16; task vectors share the same pretrained origin."
+    },
+    {
+      "label": "Compared with",
+      "value": "Individual centralized fine-tuning, FedAvg, NTK-FedAvg, FedProx, FedPer and MaT-FL."
+    },
+    {
+      "label": "Additional analysis",
+      "value": "Task-relatedness metrics, 2–30 tasks per client, deliberately conflicting task groups and cross-task aggregation ablations."
+    }
+  ],
+  "limitations": [
+    "All empirical tasks are vision classification with one backbone and adapter configuration; language or heterogeneous model architectures are not evaluated.",
+    "The main tables report no uncertainty, and MaT-FL is allocated three times as many rounds as the other methods.",
+    "The 30-task figure reports accuracy normalized to individual task fine-tuning, unlike the raw accuracy in the eight-task tables.",
+    "Cross-task transfer is not uniformly beneficial: the no-cross-task variant slightly exceeds MaTU in the two-conflict ablation in Figure 6b."
+  ],
+  "takeaways": [
+    "A unified vector needs task-specific masks and scaling to retain useful differences between local tasks.",
+    "Lower per-round communication and better average accuracy do not establish parity with independent centralized fine-tuning."
+  ],
+  "evidence_inventory": {
+    "tables": 2,
+    "figures": 6,
+    "source_url": "https://arxiv.org/pdf/2502.06376v3",
+    "version": "arXiv:2502.06376v3, 8 July 2025; 9 pages; no appendix"
+  }
+}

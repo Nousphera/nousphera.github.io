@@ -1,0 +1,202 @@
+{
+  "slug": "fedstar",
+  "problem": "Federated audio models leave most recordings unused when only a small fraction of local clips have labels.",
+  "contribution": "FedSTAR learns jointly from labels and confidence-filtered pseudo-labels, with optional self-supervised initialization to improve early convergence.",
+  "reading_guide": "First compare equal label budgets, then check the class-distribution assumption and the separate effect of model initialization.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Learn locally, aggregate, repeat",
+    "description": "The server broadcasts model weights. Each client jointly trains on labeled clips and confident pseudo-labels from unlabeled clips, then returns weights for FedAvg and the next round.",
+    "stages": [
+      {
+        "title": "Broadcast model",
+        "detail": "Send the current shared weights to the clients selected for this round.",
+        "icon": "download",
+        "location": "Server"
+      },
+      {
+        "title": "Local self-training",
+        "detail": "Jointly optimize labeled clips and pseudo-labels that pass the changing confidence threshold.",
+        "icon": "audio",
+        "location": "Clients",
+        "items": [
+          "Labeled audio",
+          "Unlabeled audio",
+          "Confidence threshold"
+        ]
+      },
+      {
+        "title": "Aggregate updates",
+        "detail": "Average returned model parameters to create the next shared model.",
+        "icon": "aggregate",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Receive shared weights",
+      "Return local weights"
+    ],
+    "footnote": "FedAvg returns the aggregated model to the next broadcast. Optional FSD-50K contrastive pretraining initializes this cycle; it is separate from the local self-training procedure."
+  },
+  "results": [
+    {
+      "title": "Learning with 3% labels",
+      "question": "Does unlabeled audio help when the supervised baseline receives exactly the same labeled clips?",
+      "context": "15 clients; 3% labels, remaining clips available unlabeled; 100 rounds, one local epoch, 80% participation, data-distribution variance 25%, unlabeled-loss weight 0.5. Mean test accuracy (%) over three runs; higher is better.",
+      "source": {
+        "label": "Appendix Table 9 · PDF page 25 (74:24)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=25"
+      },
+      "columns": [
+        "Dataset",
+        "Supervised FL (%)",
+        "FedSTAR (%)"
+      ],
+      "rows": [
+        {
+          "label": "Ambient Context",
+          "values": [
+            "33.03 ± 0.002",
+            "49.54 ± 0.005"
+          ]
+        },
+        {
+          "label": "Speech Commands",
+          "values": [
+            "62.98 ± 0.003",
+            "86.82 ± 0.006"
+          ]
+        },
+        {
+          "label": "VoxForge",
+          "values": [
+            "54.26 ± 0.002",
+            "55.82 ± 0.011"
+          ]
+        }
+      ],
+      "interpretation": "FedSTAR improves each of these three task-specific comparisons, with a much larger gap on Speech Commands than on VoxForge.",
+      "caveat": "The appendix prints ± values and calls them variance across experiments; they are retained verbatim, with no conversion to standard deviations or confidence intervals. These rows share a client count and label budget, but represent different tasks; their accuracies should not be pooled."
+    },
+    {
+      "title": "Labeled classes missing locally",
+      "question": "Can unlabeled examples help when clients have labels for only a few classes?",
+      "context": "Speech Commands; 15 clients, 3% labels, mean of three labeled classes per client out of 12; unlabeled clips are randomly distributed and may cover all classes. 100 rounds, one local epoch, 80% participation. Mean test accuracy (%), higher is better.",
+      "source": {
+        "label": "Appendix Table 8 · PDF page 24 (74:23)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=24"
+      },
+      "columns": [
+        "Class-distribution variance",
+        "Supervised FL (%)",
+        "FedSTAR (%)"
+      ],
+      "rows": [
+        {
+          "label": "0%",
+          "values": [
+            "9.83 ± 0.017",
+            "79.08 ± 0.026"
+          ]
+        },
+        {
+          "label": "25%",
+          "values": [
+            "10.54 ± 0.016",
+            "79.05 ± 0.052"
+          ]
+        },
+        {
+          "label": "50%",
+          "values": [
+            "8.44 ± 0.001",
+            "78.14 ± 0.021"
+          ]
+        }
+      ],
+      "interpretation": "Unlabeled coverage supplies information absent from each client’s labeled subset, giving large gains in this particular distribution experiment.",
+      "caveat": "The appendix prints ± values and calls them variance across experiments; they are retained verbatim, with no conversion to standard deviations or confidence intervals. This does not test the case where both labeled and unlabeled client data lack the same classes."
+    },
+    {
+      "title": "Pretraining after 100 rounds",
+      "question": "Does a better initialization always give a higher final accuracy?",
+      "context": "Speech Commands; 15 clients, 50% of the remaining unlabeled pool used; label budget varies by row. 100 rounds, one local epoch, 80% participation. Mean test accuracy (%) over three runs; higher is better.",
+      "source": {
+        "label": "Appendix Table 7 · PDF page 24 (74:23)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=24"
+      },
+      "columns": [
+        "Labeled data",
+        "Random initialization (%)",
+        "FSD-50K pretraining (%)"
+      ],
+      "rows": [
+        {
+          "label": "3%",
+          "values": [
+            "85.40 ± 0.008",
+            "85.17 ± 0.001"
+          ]
+        },
+        {
+          "label": "5%",
+          "values": [
+            "88.52 ± 0.005",
+            "88.28 ± 0.002"
+          ]
+        },
+        {
+          "label": "20%",
+          "values": [
+            "92.24 ± 0.012",
+            "93.67 ± 0.005"
+          ]
+        },
+        {
+          "label": "50%",
+          "values": [
+            "92.26 ± 0.005",
+            "93.83 ± 0.003"
+          ]
+        }
+      ],
+      "interpretation": "At this fixed unlabeled budget, pretraining helps the 20% and 50% label settings but does not improve the two smaller label budgets after 100 rounds.",
+      "caveat": "The appendix prints ± values and calls them variance across experiments; they are retained verbatim, with no conversion to standard deviations or confidence intervals. This endpoint comparison is distinct from Figure 6’s early-convergence experiment at 10 rounds."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "Ambient Acoustic Contexts (10 events), Speech Commands v2 (12 classes), VoxForge (6 languages); FSD-50K for optional contrastive pretraining."
+    },
+    {
+      "label": "Models",
+      "value": "Four-block convolutional audio network using log-mel inputs, group normalization and spatial dropout."
+    },
+    {
+      "label": "Compared with",
+      "value": "Centralized supervised training and supervised FedAvg with matching local labeled subsets; random versus pretrained FedSTAR."
+    },
+    {
+      "label": "Protocol",
+      "value": "Flower simulations with 5–30 clients, 20–80% participation, 1–4 local epochs and three full runs per setting."
+    }
+  ],
+  "limitations": [
+    "Self-training needs some reliable labels and assumes local labeled and unlabeled audio come from the same distribution.",
+    "The strongest class-skew gains use unlabeled data that may contain all classes even where labeled data do not.",
+    "More local training can harm the 3% label setting through overfitting or incorrect pseudo-labels; benefits are not universal across configurations.",
+    "Experiments simulate federated clients. Real-device energy, system heterogeneity and formal differential privacy are not established."
+  ],
+  "takeaways": [
+    "Keeping unlabeled audio in the training loop can be more useful than discarding it when local labels are scarce.",
+    "Optional public-data pretraining improves early learning in many settings, but its final-accuracy benefit depends on the label budget.",
+    "The distribution of unlabeled examples is part of the result, not an incidental implementation detail."
+  ],
+  "evidence_inventory": {
+    "tables": 9,
+    "figures": 6,
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
+    "version": "ACM TECS 21(6), Article 74, 2022; final publisher PDF with repository cover and appendix (27 PDF pages)."
+  }
+}

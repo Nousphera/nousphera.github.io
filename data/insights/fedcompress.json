@@ -1,0 +1,260 @@
+{
+  "slug": "fedcompress",
+  "problem": "Averaging clustered client models destroys their compact centroid structure, leaving the server-to-client communication costly.",
+  "contribution": "FedCompress combines local weight clustering with server-side distillation to restore compression after aggregation and adjusts cluster counts using an embedding-quality score.",
+  "reading_guide": "Use the tabulated dataset results: communication reduction, model compression and accuracy change are different metrics, and speedups are relative to each device’s FedAvg reference.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Compress both directions",
+    "description": "Clients train clustered weights and compute an embedding effective-rank score. The server averages models and scores, restores a clustered global model through teacher–student distillation on unlabeled out-of-distribution data, and adjusts cluster capacity before returning the model for the next round.",
+    "stages": [
+      {
+        "title": "Train clustered weights",
+        "detail": "Learn local weights around centroids and measure representation quality from unlabeled local embeddings.",
+        "icon": "cluster",
+        "location": "Client"
+      },
+      {
+        "title": "Aggregate model updates",
+        "detail": "Average client models and representation scores using the standard federated aggregation rule.",
+        "icon": "aggregate",
+        "location": "Server"
+      },
+      {
+        "title": "Distill and recompress",
+        "detail": "Use the aggregated model as teacher for a clustered student on unlabeled out-of-distribution data.",
+        "icon": "distill",
+        "location": "Server",
+        "items": [
+          "Global teacher",
+          "Clustered student",
+          "Unlabeled server data"
+        ]
+      },
+      {
+        "title": "Adjust cluster capacity",
+        "detail": "Update the cluster count from representation-score progress and return the compressed model.",
+        "icon": "scale",
+        "location": "Server → clients"
+      }
+    ],
+    "connections": [
+      "Clustered models + scores",
+      "Aggregated teacher",
+      "Compressed global model"
+    ],
+    "footnote": "The returned model starts the next local-training round. The server needs an unlabeled auxiliary dataset, and self-compression adds server training work."
+  },
+  "results": [
+    {
+      "title": "Communication savings and accuracy cost",
+      "question": "How much communication is saved across vision and audio tasks?",
+      "context": "20 clients, 20 rounds, ten client epochs and ten server self-compression epochs per round. Accuracy is averaged over two trials. Δ accuracy is percentage points relative to FedAvg; CCR and MCR are reduction factors, higher is better.",
+      "source": {
+        "label": "Table 1 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2401.14211v3#page=5"
+      },
+      "columns": [
+        "Dataset",
+        "FedAvg accuracy (%)",
+        "FedCompress Δ accuracy (pp)",
+        "Communication reduction (×)",
+        "Model compression (×)"
+      ],
+      "rows": [
+        {
+          "label": "CIFAR-10",
+          "values": [
+            "86.26",
+            "−1.83",
+            "4.53",
+            "5.18"
+          ]
+        },
+        {
+          "label": "CIFAR-100",
+          "values": [
+            "60.68",
+            "−1.88",
+            "3.80",
+            "3.93"
+          ]
+        },
+        {
+          "label": "PathMNIST",
+          "values": [
+            "88.22",
+            "−1.72",
+            "4.79",
+            "5.27"
+          ]
+        },
+        {
+          "label": "SpeechCommands",
+          "values": [
+            "95.75",
+            "−0.42",
+            "5.04",
+            "5.09"
+          ]
+        },
+        {
+          "label": "VoxForge",
+          "values": [
+            "81.05",
+            "−0.31",
+            "5.41",
+            "5.64"
+          ]
+        }
+      ],
+      "interpretation": "Reported communication reductions range from 3.80× to 5.41×, with accuracy losses of 0.31–1.88 percentage points. Audio tasks have the smallest losses in this evaluation.",
+      "caveat": "No variance or confidence interval is tabulated for the two trials. The source’s narrative averages do not consistently match Table 1, so individual entries are used here."
+    },
+    {
+      "title": "Why recompress at the server?",
+      "question": "Does client-side clustering alone deliver the same bidirectional savings?",
+      "context": "CIFAR-100 with ResNet-20 under the same 20-client, 20-round protocol. Accuracy differences are percentage points relative to FedAvg; communication and model-size reductions are factors relative to FedAvg.",
+      "source": {
+        "label": "Table 1 · CIFAR-100 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2401.14211v3#page=5"
+      },
+      "columns": [
+        "Method",
+        "Δ accuracy (pp)",
+        "Communication reduction (×)",
+        "Model compression (×)"
+      ],
+      "rows": [
+        {
+          "label": "FedZip",
+          "values": [
+            "−2.57",
+            "1.94",
+            "2.11"
+          ]
+        },
+        {
+          "label": "FedCompress without server self-compression",
+          "values": [
+            "−2.67",
+            "1.02",
+            "1.62"
+          ]
+        },
+        {
+          "label": "FedCompress",
+          "values": [
+            "−1.88",
+            "3.80",
+            "3.93"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "Restoring clustered weights after aggregation raises the reported communication reduction from 1.02× to 3.80× in this setting.",
+      "caveat": "Self-compression uses ten server epochs per round on auxiliary unlabeled data; the communication benefit is not a claim of free computation.",
+      "chart": {
+        "metric": "Communication reduction relative to FedAvg (×)",
+        "column": 1,
+        "min": 0,
+        "max": 4,
+        "higher_is_better": true
+      }
+    },
+    {
+      "title": "Measured inference acceleration",
+      "question": "Do the compressed models also run faster on tested edge devices?",
+      "context": "ResNet-20 on CIFAR-10 and MobileNet on SpeechCommands. Each factor compares inference time with that device/model’s FedAvg reference; higher is better. Float32 and uint8 are separate model formats.",
+      "source": {
+        "label": "Table 2 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2401.14211v3#page=6"
+      },
+      "columns": [
+        "Model · device",
+        "Float32 speedup (×)",
+        "Uint8 speedup (×)"
+      ],
+      "rows": [
+        {
+          "label": "ResNet-20 · Pixel 6",
+          "values": [
+            "1.103",
+            "1.165"
+          ]
+        },
+        {
+          "label": "ResNet-20 · Jetson Nano",
+          "values": [
+            "1.127",
+            "1.169"
+          ]
+        },
+        {
+          "label": "ResNet-20 · Coral TPU",
+          "values": [
+            "1.113",
+            "1.191"
+          ]
+        },
+        {
+          "label": "MobileNet · Pixel 6",
+          "values": [
+            "1.114",
+            "1.248"
+          ]
+        },
+        {
+          "label": "MobileNet · Jetson Nano",
+          "values": [
+            "1.137",
+            "1.161"
+          ]
+        },
+        {
+          "label": "MobileNet · Coral TPU",
+          "values": [
+            "1.152",
+            "1.194"
+          ]
+        }
+      ],
+      "interpretation": "The table reports modest inference gains: 1.103–1.152× for float32 and 1.161–1.248× for uint8.",
+      "caveat": "Absolute latency, variability and energy measurements are not supplied. These factors do not rank device speed or measure federated training time."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "CIFAR-10/100 and PathMNIST for vision; SpeechCommands and VoxForge for audio."
+    },
+    {
+      "label": "Models",
+      "value": "ResNet-20 for vision; MobileNet for audio; standard FedAvg aggregation."
+    },
+    {
+      "label": "Auxiliary server data",
+      "value": "StyleGAN (Oriented) for vision and LibriSpeech for audio; unlabeled data supports teacher–student self-compression."
+    },
+    {
+      "label": "Compared with",
+      "value": "FedAvg, FedZip with 15 clusters, and FedCompress without server self-compression; inference on Pixel 6, Jetson Nano and Coral TPU."
+    }
+  ],
+  "limitations": [
+    "The main training study uses 20 clients and 20 rounds; it does not establish scalability to foundation models or large client populations.",
+    "Server self-compression requires auxiliary data and additional optimization; sensitivity to the auxiliary distribution is not broadly quantified.",
+    "Accuracy averages use two trials without tabulated uncertainty, and some prose averages conflict with the reported table entries.",
+    "Inference acceleration is relative and modest; the paper does not directly measure end-to-end training latency or energy savings."
+  ],
+  "takeaways": [
+    "Client-side compression can be lost during model averaging, so the download path needs its own compression step.",
+    "A representation-quality proxy can adjust compression capacity, but the measured gains still involve accuracy and computation trade-offs."
+  ],
+  "evidence_inventory": {
+    "tables": 2,
+    "figures": 2,
+    "source_url": "https://arxiv.org/pdf/2401.14211v3",
+    "version": "arXiv:2401.14211v3, 25 February 2024; 9 pages including Appendix A (Algorithm 1)"
+  }
+}

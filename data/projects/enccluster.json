@@ -27,7 +27,7 @@
     },
     {
       "title": "Encrypt and encode",
-      "text": "Decentralized multi-client functional encryption protects the centroids. Binary Fuse filters encode the cluster-to-weight mappings as compact fingerprints, adding protection under the paper’s inference threat model."
+      "text": "Decentralized multi-client functional encryption protects the centroids. Binary Fuse filters compactly encode the weight mappings using shared seeds. This encoding is distinct from cryptographic encryption and is analyzed under the paper’s stated threat model."
     },
     {
       "title": "Reconstruct for secure aggregation",

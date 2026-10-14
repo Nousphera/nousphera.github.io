@@ -17,7 +17,7 @@
     "focus": "Private learning",
     "year": 2025,
     "venue": "ACM CIKM",
-    "description": "Removing data from a federated model should not require exposing who asked to forget it. EFU binds encrypted client updates to an agreed aggregation function and adds unlearning objectives that limit observable changes, allowing clients to submit learning or unlearning updates through the same protocol while preserving useful model behavior.",
+    "description": "A server should not silently drop an unlearning update from the agreed federated aggregation. EFU binds encrypted updates to authorized aggregation and lets clients submit learning or unlearning updates through the same protocol. Its experiments measure the trade-off between forgetting selected information and retaining model utility.",
     "link": {
       "href": "https://nousphera.github.io/projects/efu/",
       "label": "Project page"
@@ -77,7 +77,7 @@
     "focus": "Efficient learning",
     "year": 2024,
     "venue": "IEEE EDGE",
-    "description": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models and reduce communication in both directions with limited extra client computation.",
+    "description": "Even compressed model updates can overwhelm a federated learning link when the full update is sent every round. FedCode exchanges compact codebooks of weight-cluster centers in most rounds, periodically transferring compressed weights to realign client and server models. Clients cluster all model weights together in a model-wide step.",
     "link": {
       "href": "https://nousphera.github.io/projects/fedcode/",
       "label": "Project page"
@@ -125,7 +125,7 @@
     "focus": "Reliable learning",
     "year": 2023,
     "venue": "PerFail @ IEEE PerCom",
-    "description": "Speech emotion models often lose accuracy when speakers, languages, or recording datasets change. DA-MLDG studies whether meta-learning can improve that transfer by weighting training episodes according to estimated domain shift; its evaluation exposes the limits of log-mel representations and motivates stronger features and more varied speech emotion datasets.",
+    "description": "Models that recognize emotion in one speech dataset often fail on another. This study evaluates domain-shift-aware meta-learning for speech emotion recognition, finds mixed gains with log-mel inputs, and tests whether stronger acoustic representations improve held-out-domain performance.",
     "link": {
       "href": "https://nousphera.github.io/projects/da-mldg/",
       "label": "Project page"

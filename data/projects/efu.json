@@ -3,7 +3,7 @@
   "name": "EFU",
   "category": "Private learning",
   "tagline": "Enforce unlearning while keeping the request private",
-  "summary": "Removing data from a federated model should not require exposing who asked to forget it. EFU binds encrypted client updates to an agreed aggregation function and adds unlearning objectives that limit observable changes, allowing clients to submit learning or unlearning updates through the same protocol while preserving useful model behavior.",
+  "summary": "A server should not silently drop an unlearning update from the agreed federated aggregation. EFU binds encrypted updates to authorized aggregation and lets clients submit learning or unlearning updates through the same protocol. Its experiments measure the trade-off between forgetting selected information and retaining model utility.",
   "authors": [
     "Samaneh Mohammadi",
     "Vasileios Tsouvalas",

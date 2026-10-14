@@ -1,0 +1,230 @@
+{
+  "slug": "da-mldg",
+  "problem": "Speech emotion classifiers lose accuracy when the test corpus, speakers or language differ from the training domains.",
+  "contribution": "DA-MLDG weights the meta-test loss by an energy-based estimate of domain shift and studies why this remains insufficient for practical speech emotion generalization.",
+  "reading_guide": "Read each target scenario separately: improvements over ordinary supervised training are mixed, and the strongest method changes with the scenario.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Simulate domain shift during training",
+    "description": "Each iteration partitions source domains into meta-train and meta-test sets, takes a meta-train update, measures their energy-score gap, and weights the meta-test loss in the outer update.",
+    "stages": [
+      {
+        "title": "Split source domains",
+        "detail": "Randomly divide available source domains into non-overlapping meta-train and meta-test subsets.",
+        "icon": "split",
+        "location": "Training"
+      },
+      {
+        "title": "Meta-train update",
+        "detail": "Take a gradient step on the meta-train subset with the shared emotion model.",
+        "icon": "train",
+        "location": "Inner update"
+      },
+      {
+        "title": "Measure domain shift",
+        "detail": "Compare average energy scores of both subsets using the updated model.",
+        "icon": "energy",
+        "location": "Adaptive weight"
+      },
+      {
+        "title": "Weighted meta-update",
+        "detail": "Optimize meta-train loss together with the domain-weighted meta-test loss.",
+        "icon": "model",
+        "location": "Outer update"
+      }
+    ],
+    "connections": [
+      "Reserve held-out source domains",
+      "Evaluate updated model",
+      "Weight the meta-test loss"
+    ],
+    "footnote": "Repeat with a new source-domain split. The target corpus is unavailable during training; meta-test source data are not the final target test set."
+  },
+  "results": [
+    {
+      "title": "Generalization gains are uneven",
+      "question": "Which method works best across the seven source-to-target scenarios?",
+      "context": "Five-emotion SER with VoxCeleb-pretrained ResNet-18 and log-mel inputs; source and target corpora are defined in Table I. Mean target accuracy (%) over ten trials; higher is better. No dispersion is reported for these results.",
+      "source": {
+        "label": "Table III · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6"
+      },
+      "columns": [
+        "Scenario · target",
+        "Deep-All (%)",
+        "RSC (%)",
+        "MLDG (%)",
+        "DA-MLDG (%)"
+      ],
+      "rows": [
+        {
+          "label": "1 · IEMOCAP",
+          "values": [
+            "26.95",
+            "32.36",
+            "27.61",
+            "31.35"
+          ]
+        },
+        {
+          "label": "2 · RAVDESS",
+          "values": [
+            "43.40",
+            "44.78",
+            "38.86",
+            "39.41"
+          ]
+        },
+        {
+          "label": "3 · TESS",
+          "values": [
+            "47.03",
+            "43.77",
+            "46.29",
+            "46.80"
+          ]
+        },
+        {
+          "label": "4 · CaFE",
+          "values": [
+            "43.16",
+            "39.97",
+            "42.57",
+            "43.21"
+          ]
+        },
+        {
+          "label": "5 · AESDD",
+          "values": [
+            "60.65",
+            "56.69",
+            "60.45",
+            "62.26"
+          ]
+        },
+        {
+          "label": "6 · ShEMO",
+          "values": [
+            "31.54",
+            "40.70",
+            "37.87",
+            "38.79"
+          ]
+        },
+        {
+          "label": "7 · ShEMO",
+          "values": [
+            "40.19",
+            "40.27",
+            "34.51",
+            "37.11"
+          ]
+        }
+      ],
+      "interpretation": "DA-MLDG exceeds ordinary supervised Deep-All in four of seven scenarios and is highest among these methods in scenarios 4 and 5; RSC leads scenarios 1, 2, 6 and 7.",
+      "caveat": "Scenarios use different source corpora, so ShEMO appears twice with different training conditions. ShEMO lacks the disgust class. The small 0.05-point lead in scenario 4 has no reported uncertainty."
+    },
+    {
+      "title": "Stronger input representations",
+      "question": "Does replacing log-mel inputs with pretrained speech embeddings resolve the gap?",
+      "context": "The same seven SER scenarios using TRILLsson v3 EfficientNetv2-B3 embeddings as inputs to ResNet-18. Mean target accuracy (%) over ten trials; higher is better. No dispersion is reported.",
+      "source": {
+        "label": "Table IV · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6"
+      },
+      "columns": [
+        "Scenario · target",
+        "Deep-All (%)",
+        "DA-MLDG (%)"
+      ],
+      "rows": [
+        {
+          "label": "1 · IEMOCAP",
+          "values": [
+            "28.57",
+            "32.11"
+          ]
+        },
+        {
+          "label": "2 · RAVDESS",
+          "values": [
+            "42.61",
+            "39.82"
+          ]
+        },
+        {
+          "label": "3 · TESS",
+          "values": [
+            "50.16",
+            "48.46"
+          ]
+        },
+        {
+          "label": "4 · CaFE",
+          "values": [
+            "45.09",
+            "43.29"
+          ]
+        },
+        {
+          "label": "5 · AESDD",
+          "values": [
+            "61.17",
+            "64.11"
+          ]
+        },
+        {
+          "label": "6 · ShEMO",
+          "values": [
+            "33.16",
+            "40.22"
+          ]
+        },
+        {
+          "label": "7 · ShEMO",
+          "values": [
+            "41.15",
+            "36.97"
+          ]
+        }
+      ],
+      "interpretation": "DA-MLDG improves over its log-mel version in six scenarios, but it beats the supervised embedding baseline in only three. Better representations benefit both approaches.",
+      "caveat": "These inputs add external pretraining. The results still show substantial target-domain errors and do not demonstrate practical readiness."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "Ten SER corpora: IEMOCAP, CREMA-D, SAVEE, RAVDESS, TESS, AESDD, CaFE, EMOVO, ShEMO and EmoDB."
+    },
+    {
+      "label": "Models",
+      "value": "ResNet-18 with VoxCeleb pretraining; log-mel inputs or TRILLsson embeddings. A separate PACS image-domain comparison uses ImageNet initialization."
+    },
+    {
+      "label": "Compared with",
+      "value": "Deep-All supervised training, vanilla MLDG with fixed weight, and Representation Self-Challenging (RSC)."
+    },
+    {
+      "label": "Protocol",
+      "value": "Seven corpus-transfer scenarios; five selected emotions; ten trials. Target corpora are held out from training."
+    }
+  ],
+  "limitations": [
+    "The authors conclude that the achieved target-domain performance is insufficient for practical use; improvements are not consistent across baselines or scenarios.",
+    "Limited and largely acted corpora restrict coverage of natural speech variation; emotion categories can overlap acoustically.",
+    "ShEMO has no disgust examples, creating an imbalanced evaluation in scenarios 6 and 7.",
+    "The main comparison tables omit trial dispersion, limiting conclusions about small differences; t-SNE illustrations do not establish a causal explanation for failures."
+  ],
+  "takeaways": [
+    "Success of meta-learning in image domain generalization does not automatically transfer to speech emotion recognition.",
+    "Changing the representation can help ordinary supervised training as well as meta-learning.",
+    "The paper’s main contribution includes identifying evaluation and representation limitations, not claiming that domain shift has been solved."
+  ],
+  "evidence_inventory": {
+    "tables": 4,
+    "figures": 2,
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf",
+    "version": "PerFail / IEEE PerCom Workshops 2023, pp. 421–426; publisher PDF with repository cover (7 PDF pages), no appendix."
+  }
+}

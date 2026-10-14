@@ -1,0 +1,242 @@
+{
+  "slug": "mpsl",
+  "problem": "Multimodal fine-tuning can exceed client compute budgets even when only a small part of the model is trainable.",
+  "contribution": "MPSL keeps modality tokenizers on clients and trains a shared server encoder through aggregated local losses and returned cut-layer gradients.",
+  "reading_guide": "Separate client compute savings from task accuracy, and distinguish raw retrieval recall from scores normalized to centralized training.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Tokenize locally, train jointly",
+    "description": "Clients send modality tokens to a shared server encoder and prediction head. Predictions return to clients, which compute loss with local labels. The server aggregates these losses for one backward pass, then returns cut-layer gradients to update the local tokenizers.",
+    "stages": [
+      {
+        "title": "Modality tokenizers",
+        "detail": "Convert local image, audio or text inputs into tokens.",
+        "icon": "tokens",
+        "location": "Client",
+        "items": [
+          "Image patches",
+          "Audio spectrograms",
+          "Text tokens"
+        ]
+      },
+      {
+        "title": "Shared encoder",
+        "detail": "Encode tokens and return predictions through the task head.",
+        "icon": "transformer",
+        "location": "Server"
+      },
+      {
+        "title": "Local loss",
+        "detail": "Use private labels to calculate each client loss.",
+        "icon": "labeled",
+        "location": "Client"
+      },
+      {
+        "title": "Shared backward pass",
+        "detail": "Aggregate client losses and send cut-layer gradients back to the tokenizers.",
+        "icon": "train",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Activations to server",
+      "Predictions to clients",
+      "Local losses to server"
+    ],
+    "footnote": "Cut-layer gradients close the loop. Early fusion concatenates tokens before encoding; late fusion encodes modalities separately before combining them. No client-model weight averaging is required during training."
+  },
+  "results": [
+    {
+      "title": "Compute savings with task-dependent accuracy",
+      "question": "Does reducing client computation preserve classification accuracy on every task?",
+      "context": "Meta-Transformer ViT-B/16; 100 clients with Dirichlet α=0.1. Selected classification tasks, accuracy (%) with reported ± terms over three seeds; higher is better. Client GFLOPs per input are lower-is-better.",
+      "source": {
+        "label": "Table 1 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=5"
+      },
+      "columns": [
+        "Method",
+        "COCO-QA (%)",
+        "Kinetics-Sounds (%)",
+        "MELD (%)",
+        "Client GFLOPs"
+      ],
+      "rows": [
+        {
+          "label": "Centralized",
+          "values": [
+            "61.7 ± 0.1",
+            "81.8 ± 0.2",
+            "61.4 ± 0.4",
+            "25.8"
+          ]
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "53.5 ± 0.2",
+            "71.4 ± 0.4",
+            "48.9 ± 0.0",
+            "25.8"
+          ]
+        },
+        {
+          "label": "FedCLIP",
+          "values": [
+            "13.1 ± 2.6",
+            "63.5 ± 0.8",
+            "50.7 ± 0.7",
+            "25.8"
+          ]
+        },
+        {
+          "label": "MPSL",
+          "values": [
+            "46.2 ± 0.5",
+            "67.0 ± 1.1",
+            "58.2 ± 0.9",
+            "0.1"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "MPSL sharply lowers client compute and improves MELD over FedAvg, but trails FedAvg by 7.3 points on COCO-QA and 4.4 on Kinetics-Sounds.",
+      "caveat": "These tasks expose both gains and deficits; they are three of five classification datasets. GFLOPs measure client work, not total system work or latency. The paper does not specify the type of ± interval."
+    },
+    {
+      "title": "Retrieval improves over distributed baselines",
+      "question": "Does MPSL close the gap to centralized image-text retrieval?",
+      "context": "Image-to-text retrieval, 100 clients; top-1 recall (%) with reported ± terms over three seeds, higher is better. Full ViT-B/16 encoder fine-tuning; raw recall, not normalized scores.",
+      "source": {
+        "label": "Table 2 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=5"
+      },
+      "columns": [
+        "Method",
+        "MS-COCO R@1 (%)",
+        "Flickr30K R@1 (%)"
+      ],
+      "rows": [
+        {
+          "label": "Centralized",
+          "values": [
+            "56.8 ± 2.4",
+            "66.8 ± 5.3"
+          ]
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "1.5 ± 0.1",
+            "11.2 ± 1.7"
+          ]
+        },
+        {
+          "label": "FedCLIP",
+          "values": [
+            "0.1 ± 0.0",
+            "0.1 ± 0.0"
+          ]
+        },
+        {
+          "label": "MPSL",
+          "values": [
+            "21.1 ± 0.8",
+            "26.0 ± 0.5"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "MPSL improves on both evaluated distributed alternatives but remains well below centralized recall on both datasets.",
+      "caveat": "The table also reports text-to-image retrieval and R@10; the selected rows isolate one direction and recall threshold. The reported ± convention is unspecified.",
+      "chart": {
+        "metric": "MS-COCO image-to-text R@1 (%)",
+        "column": 0,
+        "min": 0,
+        "max": 100,
+        "higher_is_better": true
+      }
+    },
+    {
+      "title": "Retrieval depends on batch size",
+      "question": "How sensitive is distributed retrieval to the available batch size?",
+      "context": "MPSL with 25 clients. Top-1 retrieval recall normalized to centralized fine-tuning (% of reference performance); higher is better. These values are ratios, not raw recall.",
+      "source": {
+        "label": "Table 3 · PDF page 7",
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=7"
+      },
+      "columns": [
+        "Batch size",
+        "Flickr30K normalized recall (%)",
+        "MS-COCO normalized recall (%)"
+      ],
+      "rows": [
+        {
+          "label": "50",
+          "values": [
+            "37.9",
+            "21.3"
+          ]
+        },
+        {
+          "label": "100",
+          "values": [
+            "69.5",
+            "53.2"
+          ]
+        },
+        {
+          "label": "150",
+          "values": [
+            "63.0",
+            "64.1"
+          ]
+        },
+        {
+          "label": "200",
+          "values": [
+            "69.6",
+            "69.7"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "Larger batches substantially improve normalized recall over batch size 50, although the Flickr30K trend is not monotonic.",
+      "caveat": "No uncertainty is tabulated. Larger retrieval batches are marked infeasible because of dataset partition sizes; this ablation uses fewer clients than the raw-recall table."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "COCO-QA, T4SA, Kinetics-Sounds, UCF101, MELD, MS-COCO and Flickr30K; image/text, image/audio and audio/text pairs."
+    },
+    {
+      "label": "Models",
+      "value": "Meta-Transformer ViT-B/16; encoder-size analysis spans ViT-Tiny to ViT-Huge. Classification typically tunes the last six blocks; retrieval tunes the complete encoder."
+    },
+    {
+      "label": "Compared with",
+      "value": "Centralized fine-tuning, FedAvg and FedCLIP; 25 or 100 clients with non-IID class partitions."
+    },
+    {
+      "label": "Evaluation model",
+      "value": "Client tokenizers are aggregated after training and combined with the shared server model for comparison with federated baselines."
+    }
+  ],
+  "limitations": [
+    "Accuracy is task-dependent: client compute savings do not imply matching FedAvg or centralized performance on every benchmark.",
+    "Retrieval needs sufficiently large batches; limited client data can make larger batch settings infeasible.",
+    "Missing modalities, client dropouts and heterogeneous edge hardware are explicitly left for future work.",
+    "Keeping raw labels local does not itself establish a formal privacy guarantee, and reported client GFLOPs do not establish end-to-end speed or energy gains."
+  ],
+  "takeaways": [
+    "Offloading a frozen or trainable encoder can save client computation that parameter-efficient federated tuning still requires locally.",
+    "Batch size and fusion strategy matter: neither distributed retrieval nor multimodal fusion has one universally best setting."
+  ],
+  "evidence_inventory": {
+    "tables": 5,
+    "figures": 6,
+    "source_url": "https://arxiv.org/pdf/2502.06355v3",
+    "version": "arXiv:2502.06355v3, 8 July 2025; 9 pages; no appendix"
+  }
+}

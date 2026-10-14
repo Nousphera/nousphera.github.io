@@ -52,7 +52,7 @@
   "findings": [
     {
       "title": "Stronger results with several tasks per client",
-      "text": "On the 8-task benchmark with 30 clients and 20% participation, MaTU achieves 79.47% average accuracy, compared with 67.60% for MaT-FL. Its reported communication metric is 8.04 million bits per task, versus 20.43 million for MaT-FL."
+      "text": "On the 8-task benchmark with 30 clients and 20% participation, MaTU achieves 79.47% average accuracy, compared with 67.60% for MaT-FL. Its reported communication metric is 8.04 million bits per task per round, versus 20.43 million for MaT-FL; the methods run for 100 and 300 rounds, respectively."
     },
     {
       "title": "Evaluated across 30 vision tasks",

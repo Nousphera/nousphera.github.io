@@ -1,0 +1,170 @@
+{
+  "slug": "fedser",
+  "problem": "Speech emotion labels are scarce and recordings are sensitive, making centralized collection and fully supervised training difficult.",
+  "contribution": "An attention-based speech model combines federated self-training with a client-specific pseudo-label confidence schedule to use local labeled and unlabeled audio.",
+  "reading_guide": "Compare equal label budgets within each partition, and keep unseen-speaker evaluation separate from evaluation with overlapping speakers.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Federated emotion learning",
+    "description": "The server sends global weights to participating clients. Each client represents its local audio with an attention CNN, jointly trains with labels and accepted pseudo-labels, and returns parameters for aggregation.",
+    "stages": [
+      {
+        "title": "Broadcast weights",
+        "detail": "Send shared model parameters to the clients selected for a round.",
+        "icon": "download",
+        "location": "Server"
+      },
+      {
+        "title": "Attend to speech",
+        "detail": "Process local log-mel inputs with spectral, temporal and channel attention.",
+        "icon": "audio",
+        "location": "Client model"
+      },
+      {
+        "title": "Local self-training",
+        "detail": "Combine known labels with pseudo-labels passing a confidence threshold tied to round progress and participation.",
+        "icon": "train",
+        "location": "Client update"
+      },
+      {
+        "title": "Federated averaging",
+        "detail": "Aggregate local model parameters and distribute the next global model.",
+        "icon": "aggregate",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Local audio remains on device",
+      "Filter unlabeled predictions",
+      "Upload model parameters"
+    ],
+    "footnote": "The cycle repeats with aggregated weights. Raw audio stays local, but the study provides no formal differential-privacy guarantee or attack-resistance evaluation."
+  },
+  "results": [
+    {
+      "title": "Unlabeled speech helps with 10% labels",
+      "question": "Does self-training improve the same local model under each tested partition?",
+      "context": "IEMOCAP improvised subset; neutral, happy, sad and angry. Mean unweighted accuracy (UA, %) over five runs per split; higher is better; no dispersion reported. Random partitions use 10 clients and per-speaker partitions use 8.",
+      "source": {
+        "label": "Table III · page 5",
+        "url": "https://arxiv.org/pdf/2202.02611v1#page=5"
+      },
+      "columns": [
+        "Partition",
+        "Supervised · 10% labels",
+        "Self-training · 10% labels",
+        "Supervised · 100% labels"
+      ],
+      "rows": [
+        {
+          "label": "Unseen speakers · random",
+          "values": [
+            "46.72",
+            "53.94",
+            "60.52"
+          ]
+        },
+        {
+          "label": "Unseen speakers · per speaker",
+          "values": [
+            "46.55",
+            "56.83",
+            "59.55"
+          ]
+        },
+        {
+          "label": "Overlapping speakers · random",
+          "values": [
+            "51.58",
+            "59.04",
+            "64.78"
+          ]
+        },
+        {
+          "label": "Overlapping speakers · per speaker",
+          "values": [
+            "49.97",
+            "59.72",
+            "62.79"
+          ]
+        }
+      ],
+      "interpretation": "Self-training improves all four equal-label comparisons, while remaining below the corresponding fully labeled federated reference.",
+      "caveat": "Unseen-speaker results use leave-one-session-out evaluation; overlapping-speaker results use 80:20 splits with five-fold cross-validation. The latter is an easier generalization setting."
+    },
+    {
+      "title": "Centralized and federated references",
+      "question": "How does moving the attention model to federated training affect the supervised reference?",
+      "context": "Same four-emotion IEMOCAP subset; fully supervised random partitions. Mean UA (%), higher is better. The paper’s federated model uses 10 clients, 100 rounds, 80% participation and one local epoch; no dispersion reported.",
+      "source": {
+        "label": "Table II · page 5",
+        "url": "https://arxiv.org/pdf/2202.02611v1#page=5"
+      },
+      "columns": [
+        "Model",
+        "Unseen speakers (%)",
+        "Overlapping speakers (%)"
+      ],
+      "rows": [
+        {
+          "label": "CNN Transformer (cited baseline)",
+          "values": [
+            "64.79",
+            "70.05"
+          ]
+        },
+        {
+          "label": "Proposed model · centralized",
+          "values": [
+            "62.58",
+            "69.04"
+          ]
+        },
+        {
+          "label": "Proposed model · federated",
+          "values": [
+            "60.52",
+            "64.78"
+          ]
+        }
+      ],
+      "interpretation": "The same proposed architecture loses 2.06 UA points in unseen-speaker evaluation and 4.26 points with overlapping speakers when trained federatively.",
+      "caveat": "The CNN Transformer is a cited literature reference, not an ablation of the proposed architecture. Centralized and federated results should be compared within each speaker protocol."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data",
+      "value": "IEMOCAP improvised speech only, four emotion categories; 16 kHz audio and two-second segments in the method text."
+    },
+    {
+      "label": "Models",
+      "value": "Four-block convolutional model with spectral, temporal and channel attention; predictions averaged across non-overlapping utterance segments."
+    },
+    {
+      "label": "Compared with",
+      "value": "Supervised FedAvg using the identical 10% labeled subset, fully labeled FedAvg, and centralized attention-based SER references."
+    },
+    {
+      "label": "Protocol",
+      "value": "Flower simulation; leave-one-session-out for unseen speakers and five-fold 80:20 splits for overlapping speakers; random versus per-speaker client partitions."
+    }
+  ],
+  "limitations": [
+    "Evidence is limited to one dataset’s improvised subset and four emotions; cross-language, cross-corpus and natural deployment generalization are untested.",
+    "Keeping recordings on devices reduces raw-data sharing but does not establish differential privacy or resistance to information leakage through updates.",
+    "The comparison reports means without dispersion, and per-speaker and random partitions also differ in client count.",
+    "The work simulates clients and does not provide real-device training energy or latency measurements."
+  ],
+  "takeaways": [
+    "Unlabeled clips improve all four tested 10%-label federated settings, but do not fully close the gap to using all labels.",
+    "Separating speakers between training and testing is essential when assessing generalization to new users.",
+    "Data locality is a concrete system property; formal privacy protection requires evidence beyond this evaluation."
+  ],
+  "evidence_inventory": {
+    "tables": 3,
+    "figures": 2,
+    "source_url": "https://arxiv.org/pdf/2202.02611v1",
+    "version": "arXiv:2202.02611v1, 5 February 2022; 6-page public preprint of the EmotionAware / PerCom Workshops paper, no appendix."
+  }
+}

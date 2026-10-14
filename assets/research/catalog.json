@@ -1,0 +1,398 @@
+{
+  "grid": 24,
+  "stroke_width": 1.6,
+  "groups": {
+    "Data & modalities": [
+      "data",
+      "database",
+      "labeled",
+      "unlabeled",
+      "noisy-labels",
+      "image",
+      "audio",
+      "waveform",
+      "text",
+      "video",
+      "sensor",
+      "tokens",
+      "globe",
+      "language",
+      "speaker",
+      "emotion"
+    ],
+    "Devices & systems": [
+      "client",
+      "clients",
+      "server",
+      "cloud",
+      "edge",
+      "chip",
+      "gpu",
+      "memory",
+      "network",
+      "upload",
+      "download",
+      "exchange",
+      "aggregate",
+      "split",
+      "merge"
+    ],
+    "Models & learning": [
+      "model",
+      "layers",
+      "encoder",
+      "decoder",
+      "autoencoder",
+      "transformer",
+      "embedding",
+      "teacher",
+      "student",
+      "distill",
+      "frozen",
+      "train",
+      "adapt",
+      "task",
+      "task-vector",
+      "align",
+      "target"
+    ],
+    "Efficiency & protection": [
+      "compress",
+      "codebook",
+      "cluster",
+      "mask",
+      "filter",
+      "privacy",
+      "shield",
+      "lock",
+      "key",
+      "encrypt",
+      "unlearn",
+      "fingerprint",
+      "attack",
+      "trigger",
+      "scale",
+      "speed",
+      "energy"
+    ],
+    "Evidence & navigation": [
+      "chart",
+      "table",
+      "compare",
+      "accuracy",
+      "check",
+      "warning",
+      "search",
+      "book",
+      "paper",
+      "code",
+      "citation"
+    ]
+  },
+  "icons": [
+    {
+      "id": "data",
+      "file": "/assets/research/icons/data.svg"
+    },
+    {
+      "id": "database",
+      "file": "/assets/research/icons/database.svg"
+    },
+    {
+      "id": "labeled",
+      "file": "/assets/research/icons/labeled.svg"
+    },
+    {
+      "id": "unlabeled",
+      "file": "/assets/research/icons/unlabeled.svg"
+    },
+    {
+      "id": "noisy-labels",
+      "file": "/assets/research/icons/noisy-labels.svg"
+    },
+    {
+      "id": "image",
+      "file": "/assets/research/icons/image.svg"
+    },
+    {
+      "id": "audio",
+      "file": "/assets/research/icons/audio.svg"
+    },
+    {
+      "id": "waveform",
+      "file": "/assets/research/icons/waveform.svg"
+    },
+    {
+      "id": "text",
+      "file": "/assets/research/icons/text.svg"
+    },
+    {
+      "id": "video",
+      "file": "/assets/research/icons/video.svg"
+    },
+    {
+      "id": "sensor",
+      "file": "/assets/research/icons/sensor.svg"
+    },
+    {
+      "id": "client",
+      "file": "/assets/research/icons/client.svg"
+    },
+    {
+      "id": "clients",
+      "file": "/assets/research/icons/clients.svg"
+    },
+    {
+      "id": "server",
+      "file": "/assets/research/icons/server.svg"
+    },
+    {
+      "id": "cloud",
+      "file": "/assets/research/icons/cloud.svg"
+    },
+    {
+      "id": "edge",
+      "file": "/assets/research/icons/edge.svg"
+    },
+    {
+      "id": "chip",
+      "file": "/assets/research/icons/chip.svg"
+    },
+    {
+      "id": "gpu",
+      "file": "/assets/research/icons/gpu.svg"
+    },
+    {
+      "id": "memory",
+      "file": "/assets/research/icons/memory.svg"
+    },
+    {
+      "id": "network",
+      "file": "/assets/research/icons/network.svg"
+    },
+    {
+      "id": "upload",
+      "file": "/assets/research/icons/upload.svg"
+    },
+    {
+      "id": "download",
+      "file": "/assets/research/icons/download.svg"
+    },
+    {
+      "id": "exchange",
+      "file": "/assets/research/icons/exchange.svg"
+    },
+    {
+      "id": "aggregate",
+      "file": "/assets/research/icons/aggregate.svg"
+    },
+    {
+      "id": "split",
+      "file": "/assets/research/icons/split.svg"
+    },
+    {
+      "id": "merge",
+      "file": "/assets/research/icons/merge.svg"
+    },
+    {
+      "id": "compress",
+      "file": "/assets/research/icons/compress.svg"
+    },
+    {
+      "id": "codebook",
+      "file": "/assets/research/icons/codebook.svg"
+    },
+    {
+      "id": "cluster",
+      "file": "/assets/research/icons/cluster.svg"
+    },
+    {
+      "id": "mask",
+      "file": "/assets/research/icons/mask.svg"
+    },
+    {
+      "id": "filter",
+      "file": "/assets/research/icons/filter.svg"
+    },
+    {
+      "id": "model",
+      "file": "/assets/research/icons/model.svg"
+    },
+    {
+      "id": "layers",
+      "file": "/assets/research/icons/layers.svg"
+    },
+    {
+      "id": "encoder",
+      "file": "/assets/research/icons/encoder.svg"
+    },
+    {
+      "id": "decoder",
+      "file": "/assets/research/icons/decoder.svg"
+    },
+    {
+      "id": "autoencoder",
+      "file": "/assets/research/icons/autoencoder.svg"
+    },
+    {
+      "id": "transformer",
+      "file": "/assets/research/icons/transformer.svg"
+    },
+    {
+      "id": "embedding",
+      "file": "/assets/research/icons/embedding.svg"
+    },
+    {
+      "id": "tokens",
+      "file": "/assets/research/icons/tokens.svg"
+    },
+    {
+      "id": "teacher",
+      "file": "/assets/research/icons/teacher.svg"
+    },
+    {
+      "id": "student",
+      "file": "/assets/research/icons/student.svg"
+    },
+    {
+      "id": "distill",
+      "file": "/assets/research/icons/distill.svg"
+    },
+    {
+      "id": "frozen",
+      "file": "/assets/research/icons/frozen.svg"
+    },
+    {
+      "id": "train",
+      "file": "/assets/research/icons/train.svg"
+    },
+    {
+      "id": "adapt",
+      "file": "/assets/research/icons/adapt.svg"
+    },
+    {
+      "id": "task",
+      "file": "/assets/research/icons/task.svg"
+    },
+    {
+      "id": "task-vector",
+      "file": "/assets/research/icons/task-vector.svg"
+    },
+    {
+      "id": "align",
+      "file": "/assets/research/icons/align.svg"
+    },
+    {
+      "id": "target",
+      "file": "/assets/research/icons/target.svg"
+    },
+    {
+      "id": "privacy",
+      "file": "/assets/research/icons/privacy.svg"
+    },
+    {
+      "id": "shield",
+      "file": "/assets/research/icons/shield.svg"
+    },
+    {
+      "id": "lock",
+      "file": "/assets/research/icons/lock.svg"
+    },
+    {
+      "id": "key",
+      "file": "/assets/research/icons/key.svg"
+    },
+    {
+      "id": "encrypt",
+      "file": "/assets/research/icons/encrypt.svg"
+    },
+    {
+      "id": "unlearn",
+      "file": "/assets/research/icons/unlearn.svg"
+    },
+    {
+      "id": "fingerprint",
+      "file": "/assets/research/icons/fingerprint.svg"
+    },
+    {
+      "id": "attack",
+      "file": "/assets/research/icons/attack.svg"
+    },
+    {
+      "id": "trigger",
+      "file": "/assets/research/icons/trigger.svg"
+    },
+    {
+      "id": "check",
+      "file": "/assets/research/icons/check.svg"
+    },
+    {
+      "id": "warning",
+      "file": "/assets/research/icons/warning.svg"
+    },
+    {
+      "id": "scale",
+      "file": "/assets/research/icons/scale.svg"
+    },
+    {
+      "id": "speed",
+      "file": "/assets/research/icons/speed.svg"
+    },
+    {
+      "id": "energy",
+      "file": "/assets/research/icons/energy.svg"
+    },
+    {
+      "id": "chart",
+      "file": "/assets/research/icons/chart.svg"
+    },
+    {
+      "id": "table",
+      "file": "/assets/research/icons/table.svg"
+    },
+    {
+      "id": "compare",
+      "file": "/assets/research/icons/compare.svg"
+    },
+    {
+      "id": "accuracy",
+      "file": "/assets/research/icons/accuracy.svg"
+    },
+    {
+      "id": "globe",
+      "file": "/assets/research/icons/globe.svg"
+    },
+    {
+      "id": "language",
+      "file": "/assets/research/icons/language.svg"
+    },
+    {
+      "id": "speaker",
+      "file": "/assets/research/icons/speaker.svg"
+    },
+    {
+      "id": "emotion",
+      "file": "/assets/research/icons/emotion.svg"
+    },
+    {
+      "id": "search",
+      "file": "/assets/research/icons/search.svg"
+    },
+    {
+      "id": "book",
+      "file": "/assets/research/icons/book.svg"
+    },
+    {
+      "id": "paper",
+      "file": "/assets/research/icons/paper.svg"
+    },
+    {
+      "id": "code",
+      "file": "/assets/research/icons/code.svg"
+    },
+    {
+      "id": "citation",
+      "file": "/assets/research/icons/citation.svg"
+    }
+  ]
+}

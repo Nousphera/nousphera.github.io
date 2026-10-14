@@ -39,8 +39,8 @@
   },
   "method": [
     {
-      "title": "Learn from available labels",
-      "text": "Each participating client begins with the shared model and trains on its labeled audio. An optional self-supervised pre-trained initialization improves the starting representation."
+      "title": "Start from a shared model",
+      "text": "Clients receive the shared model and jointly optimize labeled and unlabeled losses locally. Optionally, the server first initializes the model through contrastive pretraining on public FSD-50K audio."
     },
     {
       "title": "Select useful pseudo-labels",

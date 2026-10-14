@@ -1,0 +1,256 @@
+{
+  "slug": "fedcode",
+  "problem": "Sending every weight position each federated round limits communication savings even after weights have been clustered.",
+  "contribution": "FedCode usually exchanges only cluster centers in both directions, with periodic compressed-weight transfers to recalibrate client and server models.",
+  "reading_guide": "Compare joint communication savings with accuracy loss; very large compression ratios can hide severe utility degradation.",
+  "diagram": {
+    "type": "cycle",
+    "title": "Exchange codebooks, recalibrate periodically",
+    "description": "The server sends its codebook, clients update and train local models, and their codebooks return to update the server model; calibration rounds also carry weight indices.",
+    "stages": [
+      {
+        "title": "Send global codebook",
+        "detail": "Cluster global weights and broadcast sorted centers to participating clients.",
+        "icon": "download",
+        "location": "Server"
+      },
+      {
+        "title": "Update and train",
+        "detail": "Map local weights to nearby received centers, then train on local data.",
+        "icon": "train",
+        "location": "Clients"
+      },
+      {
+        "title": "Return client codebooks",
+        "detail": "Cluster each trained local model and upload its centers.",
+        "icon": "upload",
+        "location": "Clients"
+      },
+      {
+        "title": "Update global weights",
+        "detail": "Concatenate received codebooks, update global weights by nearest center, and start the next round.",
+        "icon": "codebook",
+        "location": "Server"
+      }
+    ],
+    "connections": [
+      "Downstream centers",
+      "Local weight clustering",
+      "Upstream centers"
+    ],
+    "footnote": "Calibration is periodic in each direction: transmit codebooks plus weight indices; server-side calibration reconstructs models and applies FedAvg. The cycle returns to the first stage."
+  },
+  "results": [
+    {
+      "title": "Bidirectional savings against clustering baselines",
+      "question": "What does codebook transfer add beyond transmitting clustered weights every round?",
+      "context": "CIFAR-100, ResNet-20, 10 clients, full participation, 100 rounds, 4 local epochs. FedCode uses 64 centers and calibration rates 0.2/0.5. Accuracy (%) and data transmission reduction (DTR, × FedAvg) are higher-is-better; no uncertainty reported.",
+      "source": {
+        "label": "Table 6 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2311.09270v1#page=9"
+      },
+      "columns": [
+        "Method",
+        "Accuracy (%)",
+        "Downstream DTR (×)",
+        "Upstream DTR (×)",
+        "Joint DTR (×)"
+      ],
+      "rows": [
+        {
+          "label": "FedAvg",
+          "values": [
+            "61.22",
+            "—",
+            "—",
+            "—"
+          ]
+        },
+        {
+          "label": "FedAvg + weight clustering",
+          "values": [
+            "58.78",
+            "5.3",
+            "5.3",
+            "5.3"
+          ]
+        },
+        {
+          "label": "FedZip",
+          "values": [
+            "57.98",
+            "—",
+            "19.8",
+            "1.9"
+          ]
+        },
+        {
+          "label": "FedCode",
+          "values": [
+            "58.07",
+            "24.2",
+            "10.4",
+            "14.6"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "FedCode reaches 14.6× joint reduction with 58.07% accuracy. FedZip’s larger upstream reduction yields only 1.9× joint reduction because it does not compress the downstream route.",
+      "caveat": "Dashes reproduce unreported entries in the source table, not zero communication. These results use one workload and the paper’s configured baselines; MUCSC was not reproduced."
+    },
+    {
+      "title": "Calibration controls the accuracy cost",
+      "question": "How far can communication shrink before the model loses useful accuracy?",
+      "context": "CIFAR-100, ResNet-20, 64 centers, 10 clients, full participation, 100 rounds, 4 local epochs. F1/F2 are the source table’s calibration-rate labels. Accuracy change is in percentage points versus FedAvg; data volume is reported in MB.",
+      "source": {
+        "label": "Table 5 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2311.09270v1#page=9"
+      },
+      "columns": [
+        "Calibration F1 / F2",
+        "Accuracy Δ (pp)",
+        "Joint DTR (×)",
+        "Data volume (MB)"
+      ],
+      "rows": [
+        {
+          "label": "1 / 1",
+          "values": [
+            "-0.86",
+            "5.3",
+            "394.21"
+          ]
+        },
+        {
+          "label": "0.5 / 0.5",
+          "values": [
+            "-3.46",
+            "10.4",
+            "201.08"
+          ]
+        },
+        {
+          "label": "0.2 / 0.5",
+          "values": [
+            "-3.15",
+            "14.6",
+            "143.92"
+          ],
+          "highlight": true
+        },
+        {
+          "label": "0.33 / 0.33",
+          "values": [
+            "-5.94",
+            "15.2",
+            "138.01"
+          ]
+        },
+        {
+          "label": "0.1 / 0.1",
+          "values": [
+            "-21.64",
+            "44.3",
+            "47.35"
+          ]
+        },
+        {
+          "label": "0 / 0",
+          "values": [
+            "-46.88",
+            "264.7",
+            "7.9"
+          ]
+        }
+      ],
+      "interpretation": "The 264.7× ratio comes with a 46.88-point accuracy loss. The selected 0.2/0.5 setting reduces communication substantially while avoiding that extreme collapse.",
+      "caveat": "No uncertainty is reported. The preprint inconsistently assigns F1/F2 to upstream and downstream in different sections, so the original labels are retained without relabeling their direction."
+    },
+    {
+      "title": "Partial participation under heterogeneous data",
+      "question": "What accuracy cost remains when only 10% of clients participate each round?",
+      "context": "10 clients, 10% participation; IID Dir(10) versus non-IID Dir(0.1), with label and quantity skew. Accuracy changes are percentage points versus each FedAvg baseline; joint DTR is a multiplicative reduction. No uncertainty reported.",
+      "source": {
+        "label": "Table 3, 10% participation rows · PDF page 8",
+        "url": "https://arxiv.org/pdf/2311.09270v1#page=8"
+      },
+      "columns": [
+        "Model / dataset",
+        "IID accuracy Δ (pp)",
+        "Non-IID accuracy Δ (pp)",
+        "Joint DTR (×)"
+      ],
+      "rows": [
+        {
+          "label": "ResNet-20 / CIFAR-10",
+          "values": [
+            "-1.51",
+            "-1.67",
+            "15"
+          ]
+        },
+        {
+          "label": "ResNet-20 / CIFAR-100",
+          "values": [
+            "-3.04",
+            "-3.74",
+            "15.1"
+          ]
+        },
+        {
+          "label": "MobileNet / CIFAR-10",
+          "values": [
+            "-0.33",
+            "-0.81",
+            "10.9"
+          ]
+        },
+        {
+          "label": "MobileNet / CIFAR-100",
+          "values": [
+            "-1.93",
+            "-2.91",
+            "10.9"
+          ]
+        }
+      ],
+      "interpretation": "Savings persist under partial participation, but the non-IID accuracy losses are larger than the IID losses in all four selected comparisons.",
+      "caveat": "Appendix B uses longer runs for non-IID data and partial participation; MobileNet also uses more clusters for non-IID data. These rows are not controlled one-variable comparisons."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data and models",
+      "value": "CIFAR-10/100 with ResNet-20 and MobileNet v2; 12-class SpeechCommands v2 with YAMNet."
+    },
+    {
+      "label": "Federated setting",
+      "value": "10 clients; 10% or 100% participation; Dirichlet concentrations 10 and 0.1; Adam, four local epochs, batch size 128."
+    },
+    {
+      "label": "Compared with",
+      "value": "FedAvg, FedAvg with weight clustering, and FedZip; MUCSC could not be reproduced from its reported clustering details."
+    },
+    {
+      "label": "Measured scope",
+      "value": "Test accuracy, communication volume/DTR, and bits per parameter; computational complexity is analyzed, without a measured edge-device energy or latency benchmark."
+    }
+  ],
+  "limitations": [
+    "This page uses the November 2023 arXiv v1 preprint, whose summary statistics differ from the IEEE EDGE 2024 published version. Results from those versions are not combined.",
+    "Codebook size, calibration frequency, participation, and training duration jointly affect the results. Savings from a selected setting are not a universal compression guarantee.",
+    "Reported tables contain no run-to-run uncertainty. Model- and distribution-specific settings differ, including up to 2,000 rounds in the MobileNet appendix.",
+    "FedCode is a communication method. Keeping raw data local and compressing updates do not provide a demonstrated privacy guarantee against inference or malicious clients."
+  ],
+  "takeaways": [
+    "Avoiding repeated weight-position transmission can save more communication than clustering alone.",
+    "Periodic calibration is essential: relying exclusively on codebooks can greatly reduce accuracy.",
+    "Upstream-only savings can exaggerate practical benefit; inspect the joint upstream-plus-downstream metric."
+  ],
+  "evidence_inventory": {
+    "tables": 9,
+    "figures": 9,
+    "source_url": "https://arxiv.org/pdf/2311.09270v1",
+    "version": "arXiv:2311.09270v1, 15 November 2023; 14-page preprint including Appendices A–D, separate from IEEE EDGE 2024."
+  }
+}

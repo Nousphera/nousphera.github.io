@@ -12,7 +12,7 @@
     "Nirvana Meratnia"
   ],
   "tagline": "Why emotion models struggle beyond their training domain",
-  "summary": "Speech emotion models often lose accuracy when speakers, languages, or recording datasets change. DA-MLDG studies whether meta-learning can improve that transfer by weighting training episodes according to estimated domain shift; its evaluation exposes the limits of log-mel representations and motivates stronger features and more varied speech emotion datasets.",
+  "summary": "Models that recognize emotion in one speech dataset often fail on another. This study evaluates domain-shift-aware meta-learning for speech emotion recognition, finds mixed gains with log-mel inputs, and tests whether stronger acoustic representations improve held-out-domain performance.",
   "category": "Reliable learning",
   "topics": [
     "Domain generalization",

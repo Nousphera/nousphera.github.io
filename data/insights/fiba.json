@@ -1,0 +1,245 @@
+{
+  "slug": "fiba",
+  "problem": "Visually subtle backdoor triggers must survive limited local training and competing honest updates in federated learning.",
+  "contribution": "The study benchmarks invisible backdoors and common defenses in federated settings, then tests attention-based trigger placement and its detectability cost.",
+  "reading_guide": "Read attack success together with clean accuracy and detection scores; lower visual distortion does not imply that a model-level defense cannot detect an attack.",
+  "diagram": {
+    "type": "pipeline",
+    "title": "Evaluate attacks at the federated boundary",
+    "description": "Honest and malicious clients train in parallel, their updates meet at a chosen server aggregation rule, and the resulting model is evaluated for clean utility, attack success, and detectability.",
+    "stages": [
+      {
+        "title": "Parallel client training",
+        "detail": "Honest clients train clean data; malicious clients train poisoned and clean samples.",
+        "icon": "clients",
+        "location": "Clients",
+        "items": [
+          "Honest updates",
+          "Malicious updates"
+        ]
+      },
+      {
+        "title": "Chosen server aggregation",
+        "detail": "Combine the updates using FedAvg or one selected defense.",
+        "icon": "shield",
+        "location": "Server",
+        "items": [
+          "FedAvg",
+          "Robust aggregation",
+          "Behavior detection"
+        ]
+      },
+      {
+        "title": "Evaluate resulting model",
+        "detail": "Measure clean accuracy, triggered predictions, perceptual distortion, and Neural Cleanse anomaly scores.",
+        "icon": "compare",
+        "location": "Evaluation"
+      }
+    ],
+    "connections": [
+      "Client updates meet",
+      "Global model under test"
+    ],
+    "footnote": "Client training and aggregation repeat across rounds. The defense methods are alternatives; low-attention placement is a separate LSB experiment, not a universal attack component."
+  },
+  "results": [
+    {
+      "title": "Attacker participation changes success",
+      "question": "How do invisible attacks compare with a visible trigger at one or two malicious clients?",
+      "context": "CIFAR-10, ResNet-18, 10 clients, 100 rounds, 5 local epochs, Dir(0.5), target class 5. Clean accuracy and attack success rate (ASR) are percentages; ASR excludes poisoned samples from the target class.",
+      "source": {
+        "label": "Table 1 · PDF page 10",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf#page=10"
+      },
+      "columns": [
+        "Attack",
+        "Clean accuracy, 10% attackers (%)",
+        "ASR, 10% attackers (%)",
+        "ASR, 20% attackers (%)"
+      ],
+      "rows": [
+        {
+          "label": "BadNet (visible)",
+          "values": [
+            "84.00 ± 0.31",
+            "94.96 ± 0.81",
+            "97.52 ± 0.40"
+          ]
+        },
+        {
+          "label": "LSB",
+          "values": [
+            "83.37 ± 0.33",
+            "41.59 ± 6.19",
+            "65.43 ± 3.93"
+          ]
+        },
+        {
+          "label": "WaNet",
+          "values": [
+            "83.33 ± 0.31",
+            "44.41 ± 3.50",
+            "82.05 ± 3.59"
+          ]
+        },
+        {
+          "label": "Encoder",
+          "values": [
+            "83.44 ± 0.27",
+            "29.44 ± 5.90",
+            "88.59 ± 4.01"
+          ]
+        },
+        {
+          "label": "LIRA",
+          "values": [
+            "83.71 ± 0.41",
+            "10.52 ± 1.22",
+            "41.57 ± 4.66"
+          ]
+        }
+      ],
+      "interpretation": "Every tested attack gains ASR with two malicious clients. At one malicious client, all four invisible attacks have lower ASR than BadNet, despite similar clean accuracy.",
+      "caveat": "The paper reports means with ± values but does not identify the dispersion statistic or repetition count. These results use coordinated all-to-one poisoning and the specified attack settings."
+    },
+    {
+      "title": "Defense success can cost clean accuracy",
+      "question": "Can a server reduce LSB attack success while preserving ordinary predictions?",
+      "context": "Table 2(a), LSB on CIFAR-10 with 10% attackers and the same 10-client, 100-round setting. Clean accuracy is higher-is-better; ASR is lower-is-better for the defender. Both are percentages.",
+      "source": {
+        "label": "Table 2(a), LSB row · PDF page 11",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf#page=11"
+      },
+      "columns": [
+        "Server method",
+        "Clean accuracy (%)",
+        "ASR (%)"
+      ],
+      "rows": [
+        {
+          "label": "FedAvg",
+          "values": [
+            "83.37 ± 0.33",
+            "41.59 ± 6.19"
+          ]
+        },
+        {
+          "label": "Median",
+          "values": [
+            "83.16 ± 1.68",
+            "29.74 ± 12.35"
+          ]
+        },
+        {
+          "label": "Trimmed Mean",
+          "values": [
+            "84.52 ± 0.40",
+            "60.03 ± 7.17"
+          ]
+        },
+        {
+          "label": "FoolsGold",
+          "values": [
+            "83.26 ± 0.35",
+            "27.01 ± 3.08"
+          ]
+        },
+        {
+          "label": "KRUM",
+          "values": [
+            "53.81 ± 10.20",
+            "23.84 ± 26.93"
+          ]
+        },
+        {
+          "label": "Multi-KRUM",
+          "values": [
+            "69.67 ± 1.89",
+            "1.47 ± 0.45"
+          ]
+        }
+      ],
+      "interpretation": "Multi-KRUM reduces LSB ASR to 1.47% but lowers clean accuracy to 69.67%. Trimmed Mean preserves clean accuracy here while increasing ASR above the FedAvg reference.",
+      "caveat": "This panel selects one attack/dataset to keep the utility–defense tradeoff comparable. The paper also tests CIFAR-100 with 20% attackers; these different settings should not be pooled. The ± statistic is unspecified."
+    },
+    {
+      "title": "Low attention is easier to exploit and detect",
+      "question": "Does attention-based LSB placement improve success without sacrificing stealth?",
+      "context": "CIFAR-10, LSB700, 10% attackers; compare no activation mask with low- and high-attention masks. ASR is a percentage; LPIPS and Neural Cleanse anomaly index are unitless. Higher anomaly index means easier detection; the discussed threshold is 2.",
+      "source": {
+        "label": "Table 3, LSB700 rows · PDF page 14",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf#page=14"
+      },
+      "columns": [
+        "Placement",
+        "ASR (%)",
+        "LPIPS",
+        "Anomaly index"
+      ],
+      "rows": [
+        {
+          "label": "No activation mask",
+          "values": [
+            "41.59 ± 6.19",
+            "7.83 × 10⁻⁵",
+            "1.61"
+          ]
+        },
+        {
+          "label": "Low attention",
+          "values": [
+            "61.39 ± 4.47",
+            "2.25 × 10⁻⁴",
+            "3.04"
+          ],
+          "highlight": true
+        },
+        {
+          "label": "High attention",
+          "values": [
+            "36.89 ± 4.26",
+            "3.75 × 10⁻⁴",
+            "2.01"
+          ]
+        }
+      ],
+      "interpretation": "Low-attention placement raises mean ASR by 19.80 percentage points over the unmasked attack, but increases both visual distortion and the anomaly index beyond the discussed detection threshold.",
+      "caveat": "The tested attention-placement evidence is limited to LSB500/700 on CIFAR-10. Fewer modified regions can also increase trigger intensity, so placement is not isolated from every other factor."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Data and model",
+      "value": "CIFAR-10/100 with ResNet-18 trained from scratch; Flower simulations with Dirichlet concentration 0.5."
+    },
+    {
+      "label": "Threat model",
+      "value": "Attackers poison local training data and coordinate a target/trigger; model replacement additionally assumes knowledge of aggregation-related quantities."
+    },
+    {
+      "label": "Attacks and defenses",
+      "value": "LSB, WaNet, Encoder, LIRA and visible BadNet; reported defense tables cover Median, Trimmed Mean, FoolsGold, KRUM and Multi-KRUM."
+    },
+    {
+      "label": "Additional probes",
+      "value": "Distributed triggers, transient model replacement, and low/high attention LSB placement; LPIPS visual distortion and Neural Cleanse model-level detection."
+    }
+  ],
+  "limitations": [
+    "The experiments use one architecture, two small image datasets, ten clients, and specified attacker fractions. They do not establish effectiveness across arbitrary deployments, attacker access, or defenses.",
+    "The paper names PCA among evaluated defenses, but its result table does not report a PCA column. LIRA is also absent from the defense table; do not imply coverage of every attack–defense pair.",
+    "Attention-based placement is evaluated for LSB, while adaptation to WaNet and LIRA is left for future work. Higher ASR is accompanied by higher Neural Cleanse scores rather than improved stealth on that metric.",
+    "The ± notation and number of repeated runs are not specified. The distributed-trigger caption also combines four trigger parts with a 10% attacker fraction among ten clients, leaving the exact distribution setup unclear."
+  ],
+  "takeaways": [
+    "Visual subtlety, clean accuracy, attack success, and model-level detectability are different properties.",
+    "A defense that lowers attack success can still be unsuitable if it substantially harms ordinary predictions.",
+    "The evaluated low-attention placement exposes a success–detectability tradeoff, not an unconditional improvement in attack stealth."
+  ],
+  "evidence_inventory": {
+    "tables": 3,
+    "figures": 7,
+    "source_url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf",
+    "version": "Public TU/e accepted manuscript, 17 PDF pages including repository cover sheet; UbiSec 2024 paper, proceedings published 16 May 2025."
+  }
+}
