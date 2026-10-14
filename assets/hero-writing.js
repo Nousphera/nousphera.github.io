@@ -60,7 +60,7 @@
     const toggle = root.querySelector('[data-writing-toggle]');
     const label = root.querySelector('[data-writing-label]');
     const phrases = parsePhrases(root.dataset.phrases);
-    if (!text || !toggle || !label || !phrases.length) return null;
+    if (!text || !phrases.length) return null;
 
     const scheduler = environment.scheduler || {
       now: () => win.performance ? win.performance.now() : Date.now(),
@@ -108,9 +108,11 @@
       if (destroyed) return;
       const running = canRun();
       root.dataset.paused = String(!running);
-      toggle.hidden = motion.matches;
-      label.textContent = manualPaused ? 'Resume' : 'Pause';
-      toggle.setAttribute('aria-label', (manualPaused ? 'Resume' : 'Pause') + ' headline animation');
+      if (toggle) {
+        toggle.hidden = motion.matches;
+        toggle.setAttribute('aria-label', (manualPaused ? 'Resume' : 'Pause') + ' headline animation');
+      }
+      if (label) label.textContent = manualPaused ? 'Resume' : 'Pause';
       if (!running) { suspend(); return; }
       if (timer !== null) return;
       const ticket = ++generation;
@@ -142,7 +144,7 @@
       sync();
     }
 
-    listen(toggle, 'click', () => { if (manualPaused) resume(); else pause(); });
+    if (toggle) listen(toggle, 'click', () => { if (manualPaused) resume(); else pause(); });
     listen(doc, 'visibilitychange', () => {
       if (!doc.hidden && typeof doc.hasFocus === 'function') focused = doc.hasFocus();
       sync();
@@ -186,7 +188,7 @@
         completePhrase();
         destroyed = true;
         cleanups.forEach(cleanup => cleanup());
-        toggle.hidden = true;
+        if (toggle) toggle.hidden = true;
         root.dataset.paused = 'true';
         delete root.dataset.writingReady;
         controllers.delete(root);

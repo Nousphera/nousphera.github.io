@@ -47,7 +47,7 @@ function setup(options = {}) {
   root.getBoundingClientRect = () => root.rect;
   root.getClientRects = () => root.displayNone ? [] : [root.rect];
   root.closest = () => root.ancestorHidden ? {} : null;
-  root.querySelector = selector => ({ '[data-writing-text]': text, '[data-writing-toggle]': toggle, '[data-writing-label]': label })[selector];
+  root.querySelector = selector => ({ '[data-writing-text]': text, '[data-writing-toggle]': options.noControls ? null : toggle, '[data-writing-label]': options.noControls ? null : label })[selector];
   const document = new Target();
   document.hidden = options.hidden || false;
   document.focused = options.focused ?? true;
@@ -84,7 +84,7 @@ function setup(options = {}) {
 }
 
 test('keeps the initial phrase readable, erases faster, types gradually, then holds', () => {
-  const t = setup({ phrases: ['ab', 'cd'], initial: 'ab' });
+  const t = setup({ phrases: ['ab', 'cd'], initial: 'ab', noControls: true });
   t.advance(1499);
   assert.equal(t.text.textContent, 'ab');
   t.advance(1);
