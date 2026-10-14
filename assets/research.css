@@ -210,7 +210,7 @@
 .section-nav.tabs-ready a:hover { background:var(--soft); }
 .section-nav.tabs-ready a[aria-selected='true'] { color:var(--accent); background:var(--tint); border-color:color-mix(in srgb,var(--accent) 22%,transparent); font-weight:600; }
 [data-tab-panel] { scroll-margin-top:75px; min-height:300px; }
-.project-panels { overflow-anchor:none; min-height:calc(100svh - 64px); }
+.project-panels { overflow-anchor:none; min-height:max(300px,calc(100svh - 364px)); }
 .section-nav { isolation:isolate; }
 :root { scrollbar-gutter:stable; }
 [data-tab-panel]:focus-visible { outline:2px solid var(--accent); outline-offset:5px; }

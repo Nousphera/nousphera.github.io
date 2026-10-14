@@ -1,25 +1,32 @@
-/* A bounded, opt-in tour. Stage buttons remain fully manual. */
+/* An opt-in, one-shot overview. Manual method views never start a timer. */
 (function () {
   'use strict';
   const SCENES = {
-    network: ['Federated learning', 'Training stays on each client', 'Clients learn from local data; the server combines their model updates.'],
-    nnc: ['NNC · initialization', 'Let nearby examples correct a label', 'A local pre-trained embedding space supplies neighbors whose labels vote.'],
-    akd: ['AKD · local training', 'Add a teacher when labels are noisy', 'Estimated local noise gates the teacher loss alongside the supervised loss.'],
-    na: ['NA-FedAvg · server aggregation', 'Reduce the influence of noisy updates', 'After warm-up, estimate client noise once and adjust the aggregation weights.']
+    network: ['Training stays on each client', 'Clients learn from local data; the server combines their model updates.'],
+    nnc: ['Nearest Neighbor Correction', 'Image features find local neighbors; their labels vote to correct the stored label.'],
+    akd: ['Adaptive Knowledge Distillation', 'Estimated local noise gates the teacher loss alongside the supervised loss.'],
+    na: ['Noise-Aware Federated Averaging', 'After warm-up, estimate client noise once and reduce the weight of noisier updates.']
   };
-  // Network returns separate the alternatives; this is not a combined pipeline.
+  // Returning to the network separates the three alternative interventions.
   const TIMELINE = [
     {scene: 'network', duration: 3000},
-    {scene: 'network', camera: 'nnc', duration: 450},
-    {scene: 'nnc', duration: 6000},
-    {scene: 'network', returning: true, duration: 1800},
-    {scene: 'network', camera: 'akd', duration: 450},
-    {scene: 'akd', duration: 6000},
-    {scene: 'network', returning: true, duration: 1800},
-    {scene: 'network', camera: 'na', duration: 450},
-    {scene: 'na', duration: 6000}
+    {scene: 'network', camera: 'nnc', duration: 500},
+    {scene: 'nnc', duration: 9500},
+    {scene: 'network', returning: true, duration: 1500},
+    {scene: 'network', camera: 'akd', duration: 500},
+    {scene: 'akd', duration: 5500},
+    {scene: 'network', returning: true, duration: 1500},
+    {scene: 'network', camera: 'na', duration: 500},
+    {scene: 'na', duration: 5500}
   ];
   const TOTAL = TIMELINE.reduce((sum, step) => sum + step.duration, 0);
+  const NNC_PHASES = [
+    {name: 'sample', at: 0, text: 'This dog image has the wrong stored label: “Cat”.'},
+    {name: 'embedding', at: 1800, text: 'A frozen encoder maps the image content into an embedding.'},
+    {name: 'neighbors', at: 3600, text: 'Find five nearest other examples in this client’s embedding space.'},
+    {name: 'vote', at: 6000, text: 'Their stored labels vote: four “Dog”, one “Cat”.'},
+    {name: 'corrected', at: 7800, text: 'Change the stored label to “Dog”. The image stays the same.'}
+  ];
 
   function initialize(root) {
     if (root.dataset.tourReady === 'true') return;
@@ -27,18 +34,15 @@
     const controls = query('[data-tour-controls]');
     const toggle = query('[data-tour-toggle]');
     const toggleLabel = query('[data-tour-toggle-label]');
-    const playIcon = query('[data-tour-play-icon]');
-    const replay = query('[data-tour-replay]');
-    const replayLabel = query('[data-tour-replay-label]');
-    const duration = query('[data-tour-duration]');
     const progress = query('[data-tour-progress]');
     const status = query('[data-tour-status]');
     const title = query('[data-tour-title]');
     const description = query('[data-tour-description]');
-    const kicker = query('[data-tour-kicker]');
     const stages = [...root.querySelectorAll('[data-tour-stage]')];
     const panels = [...root.querySelectorAll('[data-tour-scene]')];
-    if (!controls || !toggle || !replay || panels.length !== 4) return;
+    const nncParts = [...root.querySelectorAll('[data-tour-nnc-part]')];
+    const neighbors = [...root.querySelectorAll('[data-tour-neighbor]')];
+    if (!controls || !toggle || panels.length !== 4) return;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let elapsed = 0;
     let lastTime = null;
@@ -59,9 +63,34 @@
 
     function updateControls() {
       root.dataset.running = String(playing);
-      toggleLabel.textContent = playing ? 'Pause' : finished ? 'Replay tour' : elapsed > 0 && !manual ? 'Resume' : 'Play tour';
-      playIcon.textContent = playing ? 'Ⅱ' : '▶';
-      toggle.setAttribute('aria-label', playing ? 'Pause the method tour' : finished ? 'Replay the method tour from the overview' : elapsed > 0 && !manual ? 'Resume the method tour' : 'Play the 26-second method tour');
+      const label = playing ? 'Pause' : finished ? 'Replay overview' : elapsed > 0 && !manual ? 'Resume overview' : 'Play overview';
+      toggleLabel.textContent = label;
+      toggle.setAttribute('aria-label', playing ? 'Pause the overview' : label + (label === 'Play overview' ? ', 28 seconds' : ''));
+    }
+
+    function reveal(element, visible) {
+      const value = String(visible);
+      if (element.dataset.visible !== value) element.dataset.visible = value;
+      element.setAttribute('aria-hidden', String(!visible));
+    }
+
+    function showNnc(localTime = null) {
+      const complete = localTime === null;
+      let phaseIndex = NNC_PHASES.length - 1;
+      if (!complete) {
+        phaseIndex = 0;
+        NNC_PHASES.forEach((phase, i) => { if (localTime >= phase.at) phaseIndex = i; });
+      }
+      const phase = NNC_PHASES[phaseIndex];
+      const name = complete ? 'complete' : phase.name;
+      if (root.dataset.nncPhase !== name) {
+        root.dataset.nncPhase = name;
+        description.textContent = complete ? SCENES.nnc[1] : phase.text;
+      }
+      const order = {embedding: 1, neighbors: 2, vote: 3, corrected: 4};
+      nncParts.forEach(part => reveal(part, complete || phaseIndex >= order[part.dataset.tourNncPart]));
+      // Neighbors are other local images. The query is never in this set.
+      neighbors.forEach((neighbor, i) => reveal(neighbor, complete || localTime >= 3600 + i * 220));
     }
 
     function showScene(name, {camera = '', returning = false, animate = false, announce = true} = {}) {
@@ -74,25 +103,25 @@
         panel.classList.toggle('is-arriving', active && changed && animate && !motion.matches);
       });
       stages.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.tourStage === name)));
-      const copy = SCENES[name];
-      kicker.textContent = returning ? 'Another alternative' : copy[0];
-      title.textContent = returning ? 'Back to the shared network' : copy[1];
-      description.textContent = returning ? 'Now explore a different intervention point; the methods are alternatives.' : copy[2];
-      if (announce && !camera) status.textContent = returning ? 'Returning to the network to explore another alternative.' : copy[0] + '. ' + copy[2];
+      title.textContent = SCENES[name][0];
+      description.textContent = returning ? 'Return to the network to explore a different intervention.' : SCENES[name][1];
+      if (name === 'nnc') showNnc(manual || motion.matches ? null : 0);
+      if (announce && !camera) status.textContent = returning ? 'Returning to the network. The methods are alternatives.' : SCENES[name][0] + '. ' + SCENES[name][1];
     }
 
     function render() {
-      let boundary = 0;
+      let start = 0;
       let index = TIMELINE.length - 1;
       for (let i = 0; i < TIMELINE.length; i += 1) {
-        boundary += TIMELINE[i].duration;
-        if (elapsed < boundary) { index = i; break; }
+        if (elapsed < start + TIMELINE[i].duration || i === TIMELINE.length - 1) { index = i; break; }
+        start += TIMELINE[i].duration;
       }
+      const step = TIMELINE[index];
       if (index !== activeStep) {
         activeStep = index;
-        const step = TIMELINE[index];
         showScene(step.scene, {...step, animate: true});
       }
+      if (step.scene === 'nnc') showNnc(elapsed - start);
       progress.style.transform = 'scaleX(' + Math.min(1, elapsed / TOTAL) + ')';
     }
 
@@ -107,7 +136,7 @@
 
     function tick(time) {
       if (!playing) return;
-      if (!isVisible()) { pause('Tour paused while out of view. Resume when ready.'); return; }
+      if (!isVisible()) { pause('Overview paused while out of view. Resume when ready.'); return; }
       if (lastTime !== null) elapsed += Math.max(0, time - lastTime);
       lastTime = time;
       elapsed = Math.min(elapsed, TOTAL);
@@ -115,7 +144,7 @@
       if (elapsed >= TOTAL) {
         finished = true;
         root.classList.remove('is-touring');
-        pause('Tour complete. NNC, AKD, and NA-FedAvg are three alternative interventions.');
+        pause('Overview complete. NNC, AKD, and NA-FedAvg are three alternative interventions.');
         return;
       }
       frame = window.requestAnimationFrame(tick);
@@ -133,39 +162,32 @@
       updateControls();
     }
 
-    function play({restart = false} = {}) {
-      if (motion.matches) {
-        status.textContent = 'Reduced motion is enabled. Select a stage to explore at your own pace.';
-        return;
-      }
-      if (restart || finished || manual) reset();
-      if (!isVisible()) { pause('The tour is paused while out of view.'); return; }
+    function play() {
+      if (motion.matches) return;
+      if (finished || manual) reset();
+      if (!isVisible()) { pause('The overview is paused while out of view.'); return; }
       playing = true;
       lastTime = null;
       root.classList.add('is-touring');
       updateControls();
-      status.textContent = 'Tour playing. You can pause or select a stage at any time.';
+      status.textContent = 'Overview playing. Pause or select a method at any time.';
       render();
       frame = window.requestAnimationFrame(tick);
     }
 
     toggle.addEventListener('click', () => {
-      if (playing) pause('Tour paused. Resume or select a stage.');
+      if (playing) pause('Overview paused. Resume or select a method.');
       else play();
-    });
-    replay.addEventListener('click', () => {
-      if (motion.matches) { reset(); status.textContent = 'Network overview. Select a stage to explore.'; }
-      else play({restart: true});
     });
     stages.forEach(button => button.addEventListener('click', () => {
       reset();
       manual = true;
       showScene(button.dataset.tourStage);
-      status.textContent = SCENES[button.dataset.tourStage][0] + '. Static view; select another stage to continue.';
+      updateControls();
     }));
 
     function visibilityChanged() {
-      if (playing && !isVisible()) pause('Tour paused while out of view. Resume when ready.');
+      if (playing && !isVisible()) pause('Overview paused while out of view. Resume when ready.');
     }
     document.addEventListener('visibilitychange', visibilityChanged);
     window.addEventListener('pagehide', () => pause());
@@ -179,7 +201,6 @@
       window.addEventListener('scroll', visibilityChanged, {passive: true});
       window.addEventListener('resize', visibilityChanged, {passive: true});
     }
-    // Observe actual ancestors, so Overview tab visibility pauses immediately.
     if ('MutationObserver' in window) {
       const visibility = new MutationObserver(visibilityChanged);
       let ancestor = root.parentElement;
@@ -194,10 +215,12 @@
       panels.forEach(panel => panel.classList.remove('is-arriving'));
       root.dataset.camera = '';
       toggle.hidden = motion.matches;
-      duration.textContent = motion.matches ? 'Reduced motion · explore manually' : '26 seconds · plays once';
-      replayLabel.textContent = motion.matches ? 'Overview' : 'Replay';
-      replay.setAttribute('aria-label', motion.matches ? 'Return to the network overview' : 'Replay the tour from the network overview');
-      status.textContent = motion.matches ? 'Reduced motion is enabled. Select a stage to explore at your own pace.' : 'Select a method or play the guided tour.';
+      if (motion.matches && root.dataset.active === 'nnc') {
+        manual = true;
+        showNnc();
+        updateControls();
+      }
+      status.textContent = motion.matches ? 'Reduced motion is enabled. Select a method to explore at your own pace.' : 'Select a method or play the overview.';
     }
     if (motion.addEventListener) motion.addEventListener('change', motionChanged);
     else if (motion.addListener) motion.addListener(motionChanged);
