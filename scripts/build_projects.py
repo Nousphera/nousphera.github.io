@@ -117,7 +117,7 @@ def figure_markup(f, primary=False):
 def resources(p):
     links = []
     for label, url in p['links'].items():
-        if label == 'Project':
+        if label == 'Project' or (label == 'Repository' and url == p['links'].get('Code')):
             continue
         links.append(f'<a class="resource {"primary" if label == "Paper" else ""}" href="{esc(url)}">{icon("code" if label == "Code" else "paper" if label == "Paper" else "arrow")}{esc(label)}</a>')
     links.append(f'<a class="resource" href="#citation">{icon("copy")}Cite</a>')
