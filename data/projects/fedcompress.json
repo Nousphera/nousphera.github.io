@@ -24,10 +24,11 @@
   "accent_dark": "#e8bf79",
   "tint": "#faf3e7",
   "links": {
-    "Paper": "https://arxiv.org/abs/2401.14211",
+    "Paper": "https://doi.org/10.1109/ICASSP48485.2024.10447174",
     "Code": "https://github.com/Nousphera/FedCompress",
     "Repository": "https://github.com/Nousphera/FedCompress",
-    "Poster": "https://nousphera.github.io/assets/posters/fedcompress-a0-landscape.pdf"
+    "Poster": "https://nousphera.github.io/assets/posters/fedcompress-a0-landscape.pdf",
+    "Preprint": "https://arxiv.org/abs/2401.14211"
   },
   "figure": {
     "src": "assets/projects/fedcompress/overview.webp",

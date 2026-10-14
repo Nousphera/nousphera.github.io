@@ -16,6 +16,8 @@ ICONS = {
     'arrow': '<path d="M7 17 17 7M7 7h10v10"/>',
     'paper': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>',
     'code': '<path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-13-2 16"/>',
+    'github': '<path fill="currentColor" stroke="none" d="M12 .9a11.1 11.1 0 0 0-3.5 21.6c.6.1.8-.2.8-.5v-2.1c-3.4.7-4.1-1.4-4.1-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.4-5.5-6.2 0-1.4.5-2.5 1.2-3.3-.1-.3-.5-1.6.1-3.3 0 0 1-.3 3.4 1.3a11.5 11.5 0 0 1 6.2 0C18 3.5 19 3.8 19 3.8c.6 1.7.2 3 .1 3.3.8.8 1.2 1.9 1.2 3.3 0 4.8-2.9 5.9-5.6 6.2.5.4.9 1.1.9 2.2V22c0 .3.2.6.8.5A11.1 11.1 0 0 0 12 .9Z"/>',
+    'poster': '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 11h10M11 11v5M14 14h3M14 17h3"/><rect x="6.5" y="14" width="2" height="3" rx=".5"/>',
     'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
     'moon': '<path d="M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z"/>',
     'auto': '<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8m-4-4v4m0-18v14"/>',
@@ -115,12 +117,19 @@ def figure_markup(f, primary=False):
     return f'''<figure class="paper-figure {'primary-figure' if primary else 'result-figure'}"><a class="figure-open" href="/{esc(f['src'])}" data-figure data-caption="{esc(f['caption'])}" aria-label="Enlarge figure: {esc(f['alt'])}"><img src="/{esc(f['src'])}" width="{int(f['width'])}" height="{int(f['height'])}" style="aspect-ratio:{int(f['width'])}/{int(f['height'])}" alt="{esc(f['alt'])}" {'fetchpriority="high"' if primary else 'loading="lazy"'} decoding="async"><span class="expand-label">{icon('expand')}<span>Enlarge</span></span></a><figcaption>{esc(f['caption'])} <a href="{esc(f['source_url'])}">{esc(f['source_label'])} {icon('arrow')}</a></figcaption></figure>'''
 
 def resources(p):
-    links = []
-    for label, url in p['links'].items():
-        if label == 'Project' or (label == 'Repository' and url == p['links'].get('Code')):
-            continue
-        links.append(f'<a class="resource {"primary" if label == "Paper" else ""}" href="{esc(url)}">{icon("code" if label == "Code" else "paper" if label == "Paper" else "arrow")}{esc(label)}</a>')
-    links.append(f'<a class="resource" href="#citation">{icon("copy")}Cite</a>')
+    # One publication destination; citation is already a persistent page tab.
+    sources = p['links']
+    items = [('Paper', sources['Paper'], 'paper')]
+    code = sources.get('Code') or sources.get('Repository')
+    if code:
+        items.append(('Code', code, 'github' if urlparse(code).hostname == 'github.com' else 'code'))
+    # PLiX has a distinct Hugging Face implementation and GitHub project repo.
+    repository = sources.get('Repository')
+    if repository and repository != code:
+        items.append(('GitHub', repository, 'github'))
+    if sources.get('Poster'):
+        items.append(('Poster', sources['Poster'], 'poster'))
+    links = [f'<a class="resource {"primary" if label == "Paper" else ""}" href="{esc(url)}">{icon(symbol)}{esc(label)}</a>' for label, url, symbol in items]
     return '<div class="resource-links">' + ''.join(links) + '</div>'
 
 def project_page(p, projects):
@@ -128,7 +137,10 @@ def project_page(p, projects):
     venue = p['venue'] if str(p['year']) in p['venue'] else f'{p["venue"]} · {p["year"]}'
     abstract_source = p.get('abstract_source', {'url': p['provenance']['source_url'], 'label': 'Source abstract'})
     source_note = f'<p class="source-note"><a href="{esc(abstract_source["url"])}">{esc(abstract_source["label"])} {icon("arrow")}</a> {esc(abstract_source.get("note", ""))}</p>'
-    authors = ' <span class="author-separator" aria-hidden="true">·</span> '.join(f'<span>{esc(a)}</span>' for a in p['authors'])
+    authors = ' <span class="author-separator" aria-hidden="true">·</span> '.join(
+        f'<strong class="author-highlight">{esc(a)}</strong>'
+        if a in {'Vasileios Tsouvalas', 'Vasilis Tsouvalas'} else f'<span>{esc(a)}</span>'
+        for a in p['authors'])
     methods = ''.join(f'<li><span class="step-number">{i:02d}</span><div><h3>{esc(s["title"])}</h3><p>{esc(s["text"])}</p></div></li>' for i, s in enumerate(p['method'], 1))
     findings = ''.join(f'<article><h3>{esc(s["title"])}</h3><p>{esc(s["text"])}</p></article>' for s in p['findings'])
     related = ''

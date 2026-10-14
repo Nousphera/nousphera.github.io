@@ -23,11 +23,12 @@
   "accent_dark": "#89d6cf",
   "tint": "#eaf7f5",
   "links": {
-    "Paper": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf",
+    "Paper": "https://doi.org/10.1109/BigData62323.2024.10825398",
     "Preprint": "https://arxiv.org/abs/2311.17299",
     "Publication": "https://doi.org/10.1109/BigData62323.2024.10825398",
     "Repository": "https://github.com/Nousphera/DeltaMask",
-    "Poster": "https://nousphera.github.io/assets/posters/deltamask-a0-landscape.pdf"
+    "Poster": "https://nousphera.github.io/assets/posters/deltamask-a0-landscape.pdf",
+    "PDF": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf"
   },
   "figure": {
     "src": "assets/projects/deltamask/overview.webp",

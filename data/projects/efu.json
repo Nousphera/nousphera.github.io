@@ -78,11 +78,12 @@
   "venue": "ACM CIKM",
   "type": "Conference",
   "links": {
-    "Paper": "https://arxiv.org/abs/2508.07873",
+    "Paper": "https://doi.org/10.1145/3746252.3761091",
     "Published version": "https://doi.org/10.1145/3746252.3761091",
-    "Code": "https://github.com/SamaneMohammadi/EFU",
+    "Code": "https://github.com/Nousphera/EFU",
     "Repository": "https://github.com/Nousphera/EFU",
-    "Poster": "https://nousphera.github.io/assets/posters/efu-a0-landscape.pdf"
+    "Poster": "https://nousphera.github.io/assets/posters/efu-a0-landscape.pdf",
+    "Preprint": "https://arxiv.org/abs/2508.07873"
   },
   "abstract": "Federated unlearning (FU) algorithms allow clients in federated settings to exercise their “right to be forgotten” by removing the influence of their data from a collaboratively trained model. Existing FU methods maintain data privacy by performing unlearning locally on the client-side and sending targeted updates to the server without exposing forgotten data; yet they often rely on server-side cooperation, revealing the client's intent and identity without enforcement guarantees - compromising autonomy and unlearning privacy. In this work, we propose EFU (Enforced Federated Unlearning), a cryptographically enforced FU framework that enables clients to initiate unlearning while concealing its occurrence from the server. Specifically, EFU leverages functional encryption to bind encrypted updates to specific aggregation functions, ensuring the server can neither perform unauthorized computations nor detect or skip unlearning requests. To further mask behavioral and parameter shifts in the aggregated model, we incorporate auxiliary unlearning losses based on adversarial examples and parameter importance regularization. Extensive experiments show that EFU achieves near-random accuracy on forgotten data while maintaining performance comparable to full retraining across datasets and neural architectures - all while concealing unlearning intent from the server. Furthermore, we demonstrate that EFU is agnostic to the underlying unlearning algorithm, enabling secure, function-hiding, and verifiable unlearning for any client-side FU mechanism that issues targeted updates.",
   "abstract_source": {

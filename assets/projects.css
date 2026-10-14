@@ -304,6 +304,10 @@ button {
 .author-separator {
   opacity:.5;
 }
+.author-highlight {
+  color:var(--text);
+  font-weight:600;
+}
 .resource-links {
   display:flex;
   gap:9px;
