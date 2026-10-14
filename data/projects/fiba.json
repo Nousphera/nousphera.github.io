@@ -78,7 +78,9 @@
   "type": "Conference",
   "links": {
     "Paper": "https://doi.org/10.1007/978-981-96-4836-8_13",
-    "Manuscript": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf"
+    "Manuscript": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf",
+    "Repository": "https://github.com/Nousphera/FiBA",
+    "Poster": "https://nousphera.github.io/assets/posters/fiba-a0-landscape.pdf"
   },
   "abstract": "Federated Learning (FL) enables collaborative training of machine learning models across multiple devices, while preserving data privacy. However, it also introduces vulnerabilities to backdoor attacks, where malicious updates can corrupt the global model. This work focuses on the largely unexplored domain of Federated invisible Backdoor Attacks (FiBAs), which use visually indistinguishable triggers to manipulate model behavior without being detected. We investigate the feasibility and effectiveness of these attacks, considering the unique challenges posed by FL, such as limited local training time and the need for model update aggregation. Our study presents a comprehensive evaluation of the attack success rate (ASR) of invisible BAs under various settings and defenses. Based on our observations, we propose a backdoor trigger hiding technique based on low model attention regions to improve attack resilience in federated settings. Our findings provide critical insights into the optimization of invisible BAs in FL and highlights the need for robust defense mechanisms to safeguard FL systems.",
   "abstract_source": {

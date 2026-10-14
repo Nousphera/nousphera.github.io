@@ -25,7 +25,9 @@
   "tint": "#faf3e7",
   "links": {
     "Paper": "https://arxiv.org/abs/2401.14211",
-    "Code": "https://github.com/Nousphera/FedCompress"
+    "Code": "https://github.com/Nousphera/FedCompress",
+    "Repository": "https://github.com/Nousphera/FedCompress",
+    "Poster": "https://nousphera.github.io/assets/posters/fedcompress-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/fedcompress/overview.webp",

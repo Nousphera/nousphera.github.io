@@ -25,7 +25,9 @@
   "links": {
     "Paper": "https://arxiv.org/abs/2202.02611",
     "Published version": "https://ieeexplore.ieee.org/document/9767445",
-    "PDF": "https://arxiv.org/pdf/2202.02611"
+    "PDF": "https://arxiv.org/pdf/2202.02611",
+    "Repository": "https://github.com/Nousphera/FedSER",
+    "Poster": "https://nousphera.github.io/assets/posters/fedser-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/fedser/overview.webp",

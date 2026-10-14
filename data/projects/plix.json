@@ -23,7 +23,10 @@
   "tint": "#edf2fc",
   "links": {
     "Paper": "https://arxiv.org/abs/2305.03058",
-    "PDF": "https://arxiv.org/pdf/2305.03058"
+    "PDF": "https://arxiv.org/pdf/2305.03058",
+    "Repository": "https://github.com/Nousphera/PLiX",
+    "Poster": "https://nousphera.github.io/assets/posters/plix-a0-landscape.pdf",
+    "Code": "https://huggingface.co/aaqibsaeed/plixkws"
   },
   "figure": {
     "src": "assets/projects/plix/overview.webp",
@@ -63,7 +66,7 @@
   "bibtex": "@misc{saeed2023plix,\n  author = {Saeed, Aaqib and Tsouvalas, Vasileios},\n  title = {Plug-and-Play Multilingual Few-shot Spoken Words Recognition},\n  year = {2023},\n  eprint = {2305.03058},\n  archivePrefix = {arXiv},\n  primaryClass = {eess.AS},\n  url = {https://arxiv.org/abs/2305.03058}\n}",
   "provenance": {
     "source_url": "https://arxiv.org/abs/2305.03058",
-    "figure_note": "Crop from the public arXiv PDF, Figure 2, page 4; no figure labels or data modified. The preprint is available under CC BY 4.0. The abstract retains the paper’s historical release statement; no currently verified public code link is asserted.",
+    "figure_note": "Crop from the public arXiv PDF, Figure 2, page 4; no figure labels or data modified. The preprint is available under CC BY 4.0. Released model checkpoints and inference instructions are available through the authors’ Hugging Face repository.",
     "content_pages": [
       1,
       3,

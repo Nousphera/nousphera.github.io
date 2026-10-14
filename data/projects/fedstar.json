@@ -25,7 +25,9 @@
   "links": {
     "Paper": "https://doi.org/10.1145/3520128",
     "PDF": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf",
-    "Code": "https://github.com/Nousphera/FedSTAR"
+    "Code": "https://github.com/Nousphera/FedSTAR",
+    "Repository": "https://github.com/Nousphera/FedSTAR",
+    "Poster": "https://nousphera.github.io/assets/posters/fedstar-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/fedstar/overview.webp",

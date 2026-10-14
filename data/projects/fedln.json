@@ -26,7 +26,9 @@
   "links": {
     "Paper": "https://doi.org/10.1145/3626242",
     "PDF": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf",
-    "Code": "https://github.com/Nousphera/FedLN"
+    "Code": "https://github.com/Nousphera/FedLN",
+    "Repository": "https://github.com/Nousphera/FedLN",
+    "Poster": "https://nousphera.github.io/assets/posters/fedln-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/fedln/schematic.svg",

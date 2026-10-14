@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-14",
+  "papers": [
+    {
+      "slug": "ae-psl",
+      "repository": "https://github.com/Nousphera/AE_PSL",
+      "pages": "https://nousphera.github.io/AE_PSL/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/AE_PSL",
+      "poster_url": "https://nousphera.github.io/assets/posters/ae-psl-a0-landscape.pdf"
+    },
+    {
+      "slug": "matu",
+      "repository": "https://github.com/Nousphera/MaTU",
+      "pages": "https://nousphera.github.io/MaTU/",
+      "release_status": "resources_only_implementation_pending",
+      "code_url": null,
+      "poster_url": "https://nousphera.github.io/assets/posters/matu-a0-landscape.pdf"
+    },
+    {
+      "slug": "mpsl",
+      "repository": "https://github.com/Nousphera/MPSL",
+      "pages": "https://nousphera.github.io/MPSL/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/MPSL",
+      "poster_url": "https://nousphera.github.io/assets/posters/mpsl-a0-landscape.pdf"
+    },
+    {
+      "slug": "efu",
+      "repository": "https://github.com/Nousphera/EFU",
+      "pages": "https://nousphera.github.io/EFU/",
+      "release_status": "external_implementation",
+      "code_url": "https://github.com/SamaneMohammadi/EFU",
+      "poster_url": "https://nousphera.github.io/assets/posters/efu-a0-landscape.pdf"
+    },
+    {
+      "slug": "enccluster",
+      "repository": "https://github.com/Nousphera/EncCluster",
+      "pages": "https://nousphera.github.io/EncCluster/",
+      "release_status": "external_implementation",
+      "code_url": "https://github.com/SamaneMohammadi/EncCluster",
+      "poster_url": "https://nousphera.github.io/assets/posters/enccluster-a0-landscape.pdf"
+    },
+    {
+      "slug": "deltamask",
+      "repository": "https://github.com/Nousphera/DeltaMask",
+      "pages": "https://nousphera.github.io/DeltaMask/",
+      "release_status": "resources_only_implementation_pending",
+      "code_url": null,
+      "poster_url": "https://nousphera.github.io/assets/posters/deltamask-a0-landscape.pdf"
+    },
+    {
+      "slug": "fedln",
+      "repository": "https://github.com/Nousphera/FedLN",
+      "pages": "https://nousphera.github.io/FedLN/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/FedLN",
+      "poster_url": "https://nousphera.github.io/assets/posters/fedln-a0-landscape.pdf"
+    },
+    {
+      "slug": "fedcompress",
+      "repository": "https://github.com/Nousphera/FedCompress",
+      "pages": "https://nousphera.github.io/FedCompress/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/FedCompress",
+      "poster_url": "https://nousphera.github.io/assets/posters/fedcompress-a0-landscape.pdf"
+    },
+    {
+      "slug": "fedcode",
+      "repository": "https://github.com/Nousphera/FedCode",
+      "pages": "https://nousphera.github.io/FedCode/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/FedCode",
+      "poster_url": "https://nousphera.github.io/assets/posters/fedcode-a0-landscape.pdf"
+    },
+    {
+      "slug": "fiba",
+      "repository": "https://github.com/Nousphera/FiBA",
+      "pages": "https://nousphera.github.io/FiBA/",
+      "release_status": "resources_only_implementation_pending",
+      "code_url": null,
+      "poster_url": "https://nousphera.github.io/assets/posters/fiba-a0-landscape.pdf"
+    },
+    {
+      "slug": "plix",
+      "repository": "https://github.com/Nousphera/PLiX",
+      "pages": "https://nousphera.github.io/PLiX/",
+      "release_status": "external_models_and_inference",
+      "code_url": "https://huggingface.co/aaqibsaeed/plixkws",
+      "poster_url": "https://nousphera.github.io/assets/posters/plix-a0-landscape.pdf"
+    },
+    {
+      "slug": "da-mldg",
+      "repository": "https://github.com/Nousphera/DA_MLDG",
+      "pages": "https://nousphera.github.io/DA_MLDG/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/DA_MLDG",
+      "poster_url": "https://nousphera.github.io/assets/posters/da-mldg-a0-landscape.pdf"
+    },
+    {
+      "slug": "fedstar",
+      "repository": "https://github.com/Nousphera/FedSTAR",
+      "pages": "https://nousphera.github.io/FedSTAR/",
+      "release_status": "implementation_present",
+      "code_url": "https://github.com/Nousphera/FedSTAR",
+      "poster_url": "https://nousphera.github.io/assets/posters/fedstar-a0-landscape.pdf"
+    },
+    {
+      "slug": "fedser",
+      "repository": "https://github.com/Nousphera/FedSER",
+      "pages": "https://nousphera.github.io/FedSER/",
+      "release_status": "resources_only_implementation_pending",
+      "code_url": null,
+      "poster_url": "https://nousphera.github.io/assets/posters/fedser-a0-landscape.pdf"
+    }
+  ]
+}

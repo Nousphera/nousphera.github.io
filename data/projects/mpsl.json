@@ -24,7 +24,9 @@
   "tint": "#eef4fc",
   "links": {
     "Paper": "https://arxiv.org/abs/2502.06355",
-    "Code": "https://github.com/Nousphera/MPSL"
+    "Code": "https://github.com/Nousphera/MPSL",
+    "Repository": "https://github.com/Nousphera/MPSL",
+    "Poster": "https://nousphera.github.io/assets/posters/mpsl-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/mpsl/overview.webp",

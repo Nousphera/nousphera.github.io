@@ -24,7 +24,9 @@
   "tint": "#f3effa",
   "links": {
     "Paper": "https://arxiv.org/abs/2607.17913",
-    "Code": "https://github.com/Nousphera/AE_PSL"
+    "Code": "https://github.com/Nousphera/AE_PSL",
+    "Repository": "https://github.com/Nousphera/AE_PSL",
+    "Poster": "https://nousphera.github.io/assets/posters/ae-psl-a0-landscape.pdf"
   },
   "figure": {
     "src": "assets/projects/ae-psl/overview.webp",
