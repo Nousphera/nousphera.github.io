@@ -25,7 +25,7 @@ class ResearchVisualTests(unittest.TestCase):
                 self.assertIn('data-fl-tour',html)
                 self.assertIn('id="fl-algorithm-title"',html)
             else:
-                self.assertIn('class="method-diagram ',html)
+                self.assertIn('data-paper-story',html)
                 self.assertIn('Scope &amp; limitations',html)
             for r in p['insight']['results']:
                 self.assertIn(build.esc(r['source']['label']),html)

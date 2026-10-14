@@ -105,6 +105,8 @@ def shell(title, description, path, body, p=None):
     css = ''
     extras = ''
     if p:
+        if p['slug'] != 'fedln':
+            extras = f'<link rel="stylesheet" href="{asset_url("assets/paper-experience.css")}"><script src="{asset_url("assets/paper-story.js")}" defer></script>'
         if p['slug'] == 'fedln':
             extras = f'<link rel="stylesheet" href="{asset_url("assets/fedln-content.css")}"><link rel="stylesheet" href="{asset_url("assets/fedln-tour.css")}"><script src="{asset_url("assets/fedln-tour.js")}" defer></script>'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)
@@ -183,7 +185,17 @@ def project_page(p, projects):
         results = results_markup(p)
         category = '<ul class="hero-topics" aria-label="Research topics">' + ''.join(f'<li>{esc(t)}</li>' for t in p['topics']) + '</ul>'
         page_class = ' fedln-page'
-    body = f'''<main id="main" class="project-main{page_class}"><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
+    else:
+        from paper_experience import load_story, overview_markup, method_markup, results_markup
+        story = load_story(p['slug'])
+        if story:
+            overview = overview_markup(p, story)
+            method = method_markup(p, story, originals)
+            results = results_markup(p, story)
+            category = '<ul class="hero-topics" aria-label="Research topics">' + ''.join(f'<li>{esc(t)}</li>' for t in p['topics'][:4]) + '</ul>'
+            page_class = ' paper-page'
+    project_attr = '' if p['slug'] == 'fedln' else f' data-project="{esc(p["slug"])}"'
+    body = f'''<main id="main" class="project-main{page_class}"{project_attr}><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
 <section class="paper-hero" aria-labelledby="paper-title"><div class="eyebrow"><span class="project-name">{esc(p['name'])}</span><span>{esc(venue)}</span></div>
 <h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}</section>
 <nav class="section-nav" data-project-tabs aria-label="On this page"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#findings">Results</a><a href="#citation">Citation</a></nav>
