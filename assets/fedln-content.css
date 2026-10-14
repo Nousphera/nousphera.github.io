@@ -90,10 +90,63 @@
 .fl-embedding-figure figcaption { font-size:.79rem; line-height:1.8; color:var(--muted); margin-top:17px; }
 .fl-extra-experiment + .fl-extra-experiment { margin-top:32px; padding-top:28px; border-top:1px solid var(--line); }
 .fl-extra-experiment h3 { color:var(--text); font-size:1.05rem; }
-.fl-more,.fl-boundaries { padding-inline:5px; }
+.fl-more { padding-inline:5px; }
 .fl-takeaway { margin-top:30px; padding:25px 28px; border-radius:16px; background:var(--tint); border:1px solid var(--line); }
 .fl-takeaway h3 { font-size:1.2rem; margin-bottom:10px; }
-.fl-takeaway > p:last-child { color:var(--muted); font-size:.95rem; max-width:80ch; }
+/* A complete algorithm map; HTML keeps labels sharp and readable at every width. */
+.fl-algorithm { margin:32px 0 0; border:1px solid var(--line); border-radius:18px; padding:28px; background:var(--surface); }
+.fl-algorithm figcaption h3 { font-size:1.25rem; line-height:1.4; letter-spacing:-.025em; }
+.fl-algorithm figcaption > p:last-child { color:var(--muted); font-size:.88rem; margin-top:9px; }
+.fl-algorithm-head { display:grid; grid-template-columns:118px repeat(3,minmax(0,1fr)); gap:16px; margin:26px 0 12px; font-size:.68rem; font-weight:600; color:var(--muted); }
+.fl-algorithm-head > span { padding:0 4px; }
+.fl-algorithm-head .fl-algorithm-rounds { grid-column:3 / 5; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+.fl-algorithm-rounds > span { font-size:1.3rem; line-height:1; }
+.fl-algorithm-routes { display:grid; gap:14px; }
+.fl-algorithm-route { display:grid; grid-template-columns:118px minmax(0,1fr); gap:16px; align-items:center; }
+.fl-algorithm-route-name h4 { margin:0; color:var(--fl-method-color); font-size:.9rem; font-weight:750; letter-spacing:-.02em; }
+.fl-algorithm-route-name p { color:var(--muted); font-size:.73rem; line-height:1.5; margin-top:5px; }
+.fl-algorithm-route ol { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); list-style:none; padding:0; margin:0; gap:16px; }
+.fl-algorithm-step { position:relative; min-width:0; padding:16px 14px; border:1px solid var(--line); border-radius:10px; background:var(--soft); }
+.fl-algorithm-step + .fl-algorithm-step::before { content:'→'; position:absolute; left:-16px; top:50%; width:15px; text-align:center; transform:translateY(-50%); color:var(--muted); font-size:.83rem; }
+.fl-algorithm-stage { display:block; font-size:.62rem; font-weight:650; letter-spacing:.035em; color:var(--muted); margin-bottom:12px; }
+.fl-algorithm-step-title { display:flex; gap:9px; align-items:flex-start; }
+.fl-algorithm-step-title svg { width:23px; height:23px; flex-shrink:0; color:var(--muted); }
+.fl-algorithm-step-title strong { font-size:.83rem; font-weight:650; line-height:1.5; }
+.fl-algorithm-step > p { font-size:.75rem; color:var(--muted); line-height:1.65; margin-top:10px; }
+.fl-algorithm-intervention { border-color:color-mix(in srgb,var(--fl-method-color) 50%,var(--line)); background:color-mix(in srgb,var(--fl-method-color) 7%,var(--surface)); }
+.fl-algorithm-intervention .fl-algorithm-stage,.fl-algorithm-intervention .fl-algorithm-step-title,.fl-algorithm-intervention svg { color:var(--fl-method-color); }
+.fl-algorithm-footer { display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; border-top:1px solid var(--line); padding-top:17px; margin-top:23px; color:var(--muted); font-size:.75rem; }
+.fl-algorithm-footer > svg { width:18px; height:18px; flex-shrink:0; }
+.fl-algorithm-footer > .fl-source { margin-left:auto; font-size:.75rem; }
+.fl-takeaway-list { list-style:disc; padding-left:18px; margin:22px 0 0; }
+.fl-takeaway-list li { padding-left:6px; }
+.fl-takeaway-list li::marker { color:var(--fl-method-color); font-size:.85em; }
+.fl-takeaway-list li + li { margin-top:17px; padding-top:17px; border-top:1px solid var(--line); }
+.fl-takeaway-method { color:var(--fl-method-color); font-size:.78rem; font-weight:750; }
+.fl-takeaway-list p { color:var(--muted); font-size:.9rem; line-height:1.7; margin-top:4px; max-width:85ch; }
+.fl-takeaway-list strong { color:var(--text); font-weight:650; }
+@media(max-width:900px) {
+  .fl-algorithm-head { grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:24px; }
+  .fl-algorithm-head > span:first-child { display:none; }
+  .fl-algorithm-head .fl-algorithm-rounds { grid-column:2 / 4; }
+  .fl-algorithm-route { grid-template-columns:1fr; gap:12px; }
+  .fl-algorithm-route-name { display:flex; align-items:baseline; gap:12px; }
+  .fl-algorithm-route-name p { margin:0; }
+  .fl-algorithm-routes { gap:24px; }
+}
+@media(max-width:640px) {
+  .fl-algorithm { padding:22px 18px; }
+  .fl-algorithm-head { display:none; }
+  .fl-algorithm-routes { margin-top:25px; gap:28px; }
+  .fl-algorithm-route ol { grid-template-columns:1fr; gap:18px; }
+  .fl-algorithm-step { padding:15px; }
+  .fl-algorithm-step + .fl-algorithm-step::before { content:'↓'; top:-19px; left:24px; width:20px; transform:none; }
+  .fl-algorithm-stage { font-size:.67rem; margin-bottom:8px; }
+  .fl-algorithm-step-title strong { font-size:.88rem; }
+  .fl-algorithm-step > p { font-size:.8rem; margin-top:7px; }
+  .fl-algorithm-footer > span { flex:1; }
+  .fl-algorithm-footer > .fl-source { margin-left:28px; }
+}
 @media(max-width:760px) {
   .fl-panel { padding-top:24px; }
   .fl-method-grid { grid-template-columns:1fr; gap:20px; }

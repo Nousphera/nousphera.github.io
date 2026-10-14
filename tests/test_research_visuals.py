@@ -23,7 +23,7 @@ class ResearchVisualTests(unittest.TestCase):
             html=build.project_page(p,projects)
             if p['slug'] == 'fedln':
                 self.assertIn('data-fl-tour',html)
-                self.assertIn('How to interpret these results',html)
+                self.assertIn('id="fl-algorithm-title"',html)
             else:
                 self.assertIn('class="method-diagram ',html)
                 self.assertIn('Scope &amp; limitations',html)

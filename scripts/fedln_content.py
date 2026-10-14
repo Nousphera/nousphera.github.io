@@ -8,6 +8,8 @@ are Figure 7 (PDF p19), also present unchanged in the archived 2022 poster.
 
 from html import escape
 
+from research_icons import research_icon
+
 
 _PDF = "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf"
 _OURS = {"NNC", "AKD", "AKD (embeddings)", "NA-FedAvg"}
@@ -138,10 +140,51 @@ def _more_experiments(p):
     return f'<details class="fl-details fl-more"><summary>More experiments · audio and noisy-client populations</summary><div class="fl-details-body">{"".join(parts)}</div></details>'
 
 
+def _algorithm_markup(p):
+    """A responsive, three-route rendering of Algorithm 1 (not a pipeline of methods)."""
+    routes = (
+        ('nnc', 'NNC', 'Correct labels', (
+            ('labeled', 'Initialization', 'Neighbor vote → corrected labels',
+             'Encode local examples; replace each label with its neighbors’ majority vote.', True),
+            ('train', 'Local training', 'Train on corrected labels',
+             'Minimize cross-entropy on each participating client.', False),
+            ('aggregate', 'Server aggregation', 'Sample-weighted FedAvg',
+             'Average client models by their share of training samples.', False),
+        )),
+        ('akd', 'AKD', 'Guide local learning', (
+            ('embedding', 'Initialization', 'Estimate client noise',
+             'Count disagreements between local labels and embedding-based votes.', False),
+            ('teacher', 'Local training', 'Label loss + teacher guidance',
+             'Keep observed labels; use estimated noise to gate the extra teacher loss.', True),
+            ('aggregate', 'Server aggregation', 'Sample-weighted FedAvg',
+             'Average client models by their share of training samples.', False),
+        )),
+        ('na', 'NA-FedAvg', 'Reweight updates', (
+            ('model', 'Initialization', 'Initialize the shared model',
+             'Start ordinary FedAvg, without an encoder or label correction.', False),
+            ('train', 'Local training', 'Train on observed labels',
+             'At the estimation round, also send local/global-model energy scores.', False),
+            ('aggregate', 'Server aggregation', 'Data share × clean fraction',
+             'Estimate client noise once after warm-up; reuse its clean fraction (1 − noise) for aggregation.', True),
+        )),
+    )
+    rows = []
+    for key, name, purpose, steps in routes:
+        cells = []
+        for icon, stage, title, detail, active in steps:
+            cls = ' fl-algorithm-intervention' if active else ''
+            cells.append(f'''<li class="fl-algorithm-step{cls}"><span class="fl-algorithm-stage">{stage}</span><div class="fl-algorithm-step-title">{research_icon(icon)}<strong>{title}</strong></div><p>{detail}</p></li>''')
+        rows.append(f'''<div class="fl-algorithm-route fl-method-{key}"><div class="fl-algorithm-route-name"><h4>{name}</h4><p>{purpose}</p></div><ol aria-label="{name} algorithm route">{''.join(cells)}</ol></div>''')
+    return f'''<figure class="fl-algorithm" aria-labelledby="fl-algorithm-title">
+    <figcaption><p class="fl-eyebrow">From local data to a shared model</p><h3 id="fl-algorithm-title">One federated loop. Three intervention points.</h3><p>Choose one route. Each highlighted step shows where that method intervenes.</p></figcaption>
+    <div class="fl-algorithm-head" aria-hidden="true"><span></span><span>Before training</span><span class="fl-algorithm-rounds">Every round · send shared model → train locally → aggregate <span>↻</span></span></div>
+    <div class="fl-algorithm-routes">{''.join(rows)}</div>
+    <p class="fl-algorithm-footer">{research_icon('exchange')}<span>Each round starts from the shared model; client data stay local.</span>{_source(p, 'Algorithm 1', 13)}</p>
+  </figure>'''
+
+
 def results_markup(p):
-    """Two comparable chart pairs, the original label illustration and sources."""
-    limitations = p.get('insight', {}).get('limitations', ())
-    limits = ''.join(f'<li>{escape(item)}</li>' for item in limitations)
+    """Comparable results, label illustration and a visual rendering of Algorithm 1."""
     return f'''<section id="findings" data-tab-panel class="fl-panel fl-results" aria-labelledby="fl-results-title">
   <div class="fl-intro"><p class="fl-eyebrow">The evidence</p><h2 id="fl-results-title">Different noise, different strengths</h2><p class="fl-lead">The strongest intervention changes with the dataset and the pattern of label errors.</p></div>
   <section class="fl-result-block" aria-labelledby="fl-human-title"><div class="fl-result-heading"><div><p class="fl-eyebrow">Human annotation errors</p><h3 id="fl-human-title">NNC leads on CIFAR-10N; AKD on CIFAR-100N</h3></div><span class="fl-result-unit">Test accuracy (%)</span></div>
@@ -160,6 +203,10 @@ def results_markup(p):
   </section>
   <figure class="fl-embedding-figure"><div class="fl-result-heading"><div><p class="fl-eyebrow">Inside label correction</p><h3>The points stay fixed. Their labels change.</h3></div></div><div class="fl-embedding-pair"><div><h4>Before NNC</h4><img src="/assets/projects/fedln/labels-before.png" width="1455" height="966" loading="lazy" decoding="async" alt="Fixed CIFAR-10 embeddings before correction: differently coloured labels are mixed within several visible clusters."></div><div><h4>After NNC</h4><img src="/assets/projects/fedln/labels-after.png" width="1455" height="966" loading="lazy" decoding="async" alt="The same embedding coordinates after NNC: neighboring points have more consistent class-label colours."></div></div><figcaption>CIFAR-10 with 40% random label noise; fixed CLIP features. This illustrates relabeling, not learning a new representation. {_source(p, 'Figure 7', 19)}</figcaption></figure>
   {_more_experiments(p)}
-  <details class="fl-details fl-boundaries"><summary>How to interpret these results</summary><div class="fl-details-body"><p>The results come from simulated federated clients. They support comparisons of recognition accuracy; they do not establish equal runtime or energy cost on real devices.</p><ul>{limits}</ul></div></details>
-  <div class="fl-takeaway"><p class="fl-eyebrow">Takeaways</p><h3>Choose for the noise pattern, not just its rate.</h3><p><strong class="fl-text-nnc">NNC</strong> can deliver large gains when local label votes are reliable. <strong class="fl-text-akd">AKD</strong> provides teacher guidance without replacing labels; <strong class="fl-text-na">NA-FedAvg</strong> limits noisier updates when client reliability can be distinguished.</p></div>
+  {_algorithm_markup(p)}
+  <section class="fl-takeaway" aria-labelledby="fl-takeaway-title"><p class="fl-eyebrow">Takeaways</p><h3 id="fl-takeaway-title">Match the intervention to the noise.</h3><ul class="fl-takeaway-list">
+    <li class="fl-method-nnc"><span class="fl-takeaway-method">NNC</span><p><strong>Neighborhood quality matters.</strong> Strong gains under random noise; incorrect majorities can hurt under class flipping.</p></li>
+    <li class="fl-method-akd"><span class="fl-takeaway-method">AKD</span><p><strong>Guide learning without replacing labels.</strong> Embedding-based AKD gives the highest CIFAR-100N accuracy among the compared methods.</p></li>
+    <li class="fl-method-na"><span class="fl-takeaway-method">NA-FedAvg</span><p><strong>Reduce noisier clients’ influence.</strong> Reweight updates when client reliability can be distinguished.</p></li>
+  </ul></section>
 </section>'''
