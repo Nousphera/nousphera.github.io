@@ -31,6 +31,8 @@ ICONS = {
 }
 
 def icon(name):
+    if name == 'huggingface':
+        return f'<img class="icon" src="{asset_url("assets/brands/huggingface.svg")}" width="20" height="20" alt="" aria-hidden="true">'
     return f'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICONS[name]}</svg>'
 
 def asset_url(path):
@@ -135,14 +137,14 @@ def resources(p):
     items = [('Paper', sources['Paper'], 'paper')]
     code = sources.get('Code') or sources.get('Repository')
     if code:
-        items.append(('Code', code, 'github' if urlparse(code).hostname == 'github.com' else 'code'))
-    # PLiX has a distinct Hugging Face implementation and GitHub project repo.
-    repository = sources.get('Repository')
-    if repository and repository != code:
-        items.append(('GitHub', repository, 'github'))
+        host = urlparse(code).hostname
+        if host == 'huggingface.co':
+            items.append(('HF', code, 'huggingface'))
+        else:
+            items.append(('Code', code, 'github' if host == 'github.com' else 'code'))
     if sources.get('Poster'):
         items.append(('Poster', sources['Poster'], 'poster'))
-    links = [f'<a class="resource {"primary" if label == "Paper" else ""}" href="{esc(url)}">{icon(symbol)}{esc(label)}</a>' for label, url, symbol in items]
+    links = [f'<a class="resource {"primary" if label == "Paper" else ""}" href="{esc(url)}"' + (' aria-label="HF — Code on Hugging Face"' if label == 'HF' else '') + f'>{icon(symbol)}{esc(label)}</a>' for label, url, symbol in items]
     return '<div class="resource-links">' + ''.join(links) + '</div>'
 
 def project_page(p, projects):
