@@ -16,6 +16,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install PDF text validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
       - run: python3 -m unittest discover -s tests
       - run: node --test tests/*.test.cjs
       - run: python3 scripts/build_projects.py
