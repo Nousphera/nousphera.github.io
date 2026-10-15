@@ -1,0 +1,94 @@
+{
+  "slug": "matu",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Several tasks per client",
+      "subtitle": "8 vision tasks · 30 clients · 100 rounds (MaT-FL: 300)",
+      "finding": "<strong>+11.87 accuracy points</strong> and <strong>60.6% lower traffic per task/round</strong> than MaT-FL in this multi-task setting.",
+      "source": {
+        "label": "Table 2 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6"
+      },
+      "result_index": 1,
+      "rows": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "charts": [
+        {
+          "columns": [
+            0
+          ],
+          "title": "Average accuracy (%)",
+          "maximum": 100,
+          "direction": "higher"
+        },
+        {
+          "columns": [
+            1
+          ],
+          "title": "Traffic (M bits/task/round)",
+          "maximum": 25,
+          "direction": "lower"
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "One task per client",
+      "subtitle": "8 vision tasks · 30 clients · 100 rounds (MaT-FL: 300) · selected references",
+      "finding": "With one task per client, MaTU reaches <strong>84.32%</strong>; FedPer uses fewer bits.",
+      "source": {
+        "label": "Table 1 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1
+      ],
+      "rows": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "column_labels": [
+        "Method",
+        "Accuracy (%)",
+        "M bits/task/round"
+      ]
+    }
+  ],
+  "takeaways": [
+    "Multi-task accuracy remains <strong>10.74 points below</strong> independent centralized fine-tuning.",
+    "<strong>Traffic is per task per round</strong>; the compared methods use different numbers of training rounds."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Table 2 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6",
+        "location": "Table 2, PDF p. 6; all six federated methods, Avg. Acc and Bitrate columns; task concentration ζt=0.5."
+      },
+      {
+        "label": "Table 1 · PDF page 6",
+        "url": "https://arxiv.org/pdf/2502.06376v3#page=6",
+        "location": "Table 1, PDF p. 6; Individual, FedPer, MaT-FL and MaTU rows, Avg. Acc and Bitrate columns; task concentration ζt=0."
+      }
+    ],
+    "notes": [
+      "All 19 displayed numeric cells plus the central-reference dash were checked visually against Tables 1 and 2 in arXiv:2502.06376v3. No uncertainty or seed count is reported for these entries.",
+      "The Table 2 mean-accuracy difference is 79.47 - 67.60 = 11.87 percentage points. Traffic reduction is (20.43 - 8.04)/20.43 × 100 = 60.6461%, rounded to 60.6%.",
+      "Table captions call bitrate millions of bits per task; the experimental setup specifies communicated bits per task in a round. Preserve M bits/task/round rather than MB, total training traffic or speedup.",
+      "MaT-FL uses 300 rounds; all other displayed federated methods use 100. Tables use 30 clients, one local epoch, 20% participation, and ViT-B/32 with rank-16 LoRA.",
+      "Independent centralized accuracy is 90.21 in both source tables, leaving 90.21 - 79.47 = 10.74 percentage points in the multi-task setting. Missing centralized communication is a dash and is excluded from the traffic chart, never coerced to zero.",
+      "The one-task table selects the strongest federated reference FedPer, related MaT-FL, MaTU and centralized reference. All six federated methods remain visible in the main multi-task charts. No insight-data correction was needed."
+    ]
+  }
+}

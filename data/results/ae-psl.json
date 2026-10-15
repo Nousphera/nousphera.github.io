@@ -1,0 +1,73 @@
+{
+  "slug": "ae-psl",
+  "panels": [
+    {
+      "kind": "table",
+      "title": "Global accuracy at ≈10× compression",
+      "subtitle": "ViT-B/32 · 5 clients · AE bypassed at inference · mean ± SD over three seeds",
+      "finding": "<strong>Within 0.5 accuracy points</strong> of uncompressed training on all three datasets.",
+      "source": {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1,
+        2
+      ],
+      "column_labels": [
+        "Method",
+        "CIFAR-100 (%)",
+        "Food101 (%)",
+        "SUN397 (%)"
+      ]
+    },
+    {
+      "kind": "bars",
+      "title": "Local accuracy at ≈20× compression",
+      "subtitle": "FEMNIST · 25 clients · AE active at inference · mean ± SD over three seeds",
+      "finding": "AE-PSL reaches <strong>84.6 ± 1.0%</strong>, <strong>1.2 points below</strong> uncompressed training and highest among compressed methods.",
+      "source": {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17"
+      },
+      "result_index": 1,
+      "charts": [
+        {
+          "columns": [
+            0
+          ],
+          "title": "Local accuracy (%)",
+          "maximum": 100,
+          "direction": "higher"
+        }
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Feature-aligned compression</strong> keeps global accuracy close to the uncompressed reference at ≈10× reduction.",
+    "Local and global results use <strong>different inference protocols</strong>; stronger compression is not lossless."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17",
+        "location": "Appendix Table 4, PDF p. 17; global CIFAR-100, Food101 and SUN397, N=5, Mid R≈10; uncompressed references R=1."
+      },
+      {
+        "label": "Table 4 · PDF page 17",
+        "url": "https://arxiv.org/pdf/2607.17913v1#page=17",
+        "location": "Appendix Table 4, PDF p. 17; local FEMNIST, N=25, High R≈20; uncompressed reference R=1."
+      }
+    ],
+    "notes": [
+      "All 20 displayed mean ± SD entries were checked against Table 4 and its layout-preserving text. The caption explicitly reports three seeds and standard deviations.",
+      "Global AE-PSL minus no-compression means are 0.0, +0.5 and -0.3 percentage points. The finding describes mean differences, not an equivalence test or statistical significance.",
+      "Global evaluation aggregates client-side weights and bypasses the AE. Local FEMNIST keeps the AE active, uses writer partitions, and averages local accuracy. These are distinct protocols and client counts.",
+      "Local AE-PSL versus uncompressed difference is 84.6 - 85.8 = -1.2 percentage points. The displayed compressed alternatives are C3-SL, Rand-Top-K and ADC.",
+      "R denotes activation/gradient communication reduction during split training, not total preparation cost, latency, energy or end-to-end speedup. No insight-data correction was needed."
+    ]
+  }
+}

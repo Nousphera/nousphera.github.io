@@ -1,10 +1,7 @@
 """FedLN reading standard, with paper-specific artwork and source-bound results."""
 from html import escape as esc
 import importlib
-import math
-import re
 from xml.etree import ElementTree as ET
-from research_visuals import numeric_value, table_markup
 
 GROUPS = ('compression', 'audio', 'foundations', 'privacy')
 CONNECTED_STORIES = {
@@ -116,81 +113,3 @@ def method_markup(p, s, originals):
         cards.append(f'<article class="px-method-card"><header><span>{i:02d}</span><h3>{esc(card["title"])}</h3></header><div class="px-method-body {"has-technical" if extra else ""}"><p>{inline(card["text"])}</p>{extra}</div></article>')
     source=p['insight']['evidence_inventory']
     return f'''<section id="method" data-tab-panel class="px-panel"><header class="px-section-heading"><span class="px-kicker">How it works</span><h2>{esc(p['name'])}</h2></header><div class="px-method-cards">{''.join(cards)}</div><p class="px-source"><a href="{esc(source['source_url'])}">Method details in the paper ↗</a></p>{originals}</section>'''
-
-# Each panel selects explicit columns from an audited table. Same-unit comparisons
-# share an axis; accuracy and costs are separate, never mixed into one scale.
-# (columns, label, axis maximum or None, higher/lower/None)
-CHARTS = {
- 'fedcompress': [ [([2],'Communication reduction (×)',None,'higher'),([1],'Accuracy change (pp)',None,None)], [([1],'Communication reduction (×)',4,'higher')], [([0,1],'Inference speedup (×)',None,'higher')] ],
- 'fedcode': [ [([3],'Joint traffic reduction (×)',None,'higher'),([0],'Accuracy (%)',100,'higher')], [([1],'Joint traffic reduction (×)',None,'higher'),([0],'Accuracy change (pp)',None,None)], [([0,1],'Accuracy change (pp)',None,None)] ],
- 'deltamask': [ [([0],'Accuracy (%)',100,'higher'),([1],'Bitrate (bits / parameter)',None,'lower')], [([0],'Accuracy (%)',100,'higher'),([1],'Bitrate (bits / parameter)',None,'lower')], [([0,1],'Accuracy (%)',100,'higher')] ],
- 'fedstar': [ [([0,1],'Accuracy (%)',100,'higher')], [([0,1],'Accuracy (%)',100,'higher')], [([0,1],'Accuracy (%)',100,'higher')] ],
- 'fedser': [ [([0,1,2],'Unweighted accuracy (%)',100,'higher')], [([0,1],'Unweighted accuracy (%)',100,'higher')] ],
- 'plix': [ [], [([0,1],'Encoder latency (ms)',None,'lower')], [([0,1],'Encoder energy (mJ)',None,'lower')] ],
- 'da-mldg': [ [([0,3],'Accuracy (%)',100,'higher')], [([0,1],'Accuracy (%)',100,'higher')] ],
- 'mpsl': [ [([0,1,2],'Task accuracy (%)',100,'higher'),([3],'Client computation (GFLOPs)',None,'lower')], [([0,1],'Image-to-text recall@1 (%)',100,'higher')], [([0,1],'Normalized recall (%)',100,'higher')] ],
- 'ae-psl': [ [([0,1,2],'Global accuracy (%)',100,'higher')], [([0],'Local accuracy (%)',100,'higher')], [([0,1],'Accuracy (%)',100,'higher')] ],
- 'matu': [ [([0],'Accuracy (%)',100,'higher'),([1],'Traffic (Mbits / task / round)',None,'lower')], [([0],'Accuracy (%)',100,'higher'),([1],'Traffic (Mbits / task / round)',None,'lower')] ],
- 'enccluster': [ [([2],'Upstream volume / FedAvg',4,'lower'),([3],'Encryption time (s)',None,'lower')], [([0,1],'Accuracy change (pp)',None,None)] ],
- 'efu': [ [([0],'Retained accuracy (%)',100,'higher'),([1],'Forgotten accuracy (%)',100,'lower')], [([0],'Gender accuracy (%)',100,'higher'),([1],'Identity accuracy (%)',100,'lower')] ],
- 'fiba': [ [([1,2],'Attack success rate (%)',100,None)], [([0],'Clean accuracy (%)',100,'higher'),([1],'Attack success rate (%)',100,'lower')], [([0],'Attack success rate (%)',100,None)] ]
-}
-
-
-def chart_markup(result, spec):
-    columns, title, upper, direction = spec
-    values=[numeric_value(row['values'][col]) for row in result['rows'] for col in columns]
-    for row in result['rows']:
-        for col in columns:
-            if numeric_value(row['values'][col]) is None and str(row['values'][col]).strip() not in {'—','–'}:
-                return ''
-    values = [value for value in values if value is not None]
-    if not values or any(not math.isfinite(value) for value in values): return ''
-    lower = min(0, math.floor(min(values)))
-    upper = upper if upper is not None else max(0,math.ceil(max(values)))
-    if upper <= lower: upper = lower + 1
-    if max(values)>upper: raise ValueError('Chart axis clips observations')
-    extent = upper-lower
-    zero=100*(0-lower)/extent
-    legend = ''
-    if len(columns)>1:
-        legend = '<div class="px-legend">'+''.join(f'<span class="px-series-{j}"><i></i>{esc(result["columns"][col+1])}</span>' for j,col in enumerate(columns))+'</div>'
-    rows=[]
-    for row in result['rows']:
-        bars=[]
-        for j,col in enumerate(columns):
-            raw=str(row['values'][col]); value=numeric_value(raw)
-            if value is None:
-                bars.append(f'<div class="px-measure px-series-{j}"><div class="px-missing"></div><span class="px-value">{esc(raw)}<span class="sr-only"> Not reported or not applicable in the source table</span></span></div>')
-                continue
-            start=100*(min(0,value)-lower)/extent; width=100*abs(value)/extent
-            bars.append(f'<div class="px-measure px-series-{j}"><div class="px-track" style="--zero:{zero:.4f}%"><span class="px-bar" style="left:{start:.4f}%;width:{width:.4f}%"></span></div><span class="px-value">{esc(raw)}</span></div>')
-        rows.append(f'<div class="px-chart-row {"is-own" if row.get("highlight") else ""}"><span class="px-row-label">{esc(row["label"])}</span><div>{"".join(bars)}</div></div>')
-    unit = f'<span>{"Higher" if direction=="higher" else "Lower"} is better</span>' if direction else ''
-    # Semantic table below preserves every cell and reported uncertainty. Text labels
-    # make bars readable without colour and do not imply uncertainty intervals.
-    return f'<div class="px-chart"><header><h4>{esc(title)}</h4>{unit}</header>{legend}<div class="px-chart-scale"><span>{lower:g}</span><span>{upper:g}</span></div>{"".join(rows)}</div>'
-
-
-def results_markup(p, s):
-    insight=p['insight']; blocks=[]
-    titles=s.get('result_titles',[])
-    leads=s.get('result_leads',[])
-    for i,r in enumerate(insight['results']):
-        charts=''.join(chart_markup(r,spec) for spec in CHARTS[p['slug']][i])
-        count=charts.count('class="px-chart"')
-        title=titles[i] if len(titles)>i else r['title']
-        lead=leads[i] if len(leads)>i else r['interpretation']
-        data=table_markup(r,f'{p["slug"]}-result-{i}')
-        plot=f'<div class="px-chart-grid {"paired" if count>1 else ""}">{charts}</div>' if charts else data
-        details=f'<details class="px-details px-experiment"><summary>Experiment details</summary><div class="px-details-body"><p>{esc(r["context"])}</p><p>{esc(r["caveat"])}</p>{data if charts else ""}</div></details>'
-        blocks.append(f'<article class="px-result"><header class="px-result-heading"><span>{i+1:02d}</span><h3>{esc(title)}</h3></header><p class="px-result-lead">{inline(lead) if i<len(leads) else esc(lead)}</p>{plot}{details}<a class="px-result-source" href="{esc(r["source"]["url"])}">{esc(r["source"]["label"])} ↗</a></article>')
-    settings=''.join(f'<div><dt>{esc(e["label"])}</dt><dd>{esc(e["value"])}</dd></div>' for e in insight['evaluation'])
-    limits=''.join(f'<li>{esc(t)}</li>' for t in insight['limitations'])
-    scope='<ul>'+''.join(f'<li>{inline(t)}</li>' for t in s.get('scope',[]))+'</ul>' if s.get('scope') else ''
-    takeaways=''.join(f'<li>{inline(t)}</li>' for t in s['takeaways'])
-    source=insight['evidence_inventory']
-    version = re.search(r'arXiv:\s*([0-9.]+v[0-9]+)', source['version'], re.I)
-    source_label = 'arXiv:' + version.group(1) if version else 'the source manuscript'
-    source_line = f'<p class="px-source">Results from <a href="{esc(source["source_url"])}">{esc(source_label)} ↗</a></p>'
-    return f'''<section id="findings" data-tab-panel class="px-panel"><header class="px-section-heading"><span class="px-kicker">Evaluation</span><h2>Results</h2>{source_line}</header>{''.join(blocks)}<aside class="px-takeaways"><h2>Takeaways</h2><ul>{takeaways}</ul></aside><details class="px-details"><summary>Study scope &amp; sources</summary><div class="px-details-body">{scope}<dl class="px-settings">{settings}</dl><h3>Scope &amp; limitations</h3><ul>{limits}</ul><p><a href="{esc(source['source_url'])}">{esc(source['version'])} ↗</a></p></div></details></section>'''

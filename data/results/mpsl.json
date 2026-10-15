@@ -1,0 +1,199 @@
+{
+  "slug": "mpsl",
+  "panels": [
+    {
+      "kind": "scatter",
+      "title": "Small client models, similar mean accuracy",
+      "subtitle": "Mean accuracy · 5 classification tasks · 100 clients",
+      "finding": "<strong>97.7% fewer trainable client parameters</strong> than FedAvg; mean accuracy is 0.56 points lower.",
+      "source": {
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=5",
+        "label": "Table 1 · mean of five reported accuracies"
+      },
+      "plot": {
+        "x": {
+          "label": "Trainable client parameters (M)",
+          "scale": "linear",
+          "min": 0,
+          "max": 48,
+          "short_label": "Trainable client parameters (M)",
+          "table_label": "Params (M)",
+          "ticks": [
+            0,
+            10,
+            20,
+            30,
+            40
+          ]
+        },
+        "y": {
+          "label": "Mean accuracy (%)",
+          "min": 30,
+          "max": 80,
+          "table_label": "Accuracy (%)",
+          "ticks": [
+            30,
+            40,
+            50,
+            60,
+            70,
+            80
+          ]
+        },
+        "points": [
+          {
+            "label": "FedAvg",
+            "x": 43.7,
+            "y": 67.2,
+            "x_display": "43.7",
+            "y_display": "67.20",
+            "highlight": false
+          },
+          {
+            "label": "FedCLIP",
+            "x": 3.1,
+            "y": 45.74,
+            "x_display": "3.1",
+            "y_display": "45.74",
+            "highlight": false
+          },
+          {
+            "label": "MPSL",
+            "x": 1.0,
+            "y": 66.64,
+            "x_display": "1.0",
+            "y_display": "66.64",
+            "highlight": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "table",
+      "title": "Task accuracy and client compute",
+      "subtitle": "100 clients · accuracy (%) · 3-seed means · GFLOPs per input",
+      "finding": "<strong>0.1 client GFLOPs</strong> per input; higher MELD accuracy than FedAvg, but lower COCO-QA accuracy.",
+      "source": {
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=5",
+        "label": "Table 1 · selected tasks and client compute"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        2,
+        3
+      ],
+      "rows": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Client work falls sharply:</strong> 1.0M trainable parameters and 0.1 GFLOPs per input.",
+    "<strong>The average hides task differences:</strong> MPSL trails FedAvg on COCO-QA and Kinetics-Sounds, but leads on MELD."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "url": "https://arxiv.org/pdf/2502.06355v3#page=5",
+        "label": "Table 1 · mean of five reported accuracies"
+      }
+    ],
+    "notes": [
+      "The hero reuses the accuracy-versus-client-parameters design of the archived avg_res.png asset, whose figure block is commented out in the saved v3 TeX. Its exact coordinates are recomputed from the public v3 Table 1; the unused graphic is not treated as public numerical evidence.",
+      "All five classification tasks in Table 1 at N=100 are included with equal weight: COCO-QA, T4SA, Kinetics-Sounds, UCF101 and MELD. No retrieval tasks are mixed into this mean.",
+      "Mean accuracy = arithmetic sum of the five printed percentage accuracies / 5. Scores are raw accuracies, not centralized-normalized scores. Source precision is retained in the input arrays and the derived means are displayed to two decimal places.",
+      "Table 1 reports each task as a mean over three seeds with a ± term, but the paper does not define whether that term is SD, SE or a confidence interval. These exact terms are retained in the supporting table and audit inputs.",
+      "No aggregate uncertainty is reported in Table 1, and covariance or seed-level joint values are unavailable. No error bars are manufactured by averaging or propagating task uncertainties. The archived aggregate graphic has no exact error-bar values in the saved source.",
+      "The source reports average client trainable parameters and GFLOPs per input. These are client costs, not total client-plus-server computation or measured latency.",
+      "The compact supporting table selects COCO-QA and MELD to expose one deficit and one gain, and retains Centralized, FedAvg, FedCLIP and MPSL plus client GFLOPs. The full five-task values underlying the hero remain recorded below."
+    ],
+    "aggregation": {
+      "source": "Table 1, N=100, arXiv:2502.06355v3, page 5",
+      "task_order": [
+        "COCO-QA",
+        "T4SA",
+        "Kinetics-Sounds",
+        "UCF101",
+        "MELD"
+      ],
+      "formula": "mean = sum(task_accuracy_percent) / 5",
+      "methods": {
+        "FedAvg": {
+          "task_accuracy_percent": [
+            53.5,
+            72.4,
+            71.4,
+            89.8,
+            48.9
+          ],
+          "reported_uncertainty": [
+            0.2,
+            1.6,
+            0.4,
+            0.9,
+            0.0
+          ],
+          "sum": 336.0,
+          "mean": 67.2,
+          "trainable_client_parameters_million": 43.7,
+          "client_gflops_per_input": 25.8
+        },
+        "FedCLIP": {
+          "task_accuracy_percent": [
+            13.1,
+            45.0,
+            63.5,
+            56.4,
+            50.7
+          ],
+          "reported_uncertainty": [
+            2.6,
+            2.8,
+            0.8,
+            1.2,
+            0.7
+          ],
+          "sum": 228.7,
+          "mean": 45.74,
+          "trainable_client_parameters_million": 3.1,
+          "client_gflops_per_input": 25.8
+        },
+        "MPSL": {
+          "task_accuracy_percent": [
+            46.2,
+            72.5,
+            67.0,
+            89.3,
+            58.2
+          ],
+          "reported_uncertainty": [
+            0.5,
+            1.2,
+            1.1,
+            1.0,
+            0.9
+          ],
+          "sum": 333.2,
+          "mean": 66.64,
+          "trainable_client_parameters_million": 1.0,
+          "client_gflops_per_input": 0.1
+        }
+      }
+    },
+    "calculations": {
+      "trainable_parameter_reduction_percent": {
+        "formula": "100 * (1 - 1.0 / 43.7)",
+        "value": 97.7116704805492,
+        "display": "97.7%"
+      },
+      "mean_accuracy_gap_points": {
+        "formula": "67.20 - 66.64",
+        "value": 0.56
+      }
+    }
+  }
+}

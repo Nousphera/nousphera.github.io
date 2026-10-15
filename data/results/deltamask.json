@@ -1,0 +1,152 @@
+{
+  "slug": "deltamask",
+  "panels": [
+    {
+      "kind": "scatter",
+      "title": "Accuracy at a fraction of the bitrate",
+      "subtitle": "Reported means · 8 image tasks · non-IID · 30 clients · 20% participation",
+      "finding": "<strong>75.4% less bitrate</strong> than FedPM, with a 0.51-point accuracy gap.",
+      "source": {
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11",
+        "label": "Table III · eight-task means"
+      },
+      "plot": {
+        "x": {
+          "label": "Average bitrate (bits per parameter)",
+          "scale": "linear",
+          "min": 0,
+          "max": 1.3,
+          "short_label": "Bitrate (bits / parameter)",
+          "table_label": "Bits / param.",
+          "ticks": [
+            0,
+            0.3,
+            0.6,
+            0.9,
+            1.2
+          ]
+        },
+        "y": {
+          "label": "Reported mean accuracy (%)",
+          "min": 60,
+          "max": 90,
+          "table_label": "Accuracy (%)",
+          "ticks": [
+            60,
+            70,
+            80,
+            90
+          ]
+        },
+        "points": [
+          {
+            "label": "FedMask",
+            "x": 1.0,
+            "y": 68.86,
+            "x_display": "1.000",
+            "y_display": "68.86",
+            "highlight": false
+          },
+          {
+            "label": "EDEN",
+            "x": 0.715,
+            "y": 78.56,
+            "x_display": "0.715",
+            "y_display": "78.56",
+            "highlight": false
+          },
+          {
+            "label": "DeepReduce",
+            "x": 1.173,
+            "y": 73.9,
+            "x_display": "1.173",
+            "y_display": "73.90",
+            "highlight": false
+          },
+          {
+            "label": "FedPM",
+            "x": 0.948,
+            "y": 81.64,
+            "x_display": "0.948",
+            "y_display": "81.64",
+            "highlight": false
+          },
+          {
+            "label": "DeltaMask",
+            "x": 0.233,
+            "y": 81.13,
+            "x_display": "0.233",
+            "y_display": "81.13",
+            "highlight": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "table",
+      "title": "With full participation",
+      "subtitle": "Same 8 tasks · IID · CLIP ViT-B/32 · 30 clients · 100 rounds",
+      "finding": "<strong>0.151 bpp</strong>, with accuracy 0.63 points below FedPM.",
+      "source": {
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11",
+        "label": "Table II · full participation"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1
+      ],
+      "rows": [
+        0,
+        4,
+        5
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Compact updates:</strong> 75.4% lower bitrate than FedPM in the non-IID comparison.",
+    "<strong>Close accuracy:</strong> within 0.63 points of FedPM across the two eight-task averages."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11",
+        "label": "Table III · eight-task means"
+      },
+      {
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=11",
+        "label": "Table II · IID full-participation means"
+      },
+      {
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909071/2024337517.pdf#page=2",
+        "label": "Figure 1 · original aggregate scatter design"
+      }
+    ],
+    "notes": [
+      "Plot coordinates are the exact printed Avg. Acc and Avg. bpp cells in Table III at rho=0.2; no coordinates were digitized. Figure 1 supplies the original visual design only.",
+      "Eight datasets: CIFAR-10, CIFAR-100, SVHN, EMNIST, Fashion-MNIST, EuroSAT, Food-101 and Cars196. CLIP ViT-B/32, Dirichlet alpha=0.1, 30 clients, 20% participation, 300 rounds and one local epoch.",
+      "These are raw top-1 accuracy averages, not normalized scores. The printed averages are preserved rather than recomputed from rounded per-task cells.",
+      "The archived Figure 1 FedMask position differs from the printed Table III mean; the redraw uses Table III, 68.86%.",
+      "Tables II and III report no uncertainty for their aggregate accuracy or bitrate columns. The original figure error bars have no exact numerical specification in these sources and are not reproduced or estimated.",
+      "Fine-tuning (83.19%, 32 bpp in Table III) lies outside the compressed-update comparison and is omitted from the hero scatter, as in the original. The supporting IID table includes its corresponding 88.08%, 32 bpp reference.",
+      "The supporting table selects Fine-tuning, FedPM and DeltaMask from Table II, rho=1.0, Dirichlet alpha=10, 30 clients, 100 rounds and one local epoch.",
+      "Bitrate is per parameter, not total end-to-end training traffic. The IID and non-IID settings use different round counts.",
+      "Source inconsistency: Table III FedPM printed Avg. Acc 81.64 differs from mean of visible per-task cells 81.65625; Table II DeltaMask printed85.44 differs from85.42125. All displayed values/gaps use reported average columns, not re-estimated means."
+    ],
+    "calculations": {
+      "bitrate_reduction_percent": {
+        "formula": "100 * (1 - 0.233 / 0.948)",
+        "value": 75.42194092827003,
+        "display": "75.4%"
+      },
+      "non_iid_accuracy_gap_points": {
+        "formula": "81.64 - 81.13",
+        "value": 0.51
+      },
+      "iid_accuracy_gap_points": {
+        "formula": "86.07 - 85.44",
+        "value": 0.63
+      }
+    }
+  }
+}

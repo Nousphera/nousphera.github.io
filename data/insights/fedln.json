@@ -200,6 +200,72 @@
       ],
       "interpretation": "NNC changes little in this sweep; NA-FedAvg loses accuracy as the population of clients with clean labels disappears.",
       "caveat": "100% noisy clients means every client has 40% corrupted labels. It does not mean every label is wrong."
+    },
+    {
+      "title": "Human annotation errors",
+      "question": "How do the methods perform with human label noise?",
+      "context": "CIFAR-10N and CIFAR-100N; mean accuracy (%) over three trials, 30 clients. AKD uses embedding supervision.",
+      "source": {
+        "label": "Figure 8 · PDF page 24",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf#page=24"
+      },
+      "columns": [
+        "Method",
+        "CIFAR-10N (%)",
+        "CIFAR-100N (%)"
+      ],
+      "rows": [
+        {
+          "label": "FedAvg",
+          "values": [
+            "65.68",
+            "47.25"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "CL",
+          "values": [
+            "67.31",
+            "48.72"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "FedCorr",
+          "values": [
+            "70.02",
+            "54.12"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "NNC",
+          "values": [
+            "74.69",
+            "55.39"
+          ],
+          "highlight": true
+        },
+        {
+          "label": "AKD",
+          "values": [
+            "70.39",
+            "57.39"
+          ],
+          "highlight": true
+        },
+        {
+          "label": "NA-FedAvg",
+          "values": [
+            "70.06",
+            "53.99"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "NNC has the highest CIFAR-10N accuracy; AKD has the highest CIFAR-100N accuracy among compared methods.",
+      "caveat": "Three-run means without reported dispersion; CIFAR-10N uses 200 rounds and CIFAR-100N uses 500. CL is confident learning."
     }
   ],
   "evaluation": [

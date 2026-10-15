@@ -26,11 +26,17 @@ class ResearchVisualTests(unittest.TestCase):
                 self.assertIn('id="fl-algorithm-title"',html)
             else:
                 self.assertIn('data-paper-story',html)
-                self.assertIn('Scope &amp; limitations',html)
-            for r in p['insight']['results']:
-                self.assertIn(build.esc(r['source']['label']),html)
-                for row in r['rows']:
-                    for v in row['values']: self.assertIn(build.esc(str(v)),html)
+                self.assertIn('class="results-panel"',html)
+            # Full evidence is retained in data; the page presents selected comparisons.
+            from paper_results import load_results, selected_result
+            for panel in load_results(p)['panels']:
+                self.assertIn(build.esc(panel['source']['url']), html)
+                if panel['kind'] == 'scatter': continue
+                result = selected_result(p, panel)
+                columns = panel.get('columns', list(range(len(result['columns'])-1))) if panel['kind'] == 'table' else sorted({c for chart in panel['charts'] for c in chart['columns']})
+                for row in result['rows']:
+                    for c in columns:
+                        self.assertIn(build.esc(str(row['values'][c])), html)
 
     def test_icons_are_original_vector_markup_and_grouped_once(self):
         names=[n for values in GROUPS.values() for n in values]

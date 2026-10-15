@@ -1,0 +1,83 @@
+{
+  "slug": "da-mldg",
+  "panels": [
+    {
+      "kind": "table",
+      "title": "Cross-corpus emotion recognition",
+      "subtitle": "Log-mel inputs · seven scenarios · mean accuracy over ten trials",
+      "finding": "DA-MLDG leads in <strong>2/7 scenarios</strong>; RSC leads in four.",
+      "source": {
+        "label": "Table III · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "column_labels": [
+        "Scenario · target",
+        "Deep-All (%)",
+        "RSC (%)",
+        "MLDG (%)",
+        "DA-MLDG (%)"
+      ]
+    },
+    {
+      "kind": "bars",
+      "title": "With pretrained speech embeddings",
+      "subtitle": "TRILLsson inputs · same seven scenarios · mean accuracy over ten trials",
+      "finding": "With pretrained embeddings, DA-MLDG beats the supervised baseline in <strong>3/7 scenarios</strong>.",
+      "source": {
+        "label": "Table IV · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6"
+      },
+      "result_index": 1,
+      "charts": [
+        {
+          "columns": [
+            0,
+            1
+          ],
+          "title": "Target accuracy (%)",
+          "maximum": 100,
+          "direction": "higher",
+          "series_labels": [
+            "Deep-All",
+            "DA-MLDG"
+          ],
+          "highlight_series": [
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Performance depends on the source–target split:</strong> DA-MLDG leads two of seven log-mel scenarios.",
+    "<strong>Pretrained features change the comparison:</strong> DA-MLDG beats supervised training in three of seven scenarios."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Table III · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6",
+        "location": "Table III, PDF p. 6 / printed p. 425; all seven scenarios and four methods. Table I defines source and target corpora."
+      },
+      {
+        "label": "Table IV · PDF page 6 (p. 425)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/346841444/On_efficacy_of_Meta-Learning_for_Domain_Generalization_in_Speech_Emotion_Recognition_2_.pdf#page=6",
+        "location": "Table IV, PDF p. 6 / printed p. 425; all seven scenarios and both methods with TRILLsson inputs."
+      }
+    ],
+    "notes": [
+      "All 42 displayed values were checked visually against Tables III and IV in the publisher PDF. Reported means average ten trials; no uncertainty is provided.",
+      "Table III winners: RSC in scenarios 1, 2, 6 and 7; Deep-All in 3; DA-MLDG in 4 and 5. Its scenario-4 advantage over Deep-All is only 0.05 percentage points and has no reported uncertainty, so no significance is asserted.",
+      "In Table IV, DA-MLDG exceeds Deep-All in scenarios 1, 5 and 6 only. Better inputs do not establish a consistent meta-learning advantage.",
+      "ShEMO is shown twice because scenarios 6 and 7 use different source corpora. Scenario identities are retained rather than pooled by target dataset.",
+      "No source values were corrected, averaged across scenarios, estimated from plots or promoted to deployment claims."
+    ]
+  }
+}

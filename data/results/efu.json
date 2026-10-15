@@ -1,0 +1,75 @@
+{
+  "slug": "efu",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Forget identity, retain gender",
+      "subtitle": "LFW · ViT-B/32 · all 30 clients unlearn · means of 3 runs",
+      "finding": "EFU retains <strong>95.37% gender accuracy</strong> with <strong>5.12% identity accuracy</strong>; retraining gives 96.86% and 4.71%.",
+      "source": {
+        "label": "Table 2 · PDF page 10",
+        "url": "https://arxiv.org/pdf/2508.07873v1#page=10"
+      },
+      "result_index": 1,
+      "charts": [
+        {
+          "columns": [
+            0
+          ],
+          "title": "Gender accuracy (%) · retain",
+          "maximum": 100,
+          "direction": "higher"
+        },
+        {
+          "columns": [
+            1
+          ],
+          "title": "Identity accuracy (%) · forget",
+          "maximum": 25,
+          "direction": "lower"
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Class forgetting and retained utility",
+      "subtitle": "CIFAR-10 · ResNet-18 · forget 1 of 10 classes · means of 3 runs",
+      "finding": "EFU’s retained accuracy is <strong>2.39 pp below retraining</strong>; forgotten-class accuracy is <strong>13.06% versus 13.72%</strong>.",
+      "source": {
+        "label": "Table 1(a), class-wise CIFAR-10 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2508.07873v1#page=9"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Selective forgetting:</strong> lower identity accuracy while retaining gender recognition.",
+    "<strong>Utility remains close to retraining:</strong> a 1.49-point gap on LFW and 2.39 points on CIFAR-10."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "path": "research-library/papers/2025-efu/source.pdf",
+        "sha256": "6082587c69423617fc0771bc95666fe7376871ef70ef3fab58736a5f61614707",
+        "locations": [
+          "Table 2, PDF page 10: LFW ViT-B/32, gender (retain) and identity (forget) accuracies.",
+          "Table 1(a), PDF page 9: ResNet-18, CIFAR-10 class-wise block; all eight method rows.",
+          "Section 5.1, PDF page 9 and 10: setup, unlearning schedule and means over three independent runs."
+        ]
+      }
+    ],
+    "notes": [
+      "Visually checked original pages 9 and 10 using digests/scratch-privacy/2025-efu/page-009.png and page-010.png; cross-checked text and PDF SHA-256.",
+      "All plotted values are accuracy percentages. Gender/retained accuracy is higher-is-better; identity/forgotten accuracy is lower-is-better. Each chart starts at zero.",
+      "Task-level chart uses all five rows already selected in insight result 1: retrain, three unwrapped baselines and standalone EFU. Wrapper rows omitted from that source selection remain explicitly outside the chart.",
+      "Class-wise supporting table retains all eight source rows, including wrapped baselines. The retained-accuracy gap is the transparent subtraction 94.82 - 92.43 = 2.39 pp.",
+      "PGD and FedOSD wrappers also add MAS regularization, so the table is not a pure encryption-only ablation.",
+      "No standard deviation, confidence interval or zero-forgetting claim is invented. Low forgotten accuracy is a behavioral outcome, not proof of erased influence.",
+      "Source is arXiv:2508.07873v1 (11 August 2025). Runtime and communication curves are not digitized or presented as tabulated values."
+    ]
+  }
+}

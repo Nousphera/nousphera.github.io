@@ -1,0 +1,56 @@
+{
+  "slug": "fedser",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Emotion recognition with 10% labels",
+      "subtitle": "IEMOCAP · four emotions · 8–10 clients · mean of five runs",
+      "finding": "<strong>+7.22–10.28 UA points</strong> with the same 10% label budget across all four partitions.",
+      "source": {
+        "label": "Table III · page 5",
+        "url": "https://arxiv.org/pdf/2202.02611v1#page=5"
+      },
+      "result_index": 0,
+      "charts": [
+        {
+          "columns": [
+            0,
+            1,
+            2
+          ],
+          "title": "Unweighted accuracy (%)",
+          "maximum": 100,
+          "direction": "higher",
+          "series_labels": [
+            "Supervised · 10% labels",
+            "FedSER · 10% labels",
+            "Supervised · 100% labels"
+          ],
+          "highlight_series": [
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Unlabeled speech helps every tested partition</strong>, while full-label training remains stronger.",
+    "<strong>Unseen-speaker evaluation holds out sessions</strong>; overlapping-speaker scores assess a different setting."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Table III · page 5",
+        "url": "https://arxiv.org/pdf/2202.02611v1#page=5",
+        "location": "Table III, PDF p. 5; all four partition rows and all three label/training settings. Evaluation protocol in Section IV and Table I, pp. 4–5."
+      }
+    ],
+    "notes": [
+      "All 12 displayed means were checked visually against Table III in arXiv:2202.02611v1. Five full runs are performed per split; no SD, variance or confidence interval is supplied.",
+      "Row-wise self-training gains over the same 10%-label supervised baseline are 7.22, 10.28, 7.46 and 9.75 percentage points. These are absolute UA-point gains, not relative percentages.",
+      "Unseen speakers means leave-one-session-out (a session contains a dyad), not leave-one-speaker-out. Overlapping speakers uses five-fold 80:20 splits. Random partitions have 10 clients; per-speaker partitions have 8.",
+      "The paper’s Table II centralized-to-federated gaps and its prose disagree in ordering; neither those prose approximations nor a corrected threshold formula is introduced here.",
+      "No numerical or threshold-schedule edits were needed in data/insights/fedser.json."
+    ]
+  }
+}

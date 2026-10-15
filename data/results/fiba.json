@@ -1,0 +1,70 @@
+{
+  "slug": "fiba",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "More attackers, greater success",
+      "subtitle": "CIFAR-10 · ResNet-18 · 10 clients",
+      "finding": "<strong>More malicious clients raised every attack’s mean ASR</strong>; invisible attacks remained below BadNet in both settings.",
+      "source": {
+        "label": "Table 1 · PDF page 10",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf#page=10"
+      },
+      "result_index": 0,
+      "charts": [
+        {
+          "columns": [
+            1,
+            2
+          ],
+          "title": "Attack success rate (%)",
+          "maximum": 100,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Attention placement has a cost",
+      "subtitle": "LSB700 · CIFAR-10 · 10% attackers",
+      "finding": "Low-attention placement reaches <strong>61.39% ASR</strong>, while anomaly index rises to <strong>3.04</strong>, above the discussed detection threshold of 2.",
+      "source": {
+        "label": "Table 3, LSB700 rows · PDF page 14",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/349909542/FinalPaper.pdf#page=14"
+      },
+      "result_index": 2,
+      "columns": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Attacker participation matters:</strong> all tested attacks gain success as more clients are compromised.",
+    "<strong>Placement changes the tradeoff:</strong> low-attention LSB700 gains 19.80 pp ASR, with greater distortion and detectability."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "path": "research-library/papers/2024-fiba/source.pdf",
+        "sha256": "106b322960f620f04ad7b4209ab9d7acae28daa27a0442183f1dd18b1fe90411",
+        "locations": [
+          "Table 1, PDF page 10 (including repository cover): all five attacks, ASR at 10% and 20% malicious clients.",
+          "Table 3, PDF page 14: LSB700 no-mask, low-attention and high-attention rows; ASR, LPIPS and anomaly index.",
+          "Section 5.3, PDF pages 14–15: LSB attention-placement scope and anomaly-threshold discussion."
+        ]
+      }
+    ],
+    "notes": [
+      "Visually checked original pages 10, 11 and 14 using digests/scratch-privacy/2024-fiba/page-010.png, page-011.png and page-014.png; cross-checked text and PDF SHA-256.",
+      "All five Table 1 attacks remain in source order. The paired chart shows mean ASR, preserving each original ± string in labels. Direction is null because ASR describes attack effectiveness, not a desirable defense outcome.",
+      "The paper does not identify its ± statistic or repetition count. Do not label error values as standard deviations or confidence intervals, or claim statistical significance.",
+      "Supporting table uses the three existing LSB700 insight rows in their established order. Exact improvement is 61.39 - 41.59 = 19.80 percentage points; it is not a relative-percent improvement.",
+      "FiBA is a benchmark of invisible federated backdoors. The attention-placement evidence is LSB500/700; no frequency-domain mechanism is inferred.",
+      "Low-attention LSB700 increases LPIPS from 7.83 × 10^-5 to 2.25 × 10^-4 and anomaly from 1.61 to 3.04. The smaller LSB500 ASR gain (24.72 - 20.17 = 4.55 pp) prevents generalizing the 19.80 pp result.",
+      "Table 2 defense grid is omitted from this two-panel selection rather than pooled across datasets and attacker fractions. No universal defense-evasion claim is made.",
+      "Source is the TU/e accepted manuscript with repository cover, not the publisher typeset version; page anchors count the cover."
+    ]
+  }
+}

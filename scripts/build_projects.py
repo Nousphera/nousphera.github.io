@@ -116,6 +116,7 @@ def shell(title, description, path, body, p=None):
             extras += f'<link rel="stylesheet" href="{asset_url("assets/connected-story.css")}"><link rel="stylesheet" href="{asset_url("assets/"+STORY_STYLES[p["slug"]]+"-story.css")}">'
         if p['slug'] == 'fedln':
             extras = f'<link rel="stylesheet" href="{asset_url("assets/fedln-content.css")}"><link rel="stylesheet" href="{asset_url("assets/fedln-tour.css")}"><script src="{asset_url("assets/fedln-tour.js")}" defer></script>'
+        extras += f'<link rel="stylesheet" href="{asset_url("assets/paper-results.css")}">'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)
         css = f'<style>:root{{--accent-light:{p["accent"]};--accent-dark:{p["accent_dark"]};--tint-light:{p["tint"]};}}</style>'
         for key, value in [('citation_title', p['title']), ('citation_publication_date', citation_year)] + [('citation_author', a) for a in p['authors']]:
@@ -185,22 +186,22 @@ def project_page(p, projects):
     category = f'<span>{esc(p["category"])}</span>'
     page_class = ''
     if p['slug'] == 'fedln':
-        from fedln_content import overview_markup, method_markup, results_markup
+        from fedln_content import overview_markup, method_markup, _algorithm_markup
         from fedln_tour import tour_markup
         overview = overview_markup(p).replace('<!-- FEDLN_TOUR -->', tour_markup())
-        method = method_markup(p)
-        results = results_markup(p)
+        method = method_markup(p).replace('</section>', _algorithm_markup(p) + '</section>')
         category = '<ul class="hero-topics" aria-label="Research topics">' + ''.join(f'<li>{esc(t)}</li>' for t in p['topics']) + '</ul>'
         page_class = ' fedln-page'
     else:
-        from paper_experience import load_story, overview_markup, method_markup, results_markup
+        from paper_experience import load_story, overview_markup, method_markup
         story = load_story(p['slug'])
         if story:
             overview = overview_markup(p, story)
             method = method_markup(p, story, originals)
-            results = results_markup(p, story)
             category = '<ul class="hero-topics" aria-label="Research topics">' + ''.join(f'<li>{esc(t)}</li>' for t in p['topics'][:4]) + '</ul>'
             page_class = ' paper-page'
+    from paper_results import results_markup as refined_results
+    results = refined_results(p)
     project_attr = '' if p['slug'] == 'fedln' else f' data-project="{esc(p["slug"])}"'
     body = f'''<main id="main" class="project-main{page_class}"{project_attr}><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
 <section class="paper-hero" aria-labelledby="paper-title"><div class="eyebrow"><span class="project-name">{esc(p['name'])}</span><span>{esc(venue)}</span></div>

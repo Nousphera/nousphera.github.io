@@ -1,0 +1,66 @@
+{
+  "slug": "enccluster",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Upstream traffic under encryption",
+      "subtitle": "CIFAR-10 · ResNet-20 · 30 clients · full participation; clustered FedAvg is unencrypted",
+      "finding": "EncCluster sends <strong>0.284× FedAvg’s upstream volume</strong>; DeTrust-FL sends 3.743× and SEFL 2.581×.",
+      "source": {
+        "label": "Table 3, CIFAR-10 with full participation · PDF page 12",
+        "url": "https://arxiv.org/pdf/2406.09152v1#page=12"
+      },
+      "result_index": 0,
+      "charts": [
+        {
+          "columns": [
+            2
+          ],
+          "title": "Upstream volume / FedAvg",
+          "maximum": 4,
+          "direction": "lower"
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Accuracy and encryption cost",
+      "subtitle": "CIFAR-10 · accuracy change vs FedAvg (pp) · client encryption time (s)",
+      "finding": "EncCluster reports <strong>2.04 s encryption</strong> with <strong>0.32 pp IID</strong> and <strong>0.79 pp non-IID</strong> accuracy losses.",
+      "source": {
+        "label": "Table 3, CIFAR-10 with full participation · PDF page 12",
+        "url": "https://arxiv.org/pdf/2406.09152v1#page=12"
+      },
+      "result_index": 0,
+      "columns": [
+        0,
+        1,
+        3
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Encrypted updates:</strong> 0.284× FedAvg’s upstream volume.",
+    "<strong>Close accuracy:</strong> losses of 0.32 pp (IID) and 0.79 pp (non-IID) in this comparison."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "path": "research-library/papers/2025-enccluster/source.pdf",
+        "sha256": "d547bc11919aa85e09ad7b8c0cb55b1b47e2a9851cb48ad52b62ea907ff56fc2",
+        "locations": [
+          "Table 3, PDF page 12: CIFAR-10, full participation (rho = 1), all four method rows.",
+          "Section 5.1, PDF page 11: evaluation setup including 30 clients, 128 clusters and 256-bit encryption."
+        ]
+      }
+    ],
+    "notes": [
+      "Visually checked original PDF page 12 using digests/scratch-privacy/2025-enccluster/page-012.png; cross-checked page text and source PDF SHA-256.",
+      "Both panels use insight result 0. The chart uses upstream ratio only; the supporting table uses IID/non-IID accuracy deltas and encryption seconds. No mixed-unit chart is created.",
+      "The one upstream/time pair supplied for both splits is retained, not assigned separately to IID and non-IID. The unencrypted FedAvg+clustering encryption dash remains a dash.",
+      "Results are from arXiv:2406.09152v1 (13 June 2024), not blended with the 2025 PMC paper or 2024 workshop version. No dispersion is reported.",
+      "The preprint prose reverses approximate SEFL speed/traffic reduction factors. Raw Table 3 values are used instead; no speedup ratio is inferred.",
+      "Architecture coverage in Table 5 is omitted to keep one fixed-setting comparison. These panels do not support general privacy guarantees or end-to-end runtime claims."
+    ]
+  }
+}

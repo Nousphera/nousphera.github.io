@@ -1,35 +1,13 @@
-"""Source-grounded FedLN project panels; load /assets/fedln-content.css.
+"""FedLN overview and methodology panels, based on the final ACM TIST article.
 
-The numeric series below are transcribed from the final ACM TIST article:
-Figure 8 (publisher PDF p24) and selected columns of Table 3 (PDF p20).
-PDF page numbers include the repository cover. The original scatter images
-are Figure 7 (PDF p19), also present unchanged in the archived 2022 poster.
+Results use the shared paper_results renderer and audited JSON selections.
 """
-
 from html import escape
 
 from research_icons import research_icon
 
 
 _PDF = "https://pure.tue.nl/ws/portalfiles/portal/320106480/3626242.pdf"
-_OURS = {"NNC", "AKD", "AKD (embeddings)", "NA-FedAvg"}
-_HUMAN = (
-    ("FedAvg", "65.68", "47.25"),
-    ("CL", "67.31", "48.72"),
-    ("FedCorr", "70.02", "54.12"),
-    ("NNC", "74.69", "55.39"),
-    ("AKD", "70.39", "57.39"),
-    ("NA-FedAvg", "70.06", "53.99"),
-)
-_SYNTHETIC = (
-    ("FedAvg", "57.65", "63.54"),
-    ("FedCorr", "67.27", "65.23"),
-    ("NNC", "74.76", "54.59"),
-    ("AKD (embeddings)", "68.43", "68.39"),
-    ("NA-FedAvg", "65.34", "67.92"),
-)
-
-
 def _source(p, label, page):
     url = p.get("links", {}).get("PDF", _PDF).split("#", 1)[0]
     return (f'<a class="fl-source" href="{escape(url, quote=True)}#page={page}">'
@@ -93,64 +71,6 @@ def method_markup(p):
 </section>'''
 
 
-def _table(columns, rows, caption):
-    headings = ''.join(f'<th scope="col">{escape(str(c))}</th>' for c in columns)
-    body = []
-    for row in rows:
-        cells = ''.join(f'<td>{escape(str(v))}</td>' for v in row[1:])
-        body.append(f'<tr><th scope="row">{escape(str(row[0]))}</th>{cells}</tr>')
-    return (f'<div class="fl-table-wrap"><table class="fl-data-table"><caption>{escape(caption)}</caption>'
-            f'<thead><tr>{headings}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
-
-
-def _paired_charts(key, headings, rows):
-    charts = []
-    for index, heading in enumerate(headings, 1):
-        bars = []
-        for row in rows:
-            own = ' fl-bar-row-own' if row[0] in _OURS else ''
-            route = {'NNC': 'nnc', 'AKD': 'akd', 'AKD (embeddings)': 'akd', 'NA-FedAvg': 'na'}.get(row[0])
-            if route:
-                own += f' fl-bar-{route}'
-            label = 'AKD' if row[0] == 'AKD (embeddings)' else row[0]
-            value = row[index]
-            bars.append(f'''<div class="fl-bar-row{own}" data-chart="{escape(key, quote=True)}" data-series="{escape(heading, quote=True)}" data-method="{escape(row[0], quote=True)}" data-value="{value}"><span class="fl-bar-label">{escape(label)}</span><span class="fl-bar-track"><span class="fl-bar-fill" style="--fl-value:{value}%"></span></span><span class="fl-bar-value">{value}</span></div>''')
-        charts.append(f'''<div class="fl-chart-panel"><h4>{escape(heading)}</h4><div class="fl-chart-scale"><span>0</span><span>50</span><span>100%</span></div>{''.join(bars)}</div>''')
-    # Exact numbers are available in the adjacent semantic table. Hide the
-    # decorative chart layout from assistive technology to avoid duplication.
-    return (f'<div class="fl-chart-pair" aria-hidden="true">{"".join(charts)}</div>'
-            '<p class="fl-chart-legend"><span>FedLN:</span>'
-            '<span class="fl-legend-item"><i class="fl-legend-swatch fl-swatch-nnc" aria-hidden="true"></i>NNC</span>'
-            '<span class="fl-legend-item"><i class="fl-legend-swatch fl-swatch-akd" aria-hidden="true"></i>AKD</span>'
-            '<span class="fl-legend-item"><i class="fl-legend-swatch fl-swatch-na" aria-hidden="true"></i>NA-FedAvg</span>'
-            '<span>Shared 0–100% scale.</span></p>'
-            f'<div class="fl-chart-data fl-sr-only">'
-            f'{_table(("Method", *headings), rows, "Test accuracy (%); higher is better")}</div>')
-
-
-def _more_experiments(p):
-    """Compact comparisons, with full experimental scope available on demand."""
-    experiments = p.get("insight", {}).get("results", [])[1:]
-    if not experiments:
-        return ''
-    summaries = (
-        ('Audio', 'Speech Commands v2 · 70% label noise on 80% of clients.',
-         'NNC leads under random noise; NA-FedAvg under class flipping.',
-         'Speech Commands v2 · test accuracy (%)'),
-        ('Noisy clients', 'CIFAR-10 · 40% label noise per noisy client.',
-         'NA-FedAvg loses accuracy as clients with clean labels disappear.',
-         'Share of noisy clients · test accuracy (%)'),
-    )
-    parts = []
-    for index, result in enumerate(experiments):
-        rows = [(r['label'], *r['values']) for r in result['rows']]
-        source = result['source']
-        title, context, insight, caption = summaries[index] if index < len(summaries) else (
-            result['title'], result['context'], result['interpretation'], result['title'])
-        parts.append(f'''<section class="fl-extra-experiment" aria-labelledby="fl-extra-{index}"><div class="fl-extra-heading"><h3 id="fl-extra-{index}">{escape(title)}</h3><span>Accuracy (%)</span></div><p class="fl-extra-context">{escape(context)}</p>{_table(result['columns'], rows, caption)}<p class="fl-extra-insight">{escape(insight)}</p><div class="fl-extra-footer"><a class="fl-source" href="{escape(source['url'], quote=True)}">{escape(source['label'])}</a><details class="fl-details fl-extra-setup"><summary>Setup</summary><div class="fl-details-body"><p>{escape(result['context'])}</p><p>{escape(result['caveat'])}</p></div></details></div></section>''')
-    return f'<div class="fl-extra-grid">{"".join(parts)}</div>'
-
-
 def _algorithm_markup(p):
     """A responsive, three-route rendering of Algorithm 1 (not a pipeline of methods)."""
     routes = (
@@ -192,32 +112,3 @@ def _algorithm_markup(p):
     <div class="fl-algorithm-routes">{''.join(rows)}</div>
     <p class="fl-algorithm-footer">{research_icon('exchange')}<span>Each round starts from the shared model; client data stay local.</span>{_source(p, 'Algorithm 1', 13)}</p>
   </figure>'''
-
-
-def results_markup(p):
-    """Comparable results, label illustration and a visual rendering of Algorithm 1."""
-    return f'''<section id="findings" data-tab-panel class="fl-panel fl-results" aria-labelledby="fl-results-title">
-  <h2 id="fl-results-title" class="fl-sr-only">Results</h2>
-  <section class="fl-result-block" aria-labelledby="fl-human-title"><div class="fl-result-heading"><div><p class="fl-eyebrow">Human annotation errors</p><h3 id="fl-human-title">NNC leads on CIFAR-10N; AKD on CIFAR-100N</h3></div><span class="fl-result-unit">Test accuracy (%)</span></div>
-    {_paired_charts('human', ('CIFAR-10N', 'CIFAR-100N'), _HUMAN)}
-    <p class="fl-result-insight"><strong>+10.14 percentage points</strong> for AKD over FedAvg on CIFAR-100N (57.39% vs 47.25%).</p>
-    <p class="fl-context">Three-run means; 30 clients, 80% participation. CIFAR-10N: 200 rounds; CIFAR-100N: 500 rounds. AKD uses embeddings. CL denotes confident learning.</p>
-    <p>{_source(p, 'Figure 8 · human-noise results', 24)}</p>
-    <details class="fl-details"><summary>Experimental context</summary><div class="fl-details-body"><p>Human-annotated training sets are randomly distributed across clients; evaluation uses the original clean test sets. There is no explicit clean-client group. Training uses one local epoch and 25% data-distribution variance. The figure reports no dispersion or error bars.</p></div></details>
-  </section>
-  <section class="fl-result-block" aria-labelledby="fl-synthetic-title"><div class="fl-result-heading"><div><p class="fl-eyebrow">A controlled comparison · CIFAR-10</p><h3 id="fl-synthetic-title">The same noise rate can produce opposite outcomes</h3></div><span class="fl-result-unit">Test accuracy (%)</span></div>
-    {_paired_charts('synthetic', ('Random noise', 'Class flipping'), _SYNTHETIC)}
-    <p class="fl-result-insight"><strong>NNC gains 17.11 points under random noise</strong>, yet falls below FedAvg under class flipping (54.59% vs 63.54%).</p>
-    <p class="fl-context">ResNet-20; 70% label noise on 80% of 30 clients; 200 rounds, one local epoch, 80% participation. Three-run means; AKD uses embeddings.</p>
-    <p>{_source(p, 'Table 3 · PDF page 20 (22:19)', 20)}</p>
-    <details class="fl-details"><summary>What changes between the columns?</summary><div class="fl-details-body"><p>Noise sparsity changes from 0% to 100% while the corruption rate stays at 70%. Random noise spreads wrong labels across classes; class flipping concentrates them. These accuracy comparisons do not establish equal computation: FedCorr includes additional preprocessing and fine-tuning. Trial dispersion is not reported.</p></div></details>
-  </section>
-  <figure class="fl-embedding-figure"><div class="fl-result-heading"><div><p class="fl-eyebrow">Inside label correction</p><h3>The points stay fixed. Their labels change.</h3></div></div><div class="fl-embedding-pair"><div><h4>Before NNC</h4><img src="/assets/projects/fedln/labels-before.png" width="1455" height="966" loading="lazy" decoding="async" alt="Fixed CIFAR-10 embeddings before correction: differently coloured labels are mixed within several visible clusters."></div><div><h4>After NNC</h4><img src="/assets/projects/fedln/labels-after.png" width="1455" height="966" loading="lazy" decoding="async" alt="The same embedding coordinates after NNC: neighboring points have more consistent class-label colours."></div></div><figcaption>CIFAR-10 with 40% random label noise; fixed CLIP features. This illustrates relabeling, not learning a new representation. {_source(p, 'Figure 7', 19)}</figcaption></figure>
-  {_more_experiments(p)}
-  {_algorithm_markup(p)}
-  <section class="fl-takeaway" aria-labelledby="fl-takeaway-title"><p class="fl-eyebrow">Takeaways</p><h3 id="fl-takeaway-title">Match the intervention to the noise.</h3><ul class="fl-takeaway-list">
-    <li class="fl-method-nnc"><span class="fl-takeaway-method">NNC</span><p><strong>Neighborhood quality matters.</strong> Strong gains under random noise; incorrect majorities can hurt under class flipping.</p></li>
-    <li class="fl-method-akd"><span class="fl-takeaway-method">AKD</span><p><strong>Guide learning without replacing labels.</strong> Embedding-based AKD gives the highest CIFAR-100N accuracy among the compared methods.</p></li>
-    <li class="fl-method-na"><span class="fl-takeaway-method">NA-FedAvg</span><p><strong>Reduce noisier clients’ influence.</strong> Reweight updates when client reliability can be distinguished.</p></li>
-  </ul></section>
-</section>'''

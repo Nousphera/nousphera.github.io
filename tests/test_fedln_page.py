@@ -41,12 +41,12 @@ class FedLNPageTests(unittest.TestCase):
                     '47.25','48.72','54.12','55.39','57.39','53.99',
                     '57.65','67.27','74.76','68.43','65.34',
                     '63.54','65.23','54.59','68.39','67.92']
-        self.assertEqual([b['data-value'] for b in self.markup.bars], expected)
-        for bar in self.markup.bars:
-            self.assertIn('data-method', bar)
-            self.assertIn(f'--fl-value:{bar["data-value"]}%', self.html)
-        self.assertIn('0–100%', self.html)
+        for value in expected:
+            self.assertIn(value, self.html)
+        self.assertIn('width:74.69000%', self.html)
+        self.assertIn('width:57.39000%', self.html)
         self.assertIn('falls below FedAvg', self.html)
+        self.assertIn('class="rs-table"', self.html)
 
     def test_static_sections_and_tour_are_readable_without_scripts(self):
         self.assertEqual([p['id'] for p in self.markup.panels], ['overview','method','findings','citation'])

@@ -1,0 +1,91 @@
+{
+  "slug": "plix",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Quantized encoder latency",
+      "subtitle": "Encoder only · 200 inference runs · excludes preprocessing and prototype classification",
+      "finding": "The quantized Small encoder runs in <strong>5.12–7.32 ms</strong> on the three measured devices.",
+      "source": {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14"
+      },
+      "result_index": 1,
+      "rows": [
+        2,
+        3,
+        4
+      ],
+      "charts": [
+        {
+          "columns": [
+            0,
+            1
+          ],
+          "title": "Latency (ms)",
+          "maximum": 120,
+          "direction": "lower",
+          "series_labels": [
+            "Small · TinyNet-E",
+            "Base · EfficientNet-v2 M"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Quantized encoder energy",
+      "subtitle": "Encoder energy · 200 inference runs · external power monitor",
+      "finding": "The Small encoder uses <strong>3.55–4.92 mJ</strong> per inference, below the Base encoder on every measured device.",
+      "source": {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14"
+      },
+      "result_index": 2,
+      "columns": [
+        0,
+        1
+      ],
+      "rows": [
+        2,
+        3,
+        4
+      ],
+      "column_labels": [
+        "Device · quantized",
+        "Small (mJ)",
+        "Base (mJ)"
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>New vocabularies:</strong> add labeled support clips without retraining the encoder.",
+    "<strong>Small encoder:</strong> lower latency and energy on all three measured devices."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14",
+        "location": "Table 1, PDF p. 14; quantized rows for Pixel 7, Raspberry Pi 4 and Jetson Nano, latency subtable."
+      },
+      {
+        "label": "Table 1 · page 14",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=14",
+        "location": "Table 1, PDF p. 14; same three quantized rows, energy subtable."
+      },
+      {
+        "label": "Figures 6–7 and 10–11 · pages 9–12",
+        "url": "https://arxiv.org/pdf/2305.03058v1#page=9",
+        "location": "Figures 6–7 and 10–11 with accompanying discussion, PDF pp. 9–12; qualitative recognition scope only."
+      }
+    ],
+    "notes": [
+      "All 12 displayed values were checked visually against Table 1. Small is TinyNet-E and Base is EfficientNet-v2 Medium. Quantized Small ranges are exact extrema of the three displayed device rows.",
+      "Mean costs average 200 inference runs and include the encoder only. They exclude log-mel preprocessing and prototype classification; do not describe them as end-to-end latency or battery use.",
+      "The table does not pair quantized runtime with a matching recognition-accuracy result. No recognition score is inferred from a figure or transferred from a non-quantized evaluation.",
+      "The concise recognition takeaway is qualitative: held-out vocabulary and unseen-language evaluation uses closed-set few-shot episodes. FLEURS experiments are 3-, 5- or 10-way episodes, not 102-way identification.",
+      "Full-precision rows remain in the insight data but are omitted to compare the same model format across devices. No disputed prose speedup factors are repeated. No insight-data correction was needed."
+    ]
+  }
+}

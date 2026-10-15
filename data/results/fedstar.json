@@ -1,0 +1,79 @@
+{
+  "slug": "fedstar",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Learning with 3% labels",
+      "subtitle": "15 clients · 100 rounds · accuracy (%)",
+      "finding": "With 3% labels, <strong>+23.84 accuracy points</strong> on Speech Commands; smaller gains on the other tasks.",
+      "source": {
+        "label": "Appendix Table 9 · PDF page 25 (74:24)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=25"
+      },
+      "result_index": 0,
+      "charts": [
+        {
+          "columns": [
+            0,
+            1
+          ],
+          "title": "Test accuracy (%)",
+          "maximum": 100,
+          "direction": "higher",
+          "series_labels": [
+            "Supervised FL",
+            "FedSTAR"
+          ],
+          "highlight_series": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Does pretraining always help?",
+      "subtitle": "Speech Commands · 50% unlabeled pool · 100 rounds",
+      "finding": "Pretraining improves the endpoint at <strong>20% and 50% labels</strong>, but not at 3% or 5%.",
+      "source": {
+        "label": "Appendix Table 7 · PDF page 24 (74:23)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=24"
+      },
+      "result_index": 2,
+      "columns": [
+        0,
+        1
+      ],
+      "column_labels": [
+        "Labels",
+        "Random (%)",
+        "Pretrained (%)"
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Unlabeled audio helps</strong> all three selected 3%-label comparisons.",
+    "<strong>Initialization gains depend on the label budget</strong>; pretraining is not uniformly better after 100 rounds."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Appendix Table 9 · PDF page 25 (74:24)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=25",
+        "location": "Final ACM TECS 2022 PDF, Appendix Table 9, PDF p. 25 / printed 74:24; N=15, L=3%, all three datasets, supervised and FedSTAR columns."
+      },
+      {
+        "label": "Appendix Table 7 · PDF page 24 (74:23)",
+        "url": "https://pure.tue.nl/ws/portalfiles/portal/232168240/3520128.pdf#page=24",
+        "location": "Same final PDF, Appendix Table 7, PDF p. 24 / printed 74:23; U=50%, all four label fractions, random and pretrained columns."
+      }
+    ],
+    "notes": [
+      "All 14 displayed numeric cells were checked against the final publisher PDF table renders and extracted table text. Source is the final ACM TECS 21(6), Article 74 (2022) version, not the earlier cached manuscript.",
+      "Preserve each mean and printed ± term verbatim. Appendix captions call the terms variance across experiments; do not relabel them SD or CI, convert their units, or plot invented error intervals.",
+      "Speech Commands gain is derived from Table 9: 86.82 - 62.98 = 23.84 percentage points. The three dataset accuracies are separate tasks and are not averaged.",
+      "Table 7 uses 15 clients, q=80%, sigma=25%, beta=0.5 and E=1. The selected U=50% slice avoids the conflicting U=100%, L=5% mean in main Table 6 versus Appendix Table 7.",
+      "The pretraining panel compares the 100-round endpoint, not Figure 6 early convergence. No result-data correction was needed."
+    ]
+  }
+}

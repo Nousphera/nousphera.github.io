@@ -1,0 +1,69 @@
+{
+  "slug": "fedcode",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Compress both communication directions",
+      "subtitle": "CIFAR-100 · ResNet-20 · 10 clients · full participation · 100 rounds",
+      "finding": "FedCode reaches <strong>14.6× joint reduction</strong> at <strong>58.07% accuracy</strong>; FedAvg reaches 61.22%.",
+      "source": {
+        "label": "Table 6 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2311.09270v1#page=9"
+      },
+      "result_index": 0,
+      "rows": [
+        1,
+        2,
+        3
+      ],
+      "charts": [
+        {
+          "columns": [
+            3
+          ],
+          "title": "Joint reduction vs FedAvg (×)",
+          "maximum": 16,
+          "direction": "higher"
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Calibration sets the tradeoff",
+      "subtitle": "CIFAR-100 · ResNet-20 · 64 centers · upstream / downstream calibration",
+      "finding": "<strong>264.7× reduction</strong> comes with a <strong>46.88-point accuracy loss</strong>; the selected 0.2/0.5 setting loses 3.15 points.",
+      "source": {
+        "label": "Table 5 · PDF page 9",
+        "url": "https://arxiv.org/pdf/2311.09270v1#page=9"
+      },
+      "result_index": 1,
+      "columns": [
+        0,
+        1
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Joint savings need both routes:</strong> FedZip’s 19.8× upstream reduction becomes 1.9× when downloads are included.",
+    "<strong>Calibration preserves utility:</strong> sending codebooks alone produces the largest ratio and the largest accuracy loss."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "path": "research-library/papers/2024-fedcode/source.pdf",
+        "sha256": "74e988a305fa1b0698a2b3fdd1fc7e1e2d1ef9229c839e7ab21bd9fc4b88fc3e",
+        "locations": [
+          "Table 6, PDF page 9: FedAvg, FedAvg with clustering, FedZip and FedCode accuracy and directional/joint DTR.",
+          "Table 5, PDF page 9: all six F1/F2 settings, accuracy change and DTR columns."
+        ]
+      }
+    ],
+    "notes": [
+      "Visually checked original PDF page 9 using digests/scratch-privacy/2024-fedcode/page-009.png; cross-checked page text and PDF SHA-256.",
+      "The baseline chart selects source rows 1, 2 and 3 in original order. FedAvg has a dash, not a zero or a reported 1×, in Table 6 and is not plotted.",
+      "The supporting table preserves all six calibration settings so extreme compression is not separated from its accuracy loss. MB is omitted for compactness, not recalculated.",
+      "Results are from arXiv:2311.09270v1 (15 November 2023), not mixed with IEEE EDGE 2024 camera-ready values. No uncertainty is reported.",
+      "The preprint conflicts on the directions assigned to F1/F2; original labels are retained. Every-round calibration and FedAvg with clustering are distinct table entries."
+    ]
+  }
+}

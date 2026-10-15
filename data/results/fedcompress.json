@@ -1,0 +1,65 @@
+{
+  "slug": "fedcompress",
+  "panels": [
+    {
+      "kind": "bars",
+      "title": "Recompress after aggregation",
+      "subtitle": "CIFAR-100 · ResNet-20 · 20 clients · 20 rounds · reduction relative to FedAvg",
+      "finding": "Server recompression lifts communication reduction from <strong>1.02× to 3.80×</strong>; CIFAR-100 accuracy loss is <strong>1.88 pp</strong>.",
+      "source": {
+        "label": "Table 1 · CIFAR-100 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2401.14211v3#page=5"
+      },
+      "result_index": 1,
+      "charts": [
+        {
+          "columns": [
+            1
+          ],
+          "title": "Communication reduction (×)",
+          "maximum": 4,
+          "direction": "higher"
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "title": "Savings across five tasks",
+      "subtitle": "20 clients · 20 rounds · accuracy mean of 2 trials",
+      "finding": "<strong>3.80–5.41× less communication</strong> accompanies <strong>0.31–1.88 pp accuracy loss</strong>; audio tasks have the smallest losses.",
+      "source": {
+        "label": "Table 1 · PDF page 5",
+        "url": "https://arxiv.org/pdf/2401.14211v3#page=5"
+      },
+      "result_index": 0,
+      "columns": [
+        1,
+        2
+      ]
+    }
+  ],
+  "takeaways": [
+    "<strong>Server recompression matters:</strong> client clustering alone leaves little bidirectional saving in the CIFAR-100 ablation.",
+    "The savings require <strong>10 extra server epochs per round</strong> and auxiliary unlabeled data."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "path": "research-library/papers/2024-fedcompress/source.pdf",
+        "sha256": "770de7dd7665b07a14aa8f9b79d0cee528372abebdcadb52fa3d361ddea8b967",
+        "locations": [
+          "Table 1, PDF page 5: CIFAR-100 FedZip / without-SCS / FedCompress blocks; CCR column.",
+          "Table 1, PDF page 5: all five datasets, FedCompress accuracy delta and CCR columns.",
+          "Section 4, PDF page 5: 20 clients, 20 rounds, ten local epochs, ten server epochs, two trials."
+        ]
+      }
+    ],
+    "notes": [
+      "Visually checked the original full page using digests/scratch-foundations/fedcompress/page-5.png; checked extracted page text and source PDF SHA-256.",
+      "All displayed cells exactly reuse insight results 1 and 0; selected columns use zero-based row.values indices.",
+      "Accuracy differences are percentage points, not relative percentages. Reduction factors are relative to FedAvg.",
+      "Source narrative averages conflict with Table 1. Only table entries and their explicit minimum/maximum ranges are used.",
+      "Table 2 inference speedups are omitted from the compact two-panel selection; no training-latency or energy claim is substituted."
+    ]
+  }
+}
