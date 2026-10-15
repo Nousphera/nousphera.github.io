@@ -72,3 +72,20 @@ console.log('Paper stories: bounded playback, reveals, pause/resume, manual over
  t.nodes.toggle.click();t.tick(20000);t.tick(27999);assert.equal(t.root.dataset.active,'1');
  t.tick(28001);assert.equal(t.root.dataset.active,'2');
 }
+
+// A visible play button may sit above a diagram that is still below the fold.
+{
+ const t=setup();t.steps[2].click();
+ t.viewport.bounds={top:895,bottom:1500,left:0,right:800};
+ t.nodes.toggle.click();assert.equal(t.frames.size,0);
+ t.viewport.bounds=null;t.event(t.window,'scroll');t.advance(1500);
+ assert.equal(t.frames.size,1,'Remember explicit Play until the selected diagram becomes visible');
+ assert.equal(t.root.dataset.active,'2');
+}
+{
+ const t=setup();t.steps[1].click();
+ t.viewport.bounds={top:895,bottom:1500,left:0,right:800};
+ t.nodes.toggle.click();t.nodes.toggle.click();
+ t.viewport.bounds=null;t.event(t.window,'scroll');t.advance(2000);
+ assert.equal(t.frames.size,0,'A second click cancels queued playback');
+}

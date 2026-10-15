@@ -66,7 +66,7 @@ def tour_markup():
   </div>
   <div class="fl-tour-scene-heading">
     <h3 class="fl-tour-sr-only" data-tour-title>Training stays on each client</h3>
-    <p data-tour-description>Clients learn from local data; the server combines their model updates.</p>
+    <p data-tour-description>Local data → Client updates → Shared model</p>
   </div>
   <div class="fl-tour-viewport">
     <div class="fl-tour-scene fl-tour-network" data-tour-scene="network" role="img" aria-label="A shared server exchanges model updates with three clients. Raw data stay on the clients.">
@@ -96,7 +96,7 @@ def tour_markup():
         <div class="fl-tour-neighbor-set" data-tour-nnc-part="neighbors" data-visible="true">
           <span class="fl-tour-story-arrow" aria-hidden="true">→</span>
           <span class="fl-tour-step-label">3 · Find similar images</span>
-          <strong>5 nearest other local examples</strong>
+          <strong>5 nearest local neighbors</strong>
           <div class="fl-tour-neighbor-images">{neighbors}</div>
           <span class="fl-tour-image-caption">Their stored labels</span>
           <div class="fl-tour-vote" data-tour-nnc-part="vote" data-visible="true"><span>Majority vote</span><strong><b>4 Dog</b><span> / 1 Cat</span></strong></div>
@@ -114,7 +114,7 @@ def tour_markup():
       <div class="fl-tour-local-chip">Client B · embedding-teacher variant</div>
       <div class="fl-tour-akd-story">
         <div class="fl-tour-akd-example">
-          <span class="fl-tour-step-label">1 · Same local example</span>
+          <span class="fl-tour-step-label">1 · Same local sample</span>
           {_dog(accessible=True)}
           <span class="fl-tour-image-caption">Stored label</span>
           <span class="fl-tour-label fl-tour-label-wrong">Cat</span>
@@ -144,7 +144,7 @@ def tour_markup():
       </div>
     </div>
     <div class="fl-tour-scene fl-tour-na" data-tour-scene="na" hidden>
-      <div class="fl-tour-local-chip">NA-FedAvg · equal-size client example</div>
+      <div class="fl-tour-local-chip">NA-FedAvg · Server aggregation</div>
       <div class="fl-tour-na-story">
         <div class="fl-tour-na-warmup">
           <span class="fl-tour-step-label">1 · Warm up normally</span>

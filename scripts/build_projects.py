@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from research_visuals import (validate_insight, diagram_markup, evidence_markup,
                               research_brief, takeaways_markup)
+from paper_experience import STORY_STYLES
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'https://nousphera.github.io'
@@ -111,8 +112,8 @@ def shell(title, description, path, body, p=None):
             extras = f'<link rel="stylesheet" href="{asset_url("assets/paper-experience.css")}"><script src="{asset_url("assets/paper-story.js")}" defer></script>'
         if p['slug'] == 'deltamask':
             extras += f'<link rel="stylesheet" href="{asset_url("assets/deltamask-story.css")}">'
-        if p['slug'] in {'mpsl', 'fedstar', 'fedser'}:
-            extras += f'<link rel="stylesheet" href="{asset_url("assets/connected-story.css")}"><link rel="stylesheet" href="{asset_url("assets/"+p["slug"]+"-story.css")}">'
+        if p['slug'] in STORY_STYLES:
+            extras += f'<link rel="stylesheet" href="{asset_url("assets/connected-story.css")}"><link rel="stylesheet" href="{asset_url("assets/"+STORY_STYLES[p["slug"]]+"-story.css")}">'
         if p['slug'] == 'fedln':
             extras = f'<link rel="stylesheet" href="{asset_url("assets/fedln-content.css")}"><link rel="stylesheet" href="{asset_url("assets/fedln-tour.css")}"><script src="{asset_url("assets/fedln-tour.js")}" defer></script>'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)

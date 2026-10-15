@@ -73,7 +73,7 @@ class PaperExperienceTests(unittest.TestCase):
         s['overview']='<a href="javascript:alert(1)">Test</a>'
         with self.assertRaises(ValueError):validate_story(s)
         s=copy.deepcopy(load_story('fedcompress'))
-        s['steps'][0]['svg']='<svg aria-label="Bad"><image href="https://external.example/a"/></svg>'
+        s['steps'][0]['art' if 'art' in s['steps'][0] else 'svg']='<svg aria-label="Bad"><image href="https://external.example/a"/></svg>'
         with self.assertRaises(ValueError):validate_story(s)
 
 if __name__=='__main__':unittest.main()

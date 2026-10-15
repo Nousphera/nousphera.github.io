@@ -40,3 +40,5 @@
  .connected-story.is-enhanced .story-viewport>figure[hidden] {visibility:visible;}
  .connected-story .story-navigation {display:none;}
 }
+/* Keyboard navigation uses the same visual focus as touch and pointer input. */
+.connected-story .story-steps button[aria-pressed="true"] {font-weight:650;box-shadow:inset 0 -2px 0 var(--accent);}

@@ -11,6 +11,7 @@ illustration, not experimental observations. 'Other' pools the remaining
 Speech Commands classes. U2 is deferred, never assigned a training target.
 """
 from html import escape
+from research_icons import research_icon
 from math import cos, pi
 
 
@@ -26,17 +27,7 @@ THRESHOLD = .7
 
 
 def icon(name):
-    paths = {
-        'server': '<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 6.5h4M12 17.5h4M12 10v4"/>',
-        'client': '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M1 21h22M9 17v4m6-4v4"/>',
-        'arrow': '<path d="M3 12h18m-6-6 6 6-6 6"/>',
-        'check': '<path d="m5 12 4 4L19 6"/>',
-        'pause': '<path d="M8 5v14M16 5v14"/>',
-        'audio': '<path d="M3 10v4m4-8v12m5-15v18m5-15v12m4-8v4"/>',
-        'model': '<rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 1v4m6-4v4M9 19v4m6-4v4M1 9h4m-4 6h4m14-6h4m-4 6h4M9 9h6v6H9Z"/>',
-        'loop': '<path d="M20 8a8 8 0 0 0-14-2L3 9m0-6v6h6m-5 7a8 8 0 0 0 14 2l3-3m0 6v-6h-6"/>',
-    }
-    return f'<svg class="fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths[name]}</svg>'
+    return research_icon({'packet': 'paper', 'audio': 'waveform'}.get(name, name), "fs-icon")
 
 
 def reveal(body, at=0, cls=''):
@@ -108,7 +99,7 @@ def schedule():
     ramp = f'''<div class="fs-schedule" data-schedule="cosine" data-start="0.5" data-end="0.9" data-progress="global-round">
       <div class="fs-schedule-label"><span>Global rounds</span><strong>Cosine threshold</strong></div>
       <div class="fs-curve-map" aria-hidden="true"><svg class="fs-curve" viewBox="-5 0 310 66" preserveAspectRatio="none"><path d="M0 57H300M0 9H300"/><polyline points="{curve}"/></svg><i style="left:1.6129%;top:86.3636%"></i><i class="fs-current-point" style="left:50%;top:50%"></i><i style="left:98.3871%;top:13.6364%"></i></div>
-      <div class="fs-schedule-ticks"><span><small>Early</small><b>50%</b></span><span class="fs-current"><small>Example round</small><b>70%</b></span><span><small>Late</small><b>90%</b></span></div></div>'''
+      <div class="fs-schedule-ticks"><span><small>Early</small><b>50%</b></span><span class="fs-current"><small>Current gate</small><b>70%</b></span><span><small>Late</small><b>90%</b></span></div></div>'''
     contenders = ''.join(f'<div class="fs-contender" {example_attrs(key)}><span>{key}</span><b>{CLIPS[key]["prediction"]}</b><strong>{CLIPS[key]["confidence"] * 100:g}%</strong></div>' for key in ['U1', 'U2'])
     return reveal(ramp, 200) + reveal(f'<div class="fs-gate-focus"><span>THIS ROUND</span><strong>70<span>%</span></strong><small>Minimum confidence</small></div>', 1600) + reveal('<div class="fs-contenders">' + contenders + '</div>', 3000)
 

@@ -23,7 +23,7 @@
 .ms-wire>i {position:absolute;left:43%;top:-4px;height:7px;width:7px;border-radius:50%;background:var(--accent);}
 .ms-direction-back .ms-wire {transform:rotate(180deg);}
 .ms-direction-local .ms-wire>i,.ms-direction-local .ms-wire>.ms-icon {display:none;}
-.ms-scene-body {display:flex;flex-direction:column;gap:20px;min-height:405px;padding-top:22px;}
+.ms-scene-body {display:flex;flex-direction:column;gap:20px;min-height:360px;padding-top:22px;}
 .ms-stage-heading h3 {font-size:clamp(1.16rem,2vw,1.45rem);line-height:1.35;font-weight:600;letter-spacing:-.025em;margin:6px 0 0;}
 .ms-eyebrow {display:block;font-size:.64rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
 .ms-stage-heading>.ms-eyebrow {color:var(--accent);}
@@ -227,3 +227,5 @@
  .ms-art * {animation:none!important;}
  .ms-wire>i {left:43%;opacity:1;}
 }
+
+.ms-client>.ms-icon{width:24px;height:24px;color:currentColor}

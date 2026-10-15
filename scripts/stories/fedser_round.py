@@ -8,6 +8,7 @@ printed Eq. 3 conflicts with its prose: no threshold direction/formula is
 inferred. The 0.70 filter threshold is a separate toy example, not its output.
 """
 from html import escape
+from research_icons import research_icon
 
 
 EMOTIONS = ('neutral', 'happy', 'sad', 'angry')
@@ -22,15 +23,7 @@ CHANNEL_FOCUS = 1
 
 
 def icon(name):
-    paths = {
-        'server': '<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 6.5h4M12 17.5h4M12 10v4"/>',
-        'client': '<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M10 5h4M11 19h2"/>',
-        'arrow': '<path d="M4 12h16m-6-6 6 6-6 6"/>',
-        'check': '<path d="m5 12 4 4L19 6"/>',
-        'pause': '<path d="M9 5v14M15 5v14"/>',
-        'loop': '<path d="M19 8a8 8 0 1 0 1 9M19 3v5h-5"/>',
-    }
-    return f'<svg class="se-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths[name]}</svg>'
+    return research_icon({'packet': 'paper', 'audio': 'waveform', 'weights': 'model'}.get(name, name), "se-icon")
 
 
 def reveal(body, at=0, cls=''):
@@ -124,7 +117,7 @@ def prediction_card(sample_id, probabilities):
 
 
 def confidence():
-    return reveal('<div class="se-example-note"><span>Illustrative probabilities</span><strong>τ<sub>A</sub> = 0.70</strong></div>') + \
+    return reveal('<div class="se-example-note"><span>Confidence gate</span><strong>τ<sub>A</sub> = 0.70</strong></div>') + \
         '<div class="se-predictions">' + ''.join(reveal(prediction_card(sample_id, probabilities), 1100 + index * 2200) for index, (sample_id, probabilities) in enumerate(PREDICTIONS)) + '</div>'
 
 
@@ -158,7 +151,7 @@ _CONTENT = [
      'Client A reweights the same speech features. Time attention highlights columns; frequency attention highlights a row; channel attention highlights the middle feature plane. These qualitative regions illustrate axes, not measured activations or evidence of emotion localization. The three attention maps are multiplied and normalized by softmax, then multiplied elementwise with the original CNN features.'),
     ('Participation', 'Participation → threshold', 'Global progress + Client history → Local threshold', participation, 8500,
      'Global progress and each client participation history inform its confidence threshold. Filled circles indicate participation and empty circles a missed round. Client A and Client B have distinct illustrative histories. No threshold values, direction, or corrected schedule formula are inferred from the conflicting printed equation and prose.'),
-    ('Confidence', 'Confidence → pseudo-label', 'Example · Confident: use · Uncertain: defer', confidence, 10000,
+    ('Confidence', 'Confidence → pseudo-label', 'Confident → Pseudo-label · Uncertain → Defer', confidence, 10000,
      'Illustrative four-emotion probabilities after temperature scaling with T equal to 2. This independent example uses threshold 0.70, not a value calculated from the preceding history. Speech 01 has happy probability 0.84 and becomes a happy pseudo-label. Speech 02 has maximum happy probability 0.46 and supplies no pseudo-label target. These are not empirical results or ground-truth emotions.'),
     ('Local update', 'Two losses → one update', 'Known labels + Accepted pseudo-labels · Joint training', local_update, 9000,
      'Within Client A, a labeled example with known neutral emotion supplies supervised cross-entropy. Accepted Speech 01 supplies happy as a pseudo-label target. The deferred sample is excluded from the pseudo-label loss. Both losses enter the same local update, with beta controlling the unlabeled contribution. This is joint optimization, not two independent model training phases.'),

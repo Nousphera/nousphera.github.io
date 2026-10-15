@@ -1,10 +1,11 @@
-"""One connected DeltaMask round: IEEE BigData manuscript, §III and Algorithms1–2.
+"""One connected DeltaMask round: IEEE BigData manuscript, §III and Algorithm 1.
 
 The eight-position example is internally consistent and contains no measured
 results. Filter reconstruction first shows the normal hit/miss case; the caption
 separately explains approximation. PNG compression preserves the filter bytes.
 """
 from html import escape
+from research_icons import research_icon
 
 REFERENCE = [1, 1, 0, 1, 0, 1, 0, 1]
 LOCAL = [1, 0, 0, 0, 1, 1, 1, 1]
@@ -21,18 +22,7 @@ NEXT_P = [(1 + a + b + c) / 5 for a, b, c in zip(RECONSTRUCTED, CLIENT_B, CLIENT
 
 
 def icon(name):
-    paths = {
-        'server': '<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 6.5h4M12 17.5h4M12 10v4"/>',
-        'client': '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M1 21h22M9 17v4m6-4v4"/>',
-        'lock': '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>',
-        'seed': '<path d="M20 4C9 3 3 7 5 14s15 5 15-10ZM5 20l10-11"/>',
-        'data': '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',
-        'arrow': '<path d="M4 12h16m-6-6 6 6-6 6"/>',
-        'packet': '<path d="M14 2H5v20h14V7Zm0 0v5h5M8 11h8M8 15h8M8 18h4"/>',
-        'filter': '<path d="M3 4h18l-7 8v7l-4 2v-9Z"/>',
-        'check': '<path d="m5 12 4 4L19 6"/>',
-    }
-    return f'<svg class="dm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths[name]}</svg>'
+    return research_icon({'packet': 'paper', 'audio': 'waveform'}.get(name, name), "dm-icon")
 
 
 def reveal(body, at=0, cls=''):
@@ -89,7 +79,7 @@ def packet():
 
 
 def start():
-    return reveal('<div class="dm-badges"><span>'+icon('lock')+'Frozen backbone</span><span>'+icon('seed')+'Shared seed</span></div>') + \
+    return reveal('<div class="dm-badges"><span>'+icon('frozen')+'Frozen backbone</span><span>'+icon('seed')+'Shared seed</span></div>') + \
         '<div class="dm-matrix">' + positions() + probabilities('Global probabilities', GLOBAL_P, 650, 'global') + \
         reveal('<div class="dm-between">Shared-seed sampling ↓</div>', 1500) + \
         bits('Shared reference', REFERENCE, 'reference', at=2300) + '</div>' + \
@@ -97,7 +87,7 @@ def start():
 
 
 def learn():
-    return reveal(f'<div class="dm-training-flow"><span>{icon("data")}Local data</span>{icon("arrow")}<strong>Mask-score learning</strong><span class="dm-frozen">{icon("lock")}Frozen backbone</span></div>') + \
+    return reveal(f'<div class="dm-training-flow"><span>{icon("data")}Local data</span>{icon("arrow")}<strong>Mask-score learning</strong><span class="dm-frozen">{icon("frozen")}Frozen backbone</span></div>') + \
         '<div class="dm-matrix">' + positions() + probabilities('Before training', GLOBAL_P, 550, 'global') + \
         probabilities('After training', LOCAL_P, 1500, 'local') + bits('Local mask sample', LOCAL, 'local', highlights=[2,4,5,7], at=2700) + '</div>' + \
         reveal('<p class="dm-insight"><strong>1</strong> · Weight on <span class="dm-legend-gap"></span><strong>0</strong> · Weight off</p>', 3700)

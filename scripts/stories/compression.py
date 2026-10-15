@@ -7,6 +7,7 @@ from html import escape
 
 from story_art import arrow, group, label, svg
 from stories.deltamask import STEPS as DELTAMASK_STEPS
+from stories.compression_walkthroughs import FEDCOMPRESS_STEPS, FEDCODE_STEPS
 
 
 def _text(x, y, value, small=False, anchor="middle"):
@@ -194,12 +195,7 @@ STORIES = {
             "<strong>Adaptive capacity:</strong> use embedding effective rank to guide the number of shared weight values.",
             "<strong>Vision and audio evidence:</strong> report communication, model size and device inference separately.",
         ],
-        "steps": [
-            _scene("Train weights around shared values", "After a local warm-up, clients combine task learning with a clustering penalty. Many weights share a small set of learned centroids, making the upload compact.", _compress_cluster(), "Schematic scattered local weights become groups sharing three centroids after clustering."),
-            _scene("Averaging can break compression", "Clients learn different centroids and assignments. Standard averaging can create more distinct values than either client used; compact uploads therefore do not ensure a compact download.", _compress_average(), "Illustrative client vectors with two values each average to a global vector with three distinct values."),
-            _scene("Distill a clustered global student", "The aggregated model teaches a clustered student on unlabeled server data. Matching predictions while enforcing clustering restores a compact model for the next download.", _compress_distill(), "An aggregated teacher and clustered student receive unlabeled server data; their output distributions are matched."),
-            _scene("Grow capacity when progress stalls", "Clients compute effective rank from unlabeled embeddings. The server combines these scores and monitors their moving average, increasing cluster capacity when progress stalls.", _compress_capacity(), "Unlabeled embeddings yield a representation score; a schematic plateau triggers additional cluster capacity."),
-        ],
+        "steps": FEDCOMPRESS_STEPS,
         "method": [
             {"title": "Learn task and compression together", "text": "Each client minimizes cross-entropy plus a <strong>weight-clustering penalty</strong>. The local warm-up uses β=0 before enabling clustering with β=1.",
              "formula": _math('<msub><mi>L</mi><mi>k</mi></msub><mo>=</mo><msub><mi>L</mi><mi>ce</mi></msub><mo>+</mo><mi>β</mi><msub><mi>L</mi><mi>wc</mi></msub><mo>(</mo><msub><mi>θ</mi><mi>k</mi></msub><mo>,</mo><mi>μ</mi><mo>,</mo><mi>C</mi><mo>)</mo>', "Client loss equals cross entropy plus beta times the weight clustering penalty."),
@@ -233,12 +229,7 @@ STORIES = {
             "<strong>Nearest-center updates:</strong> reuse stored model structure when receiving codebooks.",
             "<strong>Periodic calibration:</strong> restore weight assignments by occasionally sending centers plus indices.",
         ],
-        "steps": [
-            _scene("Separate values from positions", "A clustered model contains a codebook of shared values and an index for every weight position. FedCode’s additional saving comes from usually omitting that large index map.", _codebook_parts(), "A weight grid is separated into a small codebook of values and a per-position index map; ordinary FedCode rounds send the codebook."),
-            _scene("Map local weights to received centers", "The server sorts and broadcasts its codebook. Each client uses nearest-center binary search to replace local weight values, then trains on its own data.", _codebook_nearest(), "Four local weight values map to their nearest values in a received sorted codebook."),
-            _scene("Update the server from client codebooks", "Clients cluster their trained models and return the centers. The server concatenates those codebooks and replaces global weight values by nearby received centers before preparing the next codebook.", _codebook_server(), "Two client codebooks are concatenated; the server uses their centers to update values in the global weight grid."),
-            _scene("Recalibrate weight positions periodically", "Clusters and assignments can drift. Calibration rounds therefore carry both codebooks and compressed weight indices. On upstream calibration rounds, the server reconstructs client models and applies FedAvg.", _codebook_calibrate(), "Ordinary codebook rounds reuse local weight positions; periodic calibration sends codebook plus indices to reconstruct model positions."),
-        ],
+        "steps": FEDCODE_STEPS,
         "method": [
             {"title": "Factor the compressed model", "text": "With P weights, K centers and b bits per center, ordinary clustering still sends <strong>one index per weight</strong>. FedCode targets that repeated index cost.",
              "formula": _math('<mo>|</mo><msup><mi>M</mi><mo>′</mo></msup><mo>|</mo><mo>=</mo><mi>K</mi><mi>b</mi><mo>+</mo><mi>P</mi><mo>⌈</mo><msub><mi>log</mi><mn>2</mn></msub><mi>K</mi><mo>⌉</mo>', "Clustered model bits equal K times b plus P times the ceiling of log base two K."),
@@ -298,10 +289,3 @@ STORIES = {
         "scope": ["Accepted IEEE BigData manuscript; image classification across eight datasets and five pretrained backbones.", "The 0.09 bpp headline is a lowest reported setting, not the mean across tasks; fine-tuning targets the same last five blocks."],
     },
 }
-
-for _slug, _titles in {
-    "fedcompress": ["Cluster weights", "Average models", "Distill and compress", "Adjust capacity"],
-    "fedcode": ["Values and positions", "Map local weights", "Combine codebooks", "Recalibrate periodically"],
-}.items():
-    for _step, _short_title in zip(STORIES[_slug]["steps"], _titles):
-        _step["short_title"] = _short_title

@@ -54,7 +54,10 @@
       "task",
       "task-vector",
       "align",
-      "target"
+      "target",
+      "gradient",
+      "centroid",
+      "seed"
     ],
     "Efficiency & protection": [
       "compress",
@@ -86,7 +89,10 @@
       "book",
       "paper",
       "code",
-      "citation"
+      "citation",
+      "arrow",
+      "pause",
+      "loop"
     ]
   },
   "icons": [
@@ -393,6 +399,30 @@
     {
       "id": "citation",
       "file": "/assets/research/icons/citation.svg"
+    },
+    {
+      "id": "arrow",
+      "file": "/assets/research/icons/arrow.svg"
+    },
+    {
+      "id": "pause",
+      "file": "/assets/research/icons/pause.svg"
+    },
+    {
+      "id": "loop",
+      "file": "/assets/research/icons/loop.svg"
+    },
+    {
+      "id": "seed",
+      "file": "/assets/research/icons/seed.svg"
+    },
+    {
+      "id": "gradient",
+      "file": "/assets/research/icons/gradient.svg"
+    },
+    {
+      "id": "centroid",
+      "file": "/assets/research/icons/centroid.svg"
     }
   ]
 }

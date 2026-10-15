@@ -343,3 +343,6 @@
   .fl-tour .fl-tour-controls,.fl-tour .fl-tour-toggle,.fl-tour .fl-tour-status { display:none!important; }
   .fl-tour.is-enhanced .fl-tour-fallback { display:block; }
 }
+
+/* Keyword captions stay readable while the visual changes underneath. */
+.fl-tour-scene-heading [data-tour-description]{font-weight:550;letter-spacing:.005em;color:var(--text);text-wrap:balance}

@@ -39,7 +39,7 @@
     function cancelTimer() { if (timer !== null) window.clearTimeout(timer); timer = null; }
     function updateControls() {
       root.dataset.running = String(playing);
-      const label = playing ? 'Pause' : complete ? 'Replay overview' : selected ? 'Play from here' : elapsed>0 ? 'Resume' : 'Play overview';
+      const label = playing || resume ? 'Pause' : complete ? 'Replay overview' : selected ? 'Play from here' : elapsed>0 ? 'Resume' : 'Play overview';
       toggleLabel.textContent = label;
       toggle.setAttribute('aria-label', label + (playing ? ' overview' : ''));
     }
@@ -95,8 +95,10 @@
     function play() {
       if (playing || motion.matches) return;
       cancelTimer(); pending=false; resume=false;
-      if (!visible()) return;
       if (complete) { elapsed=0; complete=false; active=-1; }
+      // The controls can be visible before the artwork. Preserve the request
+      // without running unseen frames or scrolling the reader's page.
+      if (!visible()) { resume=true; updateControls(); return; }
       selected=false; playing=true; last=null; updateControls(); render();
       frame=window.requestAnimationFrame(tick);
     }
@@ -127,7 +129,10 @@
       });
       q('[data-story-close]').addEventListener('click',() => dialog.close());
     }
-    toggle.addEventListener('click',() => { takeControl(); if (playing) pause(); else play(); });
+    toggle.addEventListener('click',() => {
+      const shouldPause=playing||resume;
+      takeControl(); if (shouldPause) pause(); else play();
+    });
     function select(index) {
       if (index<0 || index>=panels.length) return;
       takeControl();pause();elapsed=starts[index];complete=false;selected=true;

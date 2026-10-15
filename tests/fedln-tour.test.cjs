@@ -214,3 +214,17 @@ for (const [out,back] of [['blur','focus'],['pagehide','pageshow']]) {
  assert.equal(t.frames.size,1);
 }
 console.log('PASS: delayed visible autoplay, camera focus, three progressive explanations, selected-method playback, pause/resume, alternatives, one-shot replay, manual views, visibility lifecycle, reduced motion.');
+{
+ const t=setup();t.stages[0].click();
+ t.viewport.bounds={top:995,bottom:1600,left:10,right:900};
+ t.nodes.toggle.click();assert.equal(t.frames.size,0);
+ t.viewport.bounds=null;t.event(t.window,'scroll');t.advance(1500);
+ assert.equal(t.frames.size,1,'Remember explicit Play until the selected method is visible');
+}
+{
+ const t=setup();t.stages[0].click();
+ t.viewport.bounds={top:995,bottom:1600,left:10,right:900};
+ t.nodes.toggle.click();t.nodes.toggle.click();
+ t.viewport.bounds=null;t.event(t.window,'scroll');t.advance(2000);
+ assert.equal(t.frames.size,0,'Cancel an explicit queued play request');
+}

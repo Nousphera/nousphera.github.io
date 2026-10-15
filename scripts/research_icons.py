@@ -83,13 +83,19 @@ ICONS = {
 'paper': path('M14 2H4v20h16V8Zm0 0v6h6M8 13h8M8 17h6'),
 'code': path('m8 6-6 6 6 6m8-12 6 6-6 6m-3-14-2 16'),
 'citation': rect(3,3,18,18)+path('M7 9h3v4H7Zm7 0h3v4h-3ZM10 13l-2 3m9-3-2 3'),
+'arrow': path('M3 12h18m-6-6 6 6-6 6'),
+'pause': path('M8 5v14M16 5v14'),
+'loop': path('M20 8A8 8 0 0 0 6 6L3 9m0-6v6h6m-5 7a8 8 0 0 0 14 2l3-3m0 6v-6h-6'),
+'seed': path('M20 4C9 3 3 7 5 14s15 5 15-10ZM5 20 15 9'),
+'gradient': path('M3 5h5l4 7h8M15 7l5 5-5 5M3 19h7'),
+'centroid': circle(12,12,3)+circle(4,5,1)+circle(20,5,1)+circle(6,21,1)+circle(21,18,1)+path('m5 6 5 4m8-4-4 4M7 19l3-5m9 3-5-3'),
 }
 GROUPS = {
 'Data & modalities': ['data','database','labeled','unlabeled','noisy-labels','image','audio','waveform','text','video','sensor','tokens','globe','language','speaker','emotion'],
 'Devices & systems': ['client','clients','server','cloud','edge','chip','gpu','memory','network','upload','download','exchange','aggregate','split','merge'],
-'Models & learning': ['model','layers','encoder','decoder','autoencoder','transformer','embedding','teacher','student','distill','frozen','train','adapt','task','task-vector','align','target'],
+'Models & learning': ['model','layers','encoder','decoder','autoencoder','transformer','embedding','teacher','student','distill','frozen','train','adapt','task','task-vector','align','target','gradient','centroid','seed'],
 'Efficiency & protection': ['compress','codebook','cluster','mask','filter','privacy','shield','lock','key','encrypt','unlearn','fingerprint','attack','trigger','scale','speed','energy'],
-'Evidence & navigation': ['chart','table','compare','accuracy','check','warning','search','book','paper','code','citation'],
+'Evidence & navigation': ['chart','table','compare','accuracy','check','warning','search','book','paper','code','citation','arrow','pause','loop'],
 }
 
 def research_icon(name, css_class='research-icon'):

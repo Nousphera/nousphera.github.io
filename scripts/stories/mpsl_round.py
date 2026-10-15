@@ -9,19 +9,11 @@ are illustrative samples, not measured predictions or batch-size examples.
 Post-training model construction (§3.3) is outside this training-step story.
 """
 from html import escape
+from research_icons import research_icon
 
 
 def icon(name):
-    paths = {
-        'client': '<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M1 21h22M9 17v4m6-4v4"/>',
-        'server': '<rect x="4" y="3" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="7" rx="2"/><path d="M8 6.5h.01M8 17.5h.01M12 6.5h4M12 17.5h4M12 10v4"/>',
-        'arrow': '<path d="M3 12h18m-6-6 6 6-6 6"/>',
-        'image': '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-6 4 4 3-4 4 6"/>',
-        'text': '<path d="M4 5h16M12 5v15M8 20h8"/>',
-        'loop': '<path d="M20 8a8 8 0 0 0-14-3L3 8m0-5v5h5M4 16a8 8 0 0 0 14 3l3-3m0 5v-5h-5"/>',
-        'layers': '<path d="m12 3 10 5-10 5L2 8Zm-9 9 9 5 9-5M3 16l9 5 9-5"/>',
-    }
-    return f'<svg class="ms-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths[name]}</svg>'
+    return research_icon({'packet': 'paper', 'audio': 'waveform'}.get(name, name), "ms-icon")
 
 
 def reveal(body, at=0, cls=''):
@@ -56,7 +48,7 @@ def network(index):
     server_active = index in (2, 4)
     clients = ''.join(
         f'<div class="ms-endpoint ms-client{" ms-active" if client_active else ""}" data-ms-client="{client}">'
-        f'{tag(client)}<div><strong>Client {client}</strong><small><span data-local-only="inputs">Inputs</span> · '
+        f'{icon("client")}<div><strong>Client {client}</strong><small><span data-local-only="inputs">Inputs</span> · '
         f'<span data-local-only="labels">y<sub>{client}</sub> = {count}</span></small></div></div>'
         for client, count in [('A', 2), ('B', 3)])
     return f'''<div class="ms-network ms-direction-{direction}" data-ms-network="true" data-active-role="{'clients' if client_active else 'server'}">

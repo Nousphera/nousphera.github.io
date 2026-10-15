@@ -1,11 +1,19 @@
 # Paper walkthroughs
 
-The thirteen paper records in these modules complement FedLN's dedicated walkthrough. Each exports `STORIES`, keyed by the public project slug. Build pages with `python3 scripts/build_projects.py`.
+The thirteen records in these modules complement FedLN’s dedicated tour. Each group exports `STORIES`, keyed by the public project slug. Build with `python3 scripts/build_projects.py`.
 
-Each story includes a short overview, three contributions, three to five illustrated steps, technical method cards, and takeaways. Steps have a compact `short_title` for controls, a full title/caption, and a self-contained accessible SVG. `story_art.py` provides theme-aware drawing primitives; custom artwork explains each paper's actual operations.
+## Visual structure
 
-Use `sa-accent`, `sa-secondary`, `sa-muted` and `sa-warn` instead of fixed colors. Artwork uses a 600 × 300 viewBox and readable labels. Wrap progressive elements in `data-reveal` groups with times below 5000 ms. A scene lasts six seconds; manual selection and reduced-motion mode reveal its complete diagram. No JavaScript is required to read the scenes. The shared controller pauses offscreen and respects manual control.
+Each method has a connected sequence of five or six stages. Keep the relevant clients, server, inputs, and model identities consistent across the sequence. Non-federated methods use their actual training and inference roles. Use compact keyword labels, a clear visual hierarchy, and the shared vector vocabulary in `research_icons.py`.
 
-Prose permits only `strong`, `em`, `sub`, `sup`, `code`, and `br` markup. Equations use native MathML. Keep numerical evidence in the audited `data/insights` tables; the renderer selects explicit columns and retains exact values, uncertainty, missing cells, units, and source links. Never turn a schematic into a claimed measurement or mix publication versions.
+Each step supplies `short_title`, `title`, `caption`, `art`, `title_in_art`, and `duration_ms`. Artwork is a self-contained, accessible HTML/SVG group. Responsive grids reflow on phones; colors use theme variables. Colors and patterns must track the same values, modalities, and roles throughout a method.
 
-Validate with `python3 -m unittest discover -s tests` and `node --test tests/*.test.cjs`. Check every new scene at phone width in both themes, including text bounds and enlarged-diagram controls.
+## Playback and accessibility
+
+Use `data-reveal` for causal disclosure. Every part must appear at least one second before the stage ends. Stage durations range from 5–20 seconds. Motion begins after visible entry, pauses offscreen or in inactive tabs, and respects manual control. Concealed parts wait before animating. Manual selection and reduced-motion preferences show the complete stage; static fallback remains readable without JavaScript.
+
+Keep visible text focused on operations, roles, and essential settings. Put detailed descriptions and explanatory-number context in accessible descriptions. Preserve scientific boundaries in the Method section and source notes. Do not turn explanatory values into reported measurements.
+
+## Validation
+
+Run `python3 -m unittest discover -s tests` and `node --test tests/*.test.cjs`. Check arithmetic and data boundaries, role and transfer direction, icon meaning, stage labels, stable heights, keyboard controls, reduced motion, expanded diagrams, and all stages at phone/tablet/desktop widths in both themes. Quantitative results remain in the separately audited `data/insights` tables.

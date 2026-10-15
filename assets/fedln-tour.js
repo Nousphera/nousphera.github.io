@@ -2,10 +2,10 @@
 (function () {
   'use strict';
   const SCENES = {
-    network: ['Training stays on each client', 'Clients learn from local data; the server combines their model updates.'],
-    nnc: ['Nearest Neighbor Correction', 'Image features find local neighbors; their labels vote to correct the stored label.'],
-    akd: ['Adaptive Knowledge Distillation', 'When client noise is detected, teacher features guide training alongside the original labels.'],
-    na: ['Noise-Aware Federated Averaging', 'Estimate client noise once, then combine updates using data share and estimated label reliability.']
+    network: ['Training stays on each client', 'Local data → Client updates → Shared model'],
+    nnc: ['Nearest Neighbor Correction', 'Local neighbors → Label vote → Corrected label'],
+    akd: ['Adaptive Knowledge Distillation', 'Detected noise → Teacher guidance + Original labels'],
+    na: ['Noise-Aware Federated Averaging', 'Estimate noise once → Weight future updates']
   };
   // Returning to the network separates the three alternative interventions.
   const TIMELINE = [
@@ -22,26 +22,26 @@
   const AUTOPLAY_DELAY = 1500;
   const TOTAL = TIMELINE.reduce((sum, step) => sum + step.duration, 0);
   const NNC_PHASES = [
-    {name: 'sample', at: 0, text: 'This dog image has the wrong stored label: “Cat”.'},
-    {name: 'embedding', at: 1800, text: 'A frozen encoder maps the image content into an embedding.'},
-    {name: 'neighbors', at: 3600, text: 'Find five nearest other examples in this client’s embedding space.'},
-    {name: 'vote', at: 6000, text: 'Their stored labels vote: four “Dog”, one “Cat”.'},
-    {name: 'corrected', at: 7800, text: 'Change the stored label to “Dog”. The image stays the same.'}
+    {name: 'sample', at: 0, text: 'Dog image · Stored label: Cat'},
+    {name: 'embedding', at: 1800, text: 'Frozen encoder → Image embedding'},
+    {name: 'neighbors', at: 3600, text: 'Same client · Five nearest neighbors'},
+    {name: 'vote', at: 6000, text: 'Label vote · 4 Dog / 1 Cat'},
+    {name: 'corrected', at: 7800, text: 'Same image · Corrected label: Dog'}
   ];
   const METHOD_LABELS = {nnc:'NNC', akd:'AKD', na:'NA-FedAvg'};
   const PHASES = {
     nnc: NNC_PHASES,
     akd: [
-      {name:'example', at:0, text:'The image and its stored label feed local training. The label may be wrong.'},
-      {name:'teacher', at:1800, text:'A frozen teacher extracts features from the same image, without using its label.'},
-      {name:'guidance', at:4200, text:'Detected client noise activates feature matching alongside the original-label signal.'},
-      {name:'update', at:7000, text:'Both signals update the local model. The stored label stays unchanged.'}
+      {name:'example', at:0, text:'Local image + Stored label'},
+      {name:'teacher', at:1800, text:'Same image → Frozen teacher → Features'},
+      {name:'guidance', at:4200, text:'Detected noise → Feature matching + Label supervision'},
+      {name:'update', at:7000, text:'Joint update · Labels unchanged'}
     ],
     na: [
-      {name:'warmup', at:0, text:'Start with ordinary federated training: clients train locally and send model updates.'},
-      {name:'scores', at:1800, text:'In one round, clients score local examples with both the shared and local models.'},
-      {name:'noise', at:4200, text:'The server uses the returned scores to estimate each client’s label noise.'},
-      {name:'aggregation', at:7000, text:'Weight each update by data share × estimated reliability. Reuse these noise estimates in later rounds.'}
+      {name:'warmup', at:0, text:'Warm-up · Local training → Model updates'},
+      {name:'scores', at:1800, text:'One scoring round · Shared model + Local model'},
+      {name:'noise', at:4200, text:'Client scores → Server noise estimates'},
+      {name:'aggregation', at:7000, text:'Data share × Reliability → Weighted aggregation'}
     ]
   };
 
@@ -96,8 +96,8 @@
       root.dataset.running = String(playing);
       const subject = selectedMethod ? METHOD_LABELS[selectedMethod] : 'overview';
       const continuing = elapsed > playbackStart && !manual;
-      const verb = playing ? 'Pause' : finished ? 'Replay' : continuing ? 'Resume' : 'Play';
-      const label = playing || finished || continuing ? verb : selectedMethod ? 'Play animation' : 'Play overview';
+      const verb = playing || resumeWhenVisible ? 'Pause' : finished ? 'Replay' : continuing ? 'Resume' : 'Play';
+      const label = playing || resumeWhenVisible || finished || continuing ? verb : selectedMethod ? 'Play animation' : 'Play overview';
       toggleLabel.textContent = label;
       toggle.setAttribute('aria-label', verb + ' ' + subject + (selectedMethod ? ' animation' : '') +
         (verb === 'Play' ? ', ' + (playbackEnd - playbackStart) / 1000 + ' seconds' : ''));
@@ -146,7 +146,7 @@
       });
       stages.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.tourStage === name)));
       title.textContent = SCENES[name][0];
-      description.textContent = returning ? 'Return to the network to explore a different intervention.' : SCENES[name][1];
+      description.textContent = returning ? 'Shared network · Alternative intervention' : SCENES[name][1];
       if (PHASES[name]) showMethod(name, manual || motion.matches ? null : 0);
       if (announce && !camera) status.textContent = returning ? 'Returning to the network. The methods are alternatives.' : SCENES[name][0] + '. ' + SCENES[name][1];
     }
@@ -221,7 +221,11 @@
       autoplayPending = false;
       resumeWhenVisible = false;
       if (finished || manual) reset(selectedMethod);
-      if (!isVisible()) { pause('The overview is paused while out of view.'); return; }
+      if (!isVisible()) {
+        resumeWhenVisible = true;
+        pause('Playback will begin when the diagram is in view.');
+        return;
+      }
       playing = true;
       lastTime = null;
       root.classList.add('is-touring');
@@ -232,8 +236,9 @@
     }
 
     toggle.addEventListener('click', () => {
+      const shouldPause = playing || resumeWhenVisible;
       takeControl();
-      if (playing) pause('Overview paused. Resume or select a method.');
+      if (shouldPause) pause('Overview paused. Resume or select a method.');
       else play();
     });
     stages.forEach(button => button.addEventListener('click', () => {

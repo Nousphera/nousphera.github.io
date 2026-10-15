@@ -9,8 +9,24 @@ from research_visuals import numeric_value, table_markup
 GROUPS = ('compression', 'audio', 'foundations', 'privacy')
 CONNECTED_STORIES = {
     'mpsl': 'One training step · Late fusion',
-    'fedstar': 'One federated round · Audio example',
-    'fedser': 'One federated round · Speech example',
+    'fedstar': 'One federated round · Audio',
+    'fedser': 'One federated round · Speech',
+    'fedcompress': 'Cluster · Distill · Adapt',
+    'fedcode': 'Codebooks across clients and server',
+    'ae-psl': 'Parallel split learning · Encoded features',
+    'matu': 'Shared updates · Task-specific models',
+    'enccluster': 'Compact updates · Encrypted aggregation',
+    'efu': 'Encrypted federated unlearning',
+    'fiba': 'Local poisoning · Global impact',
+    'plix': 'Learn once · Recognize new words',
+    'da-mldg': 'Learn across source domains',
+}
+STORY_STYLES = {
+    **{slug: slug for slug in ('mpsl', 'fedstar', 'fedser')},
+    **{slug: 'compression' for slug in ('fedcompress', 'fedcode')},
+    **{slug: 'foundation' for slug in ('ae-psl', 'matu')},
+    **{slug: 'privacy' for slug in ('enccluster', 'efu', 'fiba')},
+    **{slug: 'audio-method' for slug in ('plix', 'da-mldg')},
 }
 
 
@@ -74,7 +90,7 @@ def tour_markup(p, s):
     is_delta = p['slug'] == 'deltamask'
     connected = p['slug'] in CONNECTED_STORIES
     kind = f' data-story-kind="{esc(p["slug"])}"' if is_delta or connected else ''
-    heading = CONNECTED_STORIES.get(p['slug'], 'One FL round · 8-position example' if is_delta else 'Inside '+p['name'])
+    heading = CONNECTED_STORIES.get(p['slug'], 'One federated round · Mask updates' if is_delta else 'Inside '+p['name'])
     navigation_class = 'dm-navigation' if is_delta else 'story-navigation'
     navigation = f'<div class="{navigation_class}" data-story-navigation hidden><button type="button" data-story-prev aria-label="Previous animation step">← Previous</button><span data-story-counter>1 / {len(s["steps"])}</span><button type="button" data-story-next aria-label="Next animation step">Next →</button></div>' if is_delta or connected else ''
     css_class = 'paper-story connected-story' if connected else 'paper-story'

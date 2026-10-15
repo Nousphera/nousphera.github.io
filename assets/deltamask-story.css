@@ -32,7 +32,7 @@
 .dm-direction-up .dm-wire {transform:rotate(180deg);}
 .dm-direction-up .dm-wire-packet>.dm-icon {transform:rotate(180deg);}
 .dm-direction-still .dm-wire>i,.dm-direction-still .dm-wire>.dm-icon {display:none;}
-[data-running="true"] .dm-wire>i {animation-play-state:running;}
+[data-running="true"] [data-story-scene]:not([hidden]) .dm-wire>i {animation-play-state:running;}
 .dm-peers {display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:.65rem;color:var(--muted);}
 .dm-peers>span {display:flex;gap:5px;align-items:center;}
 .dm-peers .dm-icon {width:16px;height:16px;}
