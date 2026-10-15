@@ -1,6 +1,6 @@
 const fs=require('fs');const path=require('path');const vm=require('vm');const assert=require('assert/strict');
 const source=fs.readFileSync(path.join(__dirname,'../assets/paper-story.js'),'utf8');
-function setup({reduced=false,hidden=false}={}){
+function setup({reduced=false,hidden=false,durations=[]}={}){
  class El{
   constructor(dataset={}){this.dataset=dataset;this.attrs={};this.events={};this.hidden=false;this.isConnected=true;this.textContent='Step';this.style={setProperty(k,v){this[k]=v;}};this.classList={add(){}};}
   setAttribute(k,v){this.attrs[k]=v;}addEventListener(k,cb){(this.events[k]||=[]).push(cb);}click(){(this.events.click||[]).forEach(cb=>cb());}
@@ -8,9 +8,9 @@ function setup({reduced=false,hidden=false}={}){
   closest(){return this.parentElement?.hidden?this.parentElement:null;}
  }
  const root=new El();root.parentElement=new El();root.parentElement.hidden=hidden;
- const nodes=Object.fromEntries(['controls','toggle','toggle-label','progress','status'].map(k=>[k,new El()]));
+ const nodes=Object.fromEntries(['controls','toggle','toggle-label','progress','status','prev','next','counter'].map(k=>[k,new El()]));
  const viewport=new El();const parts=Array.from({length:4},()=>[new El({reveal:'0'}),new El({reveal:'1800'}),new El({reveal:'3600'})]);
- const panels=parts.map((p,i)=>{const e=new El({storyScene:String(i)});e.querySelectorAll=()=>p;return e;});
+ const panels=parts.map((p,i)=>{const e=new El({storyScene:String(i),storyDuration:durations[i]});e.querySelectorAll=()=>p;return e;});
  const steps=panels.map((p,i)=>new El({storyStep:String(i)}));
  root.querySelector=s=>s==='.story-viewport'?viewport:nodes[s.slice(12,-1)];
  root.querySelectorAll=s=>s==='[data-story-scene]'?panels:steps;
@@ -61,3 +61,14 @@ for(const reason of ['scroll','tab','hidden','blur','pagehide']){
  const t=setup();t.viewport.bounds={top:895,bottom:1300,left:0,right:800};t.event(t.window,'scroll');t.advance(5000);assert.equal(t.frames.size,0,'A sliver of artwork must not trigger autoplay');
 }
 console.log('Paper stories: bounded playback, reveals, pause/resume, manual override, visibility, reduced motion passed.');
+
+{
+ const t=setup({durations:[7000,8000,11000,6000]});t.advance(1500);t.tick(0);t.tick(6500);
+ assert.equal(t.root.dataset.active,'0','Longer scenes must not cut off at the old six-second boundary');
+ t.tick(7500);assert.equal(t.root.dataset.active,'1');
+ t.nodes.next.click();assert.equal(t.root.dataset.active,'2');assert.equal(t.frames.size,0);
+ assert.equal(t.nodes.counter.textContent,'3 / 4');
+ t.nodes.prev.click();assert.equal(t.root.dataset.active,'1');
+ t.nodes.toggle.click();t.tick(20000);t.tick(27999);assert.equal(t.root.dataset.active,'1');
+ t.tick(28001);assert.equal(t.root.dataset.active,'2');
+}

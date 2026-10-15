@@ -38,17 +38,19 @@ def validate_story(s):
         if not s.get(key): raise ValueError('Story missing ' + key)
     inline(s['overview'])
     for value in s['contributions'] + s['takeaways'] + s.get('scope',[]) + s.get('result_leads',[]): inline(value)
-    if not 3 <= len(s['steps']) <= 5: raise ValueError('Story needs 3–5 steps')
+    if not 3 <= len(s['steps']) <= 6: raise ValueError('Story needs 3–6 steps')
     for step in s['steps']:
         if not step.get('title') or not step.get('caption'): raise ValueError('Story step needs a title and caption')
-        svg = ET.fromstring(step['svg'])
-        if svg.tag.split('}')[-1] != 'svg' or not svg.get('aria-label'):
-            raise ValueError('Story SVG needs an accessible description')
+        svg = ET.fromstring(step.get('art', step.get('svg', '')))
+        if svg.tag.split('}')[-1] not in {'svg','div'} or not svg.get('aria-label'):
+            raise ValueError('Story artwork needs an accessible description')
+        duration = step.get('duration_ms', 6000)
+        if not 5000 <= duration <= 20000: raise ValueError('Invalid scene duration')
         for element in svg.iter():
-            if element.tag.split('}')[-1] in {'script','foreignObject','image'}:
+            if element.tag.split('}')[-1] in {'script','foreignObject','image','iframe','object','embed','style','link','img'}:
                 raise ValueError('Story artwork must be self-contained vector markup')
             if any(k.startswith('on') for k in element.attrib): raise ValueError('Inline event handler')
-            if 'data-reveal' in element.attrib and not 0 <= int(element.get('data-reveal')) < 5000:
+            if 'data-reveal' in element.attrib and not 0 <= int(element.get('data-reveal')) < duration - 1000:
                 raise ValueError('Artwork must be fully visible before a scene ends')
     for card in s['method']:
         inline(card['text'])
@@ -60,11 +62,18 @@ def validate_story(s):
 
 def tour_markup(p, s):
     buttons = ''.join(f'<button type="button" data-story-step="{i}" aria-pressed="{str(i==0).lower()}"><span>{i+1:02d}</span>{esc(step.get("short_title",step["title"]))}</button>' for i,step in enumerate(s['steps']))
-    scenes = ''.join(f'<figure data-story-scene="{i}"><div class="story-picture">{step["svg"]}</div><figcaption><strong>{esc(step["title"])}</strong><span>{esc(step["caption"])}</span></figcaption></figure>' for i,step in enumerate(s['steps']))
-    return f'''<section class="paper-story" data-paper-story data-running="false" aria-label="{esc(p['name'])} visual walkthrough">
-<header class="story-head"><span class="px-kicker">Inside {esc(p['name'])}</span><button type="button" class="story-toggle" data-story-toggle hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path class="story-play-icon" d="m6 3 11 7-11 7Z"/><path class="story-pause-icon" d="M4 3h4v14H4zM12 3h4v14h-4z"/></svg><span data-story-toggle-label>Play overview</span></button></header>
+    scenes = ''
+    for i,step in enumerate(s['steps']):
+        title = '' if step.get('title_in_art') else f'<strong>{esc(step["title"])}</strong>'
+        scenes += f'<figure data-story-scene="{i}" data-story-duration="{step.get("duration_ms",6000)}"><div class="story-picture">{step.get("art", step.get("svg", ""))}</div><figcaption>{title}<span>{esc(step["caption"])}</span></figcaption></figure>'
+    is_delta = p['slug'] == 'deltamask'
+    kind = ' data-story-kind="deltamask"' if is_delta else ''
+    heading = 'One FL round · 8-position example' if is_delta else 'Inside '+p['name']
+    navigation = '<div class="dm-navigation" data-story-navigation hidden><button type="button" data-story-prev aria-label="Previous animation step">← Previous</button><span data-story-counter>1 / 6</span><button type="button" data-story-next aria-label="Next animation step">Next →</button></div>' if is_delta else ''
+    return f'''<section class="paper-story"{kind} data-paper-story data-running="false" aria-label="{esc(p['name'])} visual walkthrough">
+<header class="story-head"><span class="px-kicker">{esc(heading)}</span><button type="button" class="story-toggle" data-story-toggle hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path class="story-play-icon" d="m6 3 11 7-11 7Z"/><path class="story-pause-icon" d="M4 3h4v14H4zM12 3h4v14h-4z"/></svg><span data-story-toggle-label>Play overview</span></button></header>
 <nav class="story-steps" aria-label="Explore the method" data-story-controls hidden>{buttons}</nav><div class="story-progress" aria-hidden="true"><span data-story-progress></span></div>
-<div class="story-viewport">{scenes}<button type="button" class="story-expand" data-story-expand hidden aria-label="Expand current diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>Expand diagram</button></div><span class="sr-only" role="status" data-story-status></span><dialog class="story-dialog" data-story-dialog aria-label="{esc(p['name'])} enlarged diagram"><header><span>Method diagram</span><button type="button" data-story-close aria-label="Close enlarged diagram">Close ×</button></header><p class="story-dialog-hint">Swipe across the diagram</p><div class="story-dialog-scroll" data-story-expanded tabindex="0" aria-label="Enlarged diagram; scroll horizontally on small screens"></div><p data-story-expanded-caption></p></dialog></section>'''
+<div class="story-viewport">{scenes}<button type="button" class="story-expand" data-story-expand hidden aria-label="Expand current diagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>Expand diagram</button></div>{navigation}<span class="sr-only" role="status" data-story-status></span><dialog class="story-dialog" data-story-dialog aria-label="{esc(p['name'])} enlarged diagram"><header><span>Method diagram</span><button type="button" data-story-close aria-label="Close enlarged diagram">Close ×</button></header><p class="story-dialog-hint">Swipe across the diagram</p><div class="story-dialog-scroll" data-story-expanded tabindex="0" aria-label="Enlarged diagram; scroll horizontally on small screens"></div><p data-story-expanded-caption></p></dialog></section>'''
 
 
 def overview_markup(p, s):

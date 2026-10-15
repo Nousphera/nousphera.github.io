@@ -6,6 +6,7 @@ DeltaMask IEEE BigData accepted manuscript, TU/e 2024337517.pdf.
 from html import escape
 
 from story_art import arrow, group, label, svg
+from stories.deltamask import STEPS as DELTAMASK_STEPS
 
 
 def _text(x, y, value, small=False, anchor="middle"):
@@ -184,84 +185,6 @@ def _codebook_calibrate():
     return art
 
 
-_REFERENCE = [1,1,0,1,0,1,0,1]
-_LOCAL = [1,0,0,0,1,1,1,1]
-
-
-def _mask_freeze():
-    base = ["accent"]*9
-    mask = [1,0,1,0,1,1,1,0,1]
-    tones = ["accent" if b else "muted" for b in mask]
-    art = group(_text(106,36,"Fixed weights") + _grid(46,84,base,3,34,7) +
-                _text(106,253,"Pretrained",True))
-    art += group(_text(207,148,"⊙") + _text(300,36,"Learned mask") +
-                 _cells(240,84,mask,34,7,3,tones) +
-                 _text(300,253,"Sampled bits",True),900)
-    art += group(_text(398,148,"=") + _text(493,36,"Subnetwork") +
-                 _grid(433,84,tones,3,34,7) +
-                 _text(493,253,"Selected weights",True),1800)
-    art += group(_text(300,285,"Train mask scores; keep the backbone weights fixed",True),2800)
-    return art
-
-
-def _mask_difference():
-    changes = [a ^ b for a,b in zip(_REFERENCE,_LOCAL)]
-    art = group(_text(300,29,"Compare with the shared seeded sample") +
-                _text(78,87,"Shared",True) + _cells(175,59,_REFERENCE,39,6))
-    art += group(_text(78,159,"Local",True) + _cells(175,131,_LOCAL,39,6),900)
-    art += group(_text(78,231,"Changed",True) +
-                 _cells(175,203,changes,39,6,tones=["accent" if b else "muted" for b in changes]),1800)
-    art += group(_text(300,282,"Only differing positions enter the update set",True),2800)
-    return art
-
-
-def _mask_rank():
-    art = group(_text(300,34,"Rank changed positions by relative entropy") +
-                _text(300,68,"KL compares local and global probabilities",True))
-    for i,(x,position) in enumerate([(90,5),(230,2),(370,7),(510,4)]):
-        tone = "accent" if i < 3 else "muted"
-        art += group(_circle(x,128,29,tone) + _text(x,135,str(position)),600+i*350)
-        if i < 3:
-            art += group(arrow(x+37,128,x+98,128,tone="muted"),800+i*350)
-    art += group(_line("M57 183 V198 H403 V183","accent") +
-                 _text(230,238,"Keep the top-κ subset") +
-                 _text(510,238,"Omit",True),2200)
-    art += group(_text(300,281,"κ controls how many ranked changes are sent",True),3100)
-    return art
-
-
-def _mask_filter():
-    art = group(_text(108,35,"Positions") +
-                "".join(_circle(108,y,22)+_text(108,y+7,str(v)) for y,v in
-                        [(88,5),(151,2),(214,7)]))
-    hashes = ""
-    for path in ["M139 88 Q174 88 197 151","M139 151 H197",
-                 "M139 214 Q174 214 197 151","M197 151 Q220 88 244 82",
-                 "M197 151 Q220 115 244 115","M197 151 Q220 181 244 181",
-                 "M197 151 Q220 214 244 214"]:
-        hashes += _line(path,"accent")
-    art += group(hashes + _text(308,35,"BFuse8 filter") +
-                 _grid(250,70,["accent","secondary","muted","secondary", "muted","accent","accent","muted",
-                               "secondary","accent","muted","accent","accent","muted","secondary","secondary",
-                               "muted","accent","secondary","accent"],4,24,9),900)
-    art += group(arrow(384,151,436,151) + _text(497,35,"DEFLATE") +
-                 _grid(450,104,["muted","secondary","muted","accent"]*4,4,20,5),1900)
-    art += group(_text(300,280,"Approximate membership → lossless byte compression",True),2900)
-    return art
-
-
-def _mask_recover():
-    membership = [0,1,0,0,1,1,1,0]
-    recovered = [a ^ b for a,b in zip(_REFERENCE,membership)]
-    tones = ["warn" if i == 5 else ("accent" if b else "muted") for i,b in enumerate(membership)]
-    art = group(_text(300,28,"Query the filter and flip reference bits") +
-                _text(78,86,"Reference",True) + _cells(175,58,_REFERENCE,39,6))
-    art += group(_text(78,151,"Query",True) + _cells(175,123,membership,39,6,tones=tones),900)
-    art += group(_text(78,216,"Recovered",True) + _cells(175,188,recovered,39,6,tones=tones),1900)
-    art += group(_text(300,257,"Highlighted query: a possible false positive",True) +
-                 _text(300,286,"Bayesian aggregation forms the next probabilities",True),2800)
-    return art
-
 
 STORIES = {
     "fedcompress": {
@@ -347,13 +270,7 @@ STORIES = {
             "<strong>Sparse change encoding:</strong> rank differing positions and compress them with a binary fuse filter.",
             "<strong>Controllable trade-off:</strong> vary retained changes and fingerprint width to balance bitrate and accuracy.",
         ],
-        "steps": [
-            _scene("Learn which pretrained weights to use", "Local training changes mask scores, not pretrained backbone weights. Sampling the mask selects a subnetwork for the task; the experiments mask the last five backbone blocks.", _mask_freeze(), "A frozen weight grid multiplied by a sampled binary mask produces a selected subnetwork."),
-            _scene("Find changes to a shared reference", "A publicly shared seed lets every participant sample the same reference binary mask from global probabilities. Compare the trained local sample with that reference and collect the differing positions.", _mask_difference(), "An illustrative shared reference mask and local mask differ at positions two, four, five and seven; only those positions enter the change set."),
-            _scene("Keep the most informative changes", "Rank differing positions by KL divergence between local and global mask probabilities. Retain a top-κ subset, controlling how much information enters the transmission.", _mask_rank(), "Four schematic changed positions are ranked by relative entropy; three are retained and one is omitted."),
-            _scene("Encode positions as fingerprints", "A four-wise BFuse8 filter stores the selected positions compactly. Its fingerprint array is then losslessly DEFLATE-compressed in a PNG-like representation for upload.", _mask_filter(), "Selected index positions are hashed into a binary fuse fingerprint array, then losslessly compressed for transmission."),
-            _scene("Reconstruct, then aggregate masks", "The server queries the filter and flips reference bits at reported positions. Recovery is approximate: ranking omits some changes and membership queries can return false positives. Bayesian aggregation updates the next global probabilities.", _mask_recover(), "Membership queries flip reference bits; an illustrative false positive changes an extra bit before reconstructed masks enter Bayesian aggregation."),
-        ],
+        "steps": DELTAMASK_STEPS,
         "method": [
             {"title": "Optimize a stochastic mask", "text": "Transform unconstrained mask scores with a sigmoid, sample binary activations, and apply them to <strong>fixed pretrained weights</strong>. The classifier first receives one round of linear probing.",
              "formula": _math('<mi>θ</mi><mo>=</mo><mi>sigmoid</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>,</mo><mspace width="0.5em"/><mi>m</mi><mo>∼</mo><mi>Bern</mi><mo>(</mo><mi>θ</mi><mo>)</mo><mo>,</mo><mspace width="0.5em"/><msup><mi>w</mi><mo>′</mo></msup><mo>=</mo><mi>m</mi><mo>⊙</mo><msub><mi>w</mi><mi>init</mi></msub>', "Mask probabilities are sigmoid of scores; a Bernoulli mask multiplies the fixed initial weights."),
@@ -385,7 +302,6 @@ STORIES = {
 for _slug, _titles in {
     "fedcompress": ["Cluster weights", "Average models", "Distill and compress", "Adjust capacity"],
     "fedcode": ["Values and positions", "Map local weights", "Combine codebooks", "Recalibrate periodically"],
-    "deltamask": ["Learn masks", "Find changes", "Rank changes", "Encode positions", "Recover and aggregate"],
 }.items():
     for _step, _short_title in zip(STORIES[_slug]["steps"], _titles):
         _step["short_title"] = _short_title

@@ -17,7 +17,13 @@
     if (!panels.length || panels.length !== steps.length || !toggle || !controls || !viewport) return;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const parts = panels.map(panel => [...panel.querySelectorAll('[data-reveal]')]);
-    const total = STEP_MS * panels.length;
+    const durations = panels.map(panel => {
+      const value=Number(panel.dataset.storyDuration);
+      return Number.isFinite(value) && value>=5000 && value<=20000 ? value : STEP_MS;
+    });
+    const starts=[];
+    const total=durations.reduce((sum,duration) => {starts.push(sum);return sum+duration;},0);
+    const previous=q('[data-story-prev]'), next=q('[data-story-next]'), counter=q('[data-story-counter]');
     let elapsed = 0, last = null, frame = null, timer = null, active = -1;
     let playing = false, complete = false, pending = true, resume = false;
     let intersecting = true, pageActive = true, focused = true, selected = false;
@@ -50,6 +56,9 @@
         root.dataset.active = String(index);
         panels.forEach((panel,i) => { panel.hidden=i!==index; });
         steps.forEach((step,i) => { step.setAttribute('aria-pressed',String(i===index)); });
+        if (previous) previous.disabled=index===0;
+        if (next) next.disabled=index===panels.length-1;
+        if (counter) counter.textContent=(index+1)+' / '+panels.length;
         // Scroll only the horizontal control strip, never the document.
         const button=steps[index];
         if (controls.scrollWidth>controls.clientWidth) {
@@ -63,8 +72,9 @@
       progress.style.transform='scaleX('+Math.min(1,elapsed/total)+')';
     }
     function render() {
-      const index=Math.min(panels.length-1,Math.floor(elapsed/STEP_MS));
-      show(index,elapsed-index*STEP_MS,true);
+      let index=starts.findIndex((start,i) => elapsed<start+durations[i]);
+      if (index===-1) index=panels.length-1;
+      show(index,elapsed-starts[index],true);
     }
     function pause() {
       if (frame!==null) window.cancelAnimationFrame(frame);
@@ -118,10 +128,16 @@
       q('[data-story-close]').addEventListener('click',() => dialog.close());
     }
     toggle.addEventListener('click',() => { takeControl(); if (playing) pause(); else play(); });
-    steps.forEach((button,index) => button.addEventListener('click',() => {
-      takeControl();pause();elapsed=index*STEP_MS;complete=false;selected=true;
+    function select(index) {
+      if (index<0 || index>=panels.length) return;
+      takeControl();pause();elapsed=starts[index];complete=false;selected=true;
       show(index,null,true);updateControls();
-    }));
+    }
+    steps.forEach((button,index) => button.addEventListener('click',() => select(index)));
+    if (previous) previous.addEventListener('click',() => select(active-1));
+    if (next) next.addEventListener('click',() => select(active+1));
+    const navigation=q('[data-story-navigation]');
+    if (navigation) navigation.hidden=false;
     document.addEventListener('visibilitychange',visibilityChanged);
     window.addEventListener('scroll',visibilityChanged,{passive:true});
     window.addEventListener('resize',visibilityChanged,{passive:true});

@@ -24,13 +24,14 @@ class PaperExperienceTests(unittest.TestCase):
                 self.assertEqual(html.count(f'id="{panel}" data-tab-panel'),1,p['slug'])
             self.assertIn(build.esc(p['abstract']),html)
             for step in s['steps']:
-                digest=hashlib.sha256(step['svg'].encode()).hexdigest()
+                art=step.get('art',step.get('svg',''))
+                digest=hashlib.sha256(art.encode()).hexdigest()
                 self.assertNotIn(digest,artwork,'Every scene must explain its own operation')
                 artwork.add(digest);count+=1
-                self.assertIn('data-reveal=',step['svg'])
+                self.assertIn('data-reveal=',art)
                 self.assertTrue(step.get('short_title'),p['slug'])
                 # No hard-coded palette can become illegible after a theme change.
-                self.assertIsNone(re.search(r'(?:fill|stroke)="#[0-9a-fA-F]',step['svg']))
+                self.assertIsNone(re.search(r'(?:fill|stroke)="#[0-9a-fA-F]',art))
         self.assertGreaterEqual(count,39)
 
     def test_negative_changes_use_zero_reference_and_keep_raw_values(self):
