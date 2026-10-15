@@ -1,0 +1,11 @@
+{
+  "version": "Author preprint",
+  "source_url": "https://arxiv.org/pdf/2502.06355",
+  "sha256": "f520ff475d39bbd5645f92c986ab7c8d405763d924a43fa46cd6be23a47a3498",
+  "bytes": 1560647,
+  "abstract": "Multimodal transformers integrate diverse data types like images, audio, and text, advancing tasks such as audio-visual understanding and image-text retrieval; yet their high parameterization limits deployment on resource-constrained edge devices. Split Learning (SL), which partitions models at a designated cut-layer to offload compute-intensive operations to the server, offers a promising approach for distributed training of multimodal transformers, though its application remains underexplored. We present MPSL, a parallel SL approach for computational efficient fine-tuning of multimodal transformers in a distributed manner, while eliminating label sharing, client synchronization, and per-client sub-model management. MPSL employs lightweight client-side tokenizers and a unified modality-agnostic encoder, allowing flexible adaptation to task-specific needs. Our evaluation across 7 multimodal datasets demonstrates that MPSL matches or outperforms Federated Learning, reduces client-side computations by 250x, and achieves superior scalability in communication cost with model growth. Through extensive analysis, we highlight task suitability, trade-offs, and scenarios where MPSL excels, inspiring further exploration.",
+  "arxiv_id": "2502.06355",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "license_label": "CC BY 4.0",
+  "metadata": {}
+}

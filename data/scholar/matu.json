@@ -1,0 +1,12 @@
+{
+  "version": "Author preprint",
+  "source_url": "https://arxiv.org/pdf/2502.06376",
+  "sha256": "44603dc5b2edb079151814d79f82fb9bbcccce1c8a2241e81d57e2eded7410f4",
+  "bytes": 2243934,
+  "abstract": "Federated Learning (FL) traditionally assumes homogeneous client tasks; however, in real-world scenarios, clients often specialize in diverse tasks, introducing task heterogeneity. To address this challenge, Many-Task FL (MaT-FL) has emerged, enabling clients to collaborate effectively despite task diversity. Existing MaT-FL approaches rely on client grouping or personalized layers, requiring the server to manage individual models and failing to account for clients handling multiple tasks. We propose MaTU, a MaT-FL approach that enables joint learning of task vectors across clients, eliminating the need for clustering or client-specific weight storage at the server. Our method introduces a novel aggregation mechanism that determines task similarity based on the direction of clients task vectors and constructs a unified task vector encapsulating all tasks. To address task-specific requirements, we augment the unified task vector with lightweight modulators that facilitate knowledge transfer among related tasks while disentangling dissimilar ones. Evaluated across 30 datasets, MaTU achieves superior performance over state-of-the-art MaT-FL approaches, with results comparable to per-task fine-tuning, while delivering significant communication savings.",
+  "arxiv_id": "2502.06376",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "license_label": "CC BY 4.0",
+  "note": "Images optimized to 600 dpi for web delivery; research content unchanged.",
+  "metadata": {}
+}

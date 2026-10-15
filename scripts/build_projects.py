@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from research_visuals import (validate_insight, diagram_markup, evidence_markup,
                               research_brief, takeaways_markup)
 from paper_experience import STORY_STYLES
+from scholar import metadata as scholar_metadata, abstract_page, archive_link
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGIN = 'https://nousphera.github.io'
@@ -119,11 +120,11 @@ def shell(title, description, path, body, p=None):
         extras += f'<link rel="stylesheet" href="{asset_url("assets/paper-results.css")}">'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)
         css = f'<style>:root{{--accent-light:{p["accent"]};--accent-dark:{p["accent_dark"]};--tint-light:{p["tint"]};}}</style>'
-        for key, value in [('citation_title', p['title']), ('citation_publication_date', citation_year)] + [('citation_author', a) for a in p['authors']]:
-            meta += f'<meta name="{key}" content="{esc(value)}">\n'
+        meta += scholar_metadata(p)
         preview = p.get('social_image', p['figure']['src'])
         meta += f'<meta property="og:image" content="{ORIGIN}/{esc(preview)}">\n'
         data = {'@context': 'https://schema.org', '@type': 'ScholarlyArticle', 'headline': p['title'], 'description': p['summary'], 'author': [{'@type': 'Person', 'name': a} for a in p['authors']], 'datePublished': citation_year, 'url': ORIGIN + path, 'sameAs': [url for label, url in p['links'].items() if label not in ('Code', 'Project')], 'image': ORIGIN + '/' + p['figure']['src']}
+        data['encoding'] = {'@type': 'MediaObject', 'encodingFormat': 'application/pdf', 'contentUrl': ORIGIN + path + 'paper.pdf'}
         meta += '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026') + '</script>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -205,7 +206,7 @@ def project_page(p, projects):
     project_attr = '' if p['slug'] == 'fedln' else f' data-project="{esc(p["slug"])}"'
     body = f'''<main id="main" class="project-main{page_class}"{project_attr}><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
 <section class="paper-hero" aria-labelledby="paper-title"><div class="eyebrow"><span class="project-name">{esc(p['name'])}</span><span>{esc(venue)}</span></div>
-<h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}</section>
+<h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}<p class="source-note">{archive_link(p)}</p></section>
 <nav class="section-nav" data-project-tabs aria-label="On this page"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#findings">Results</a><a href="#citation">Citation</a></nav>
 <div class="project-panels">{overview}{method}
 {results}
@@ -233,6 +234,7 @@ def build():
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(project_page(p, projects))
         (folder / 'citation.bib').write_text(p['bibtex'].strip() + '\n')
+        (folder / 'paper.html').write_text(abstract_page(p))
     from research_home import legacy_gallery
     (ROOT / 'projects/index.html').write_text(legacy_gallery(asset_url))
     (ROOT / 'index.html').write_text(gallery_page(projects, home=True))
@@ -240,6 +242,7 @@ def build():
     compatibility = [{'id': p['slug'], 'title': p['title'], 'focus': p['category'], 'year': p['year'], 'venue': p['venue'], 'description': p['summary'], 'link': {'href': f'{ORIGIN}/projects/{p["slug"]}/', 'label': 'Project page'}} for p in projects]
     (ROOT / 'assets/publications.json').write_text(json.dumps(compatibility, indent=2, ensure_ascii=False) + '\n')
     urls = ['/'] + [f'/projects/{p["slug"]}/' for p in projects]
+    urls += [f'/projects/{p["slug"]}/paper.html' for p in projects]
     (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{ORIGIN}{path}</loc></url>\n' for path in urls) + '</urlset>\n')
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {ORIGIN}/sitemap.xml\n')
     (ROOT / '.nojekyll').touch()
