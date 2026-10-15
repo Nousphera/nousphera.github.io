@@ -5,6 +5,8 @@ Diagrams are schematic; positions, waveforms and confidence bars are not data.
 """
 from html import escape
 from story_art import arrow, group, svg
+from stories.fedstar_round import STEPS as FEDSTAR_STEPS
+from stories.fedser_round import STEPS as FEDSER_STEPS
 
 
 def _t(x, y, value, small=False, anchor='middle'):
@@ -36,16 +38,6 @@ def _clip(x, y, title, tone='accent', w=160):
     return _box(x, y, w, 74, tone) + _wave(x+14, y+27, w-28, tone, .65) + _t(x+w/2, y+63, title, True)
 
 
-def _spectrogram(x, y, w=146, h=108, tone='accent', weighted=False):
-    art = _box(x, y, w, h, tone, rx=4)
-    for row in range(5):
-        for col in range(8):
-            power = ((row*3+col*5+row*col) % 9 + 1)/12
-            if weighted: power *= 1 if (2 <= col <= 4 or row == 2) else .25
-            art += f'<rect class="sa-{tone}" x="{x+5+col*(w-10)/8:.1f}" y="{y+5+row*(h-10)/5:.1f}" width="{(w-10)/8-2:.1f}" height="{(h-10)/5-2:.1f}" rx="2" fill="currentColor" opacity="{power:.2f}"/>'
-    return art
-
-
 def _bars(x, y, heights, tone='accent', width=24, gap=14):
     return ''.join(f'<rect class="sa-{tone}" x="{x+i*(width+gap)}" y="{y-h}" width="{width}" height="{h}" rx="3" fill="currentColor" opacity="{1 if i==0 else .45}"/>' for i,h in enumerate(heights))
 
@@ -58,88 +50,8 @@ def _vector(x, y, tone='accent', values=(.2,.8,.5,.35), vertical=False):
     return art
 
 
-def _person(x, y, tone='accent'):
-    return _dot(x, y, tone, 8) + f'<path class="sa-{tone}" d="M{x-15} {y+31} Q{x-15} {y+12} {x} {y+12} Q{x+15} {y+12} {x+15} {y+31}" fill="none" stroke="currentColor" stroke-width="3"/>'
-
-
 def _math(body, label):
     return f'<math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="{escape(label, quote=True)}">{body}</math>'
-
-
-# FedSTAR: the optional public-data preparation is separate from the round loop.
-def _fedstar_prepare():
-    art = group(_t(300,29,'Optional preparation · public FSD-50K') + _clip(30,65,'One recording'), 0)
-    art += group(_clip(240,54,'Segment A') + _clip(240,153,'Segment B') + arrow(190,102,230,91) + arrow(190,108,230,188), 850)
-    art += group(_dot(481,111,'accent',12) + _dot(510,126,'accent',12) + _dot(520,210,'secondary',10) + _dot(470,226,'secondary',10) + _line(493,115,500,121,'accent') + _t(497,73,'Pull together',True) + _t(497,252,'Other clips apart',True), 1900)
-    art += group(arrow(408,90,455,110) + arrow(408,188,455,128) + _t(300,286,'Pretrained encoder initializes client learning',True), 3100)
-    return svg(art,'Schematic contrastive pretraining: two segments of one public recording are brought together in representation space; other recordings supply negatives. The encoder initializes downstream federated training.')
-
-
-def _fedstar_batches():
-    art = group(_box(26,48,548,216,'muted',dash=True) + _t(300,29,'One client · audio stays here'),0)
-    art += group(_clip(48,81,'Known label: “go”') + _clip(48,173,'No label','secondary'),650)
-    art += group(_spectrogram(365,83,144,100) + _t(438,217,'Shared local model',True) + arrow(219,117,349,117) + arrow(219,210,349,148),1700)
-    art += group(_t(300,286,'Equal-sized labeled and unlabeled batches',True),3200)
-    return svg(art,'A client forms equally sized labeled and unlabeled audio batches. Both branches are processed by the same local audio model; raw audio remains within the client boundary.')
-
-
-def _fedstar_filter():
-    art = group(_t(300,29,'Keep the class · soften the confidence') + _bars(61,182,[110,34,22]) + _t(108,217,'Raw logits',True),0)
-    art += group(arrow(178,132,226,132,'T = 4') + _bars(245,182,[83,50,37]) + _t(293,217,'Scaled prediction',True),1100)
-    art += group(_line(235,113,360,113,'warn',True) + _t(365,104,'τ',True) + arrow(376,144,413,144),2300)
-    art += group(_box(425,79,147,113) + _t(498,116,'Above τ?') + _t(498,154,'Use pseudo-label',True) + _t(300,272,'Threshold rises during training: 0.5 → 0.9',True),3400)
-    return svg(art,'Schematic confidence filtering: temperature four softens probabilities without changing the top predicted class. Only predictions above the increasing confidence threshold become training targets. Bars illustrate the operation, not measured confidence values.')
-
-
-def _fedstar_joint():
-    art = group(_clip(32,62,'Known label') + _clip(32,170,'Pseudo-label','secondary'),0)
-    art += group(arrow(201,100,252,100) + arrow(201,207,252,207,'β = 0.5','secondary') + _box(264,61,147,69) + _box(264,171,147,69,'secondary') + _t(338,103,'Labeled loss',True) + _t(338,213,'Unlabeled loss',True),1100)
-    art += group(_line(421,96,447,152,'accent') + _line(421,206,447,152,'secondary') + _dot(447,152,'accent',8) + arrow(456,152,490,152),2300)
-    art += group(_vector(504,109,vertical=True) + _t(300,280,'Add both losses, then update model weights',True),3400)
-    return svg(art,'Labeled cross-entropy and confidence-filtered pseudo-label cross-entropy are combined with unlabeled weight 0.5 before one local parameter update. There is no required separate supervised stage.')
-
-
-def _fedstar_share():
-    art = group(_box(20,48,192,213,'muted',dash=True) + _t(116,79,'Client updates',True) + _vector(70,102) + _vector(70,148,'secondary',(.75,.3,.6,.4)) + _vector(70,194,'accent',(.4,.6,.3,.9)),0)
-    art += group(arrow(223,150,276,150) + _box(290,81,122,141) + _t(351,117,'FedAvg') + _t(351,152,'Weighted',True) + _t(351,178,'average',True),1200)
-    art += group(arrow(424,150,465,150) + _vector(478,110,vertical=True) + _t(504,247,'Global model',True),2400)
-    art += group(arrow(493,83,117,32,curved='M493 83 Q493 32 300 32 L117 32') + _t(300,282,'Broadcast shared weights for the next round',True),3600)
-    return svg(art,'Participating clients upload model parameters. The server forms a data-weighted average and sends the resulting global weights back for the next federated round; recordings are not uploaded.')
-
-
-# FedSER: spatially distinct views of time, frequency, channel and client history.
-def _fedser_features():
-    art=group(_t(300,29,'Make speech structure visible') + _wave(32,139,145,'accent',1.7) + _t(105,222,'Speech segment',True),0)
-    art+=group(arrow(184,139,234,139) + _spectrogram(250,76,198,140) + _t(349,247,'Time →',True) + _t(349,62,'Frequency bands',True),1100)
-    art+=group(_box(464,85,18,123,'secondary',rx=3) + _box(489,95,18,103,'secondary',rx=3) + _box(514,107,18,78,'secondary',rx=3) + _t(500,247,'CNN',True),2600)
-    art+=group(_t(300,285,'Four blocks learn time and frequency features',True),3600)
-    return svg(art,'A speech segment becomes a log-mel time-frequency representation. Four convolutional blocks combine separate temporal and frequency convolutions into learned feature channels. The displayed waveform and cells are schematic.')
-
-
-def _fedser_attention():
-    art=group(_t(300,29,'Weight time, frequency and channels') + _spectrogram(30,89,144,112) + _t(102,239,'CNN features',True),0)
-    art+=group(_box(220,65,18,103,'secondary',rx=2) + _box(246,65,18,103,'secondary',rx=2) + _t(243,192,'Time',True) + _box(286,69,77,16,'accent',rx=2) + _box(286,95,77,16,'accent',rx=2) + _box(286,121,77,16,'accent',rx=2) + _t(324,192,'Bands',True),900)
-    art+=group(_vector(224,224,'warn',(.3,.8,.5,.9)) + _t(327,246,'Channels',True,'start') + arrow(178,136,206,136),1900)
-    art+=group(arrow(376,136,413,136) + _spectrogram(432,89,144,112,weighted=True) + _t(504,239,'Weighted features',True),3000)
-    return svg(art,'Spectral, temporal and channel attention maps are combined, normalized and multiplied elementwise with the CNN features. The brighter region illustrates reweighting, not a measured emotion explanation.')
-
-
-def _fedser_schedule():
-    art=group(_t(300,29,'Participation informs local confidence') + _person(72,88) + _t(72,157,'Client A',True) + _person(72,199,'secondary') + _t(72,269,'Client B',True),0)
-    for row, tone, pattern in [(99,'accent',[1,1,1,1]),(210,'secondary',[1,0,1,0])]:
-        for i,on in enumerate(pattern):
-            art+=group(_dot(182+i*47,row,tone,10,not on),700+i*350)
-    art+=group(_t(253,60,'Round participation',True) + arrow(349,99,391,99) + arrow(349,210,391,210,'','secondary'),2000)
-    art+=group(_box(406,61,165,76) + _t(489,94,'Local threshold',True) + _t(489,123,'τA',True) + _box(406,172,165,76,'secondary') + _t(489,205,'Local threshold',True) + _t(489,234,'τB',True),3000)
-    return svg(art,'A schematic participation history distinguishes two clients. Their confidence schedules depend on both global training progress and local participation. Filled circles mean participation and hollow circles mean a missed round; no exact threshold values are implied.')
-
-
-def _fedser_local():
-    art=group(_box(26,48,354,215,'muted',dash=True) + _t(204,76,'On each device',True) + _clip(42,91,'Known emotion',w=144) + _clip(42,179,'Pseudo-label','secondary',w=144),0)
-    art+=group(arrow(193,126,239,158) + arrow(193,212,239,183,'','secondary') + _box(252,127,108,86) + _t(306,159,'Joint loss',True) + _t(306,190,'Update',True),1100)
-    art+=group(arrow(390,168,434,168) + _vector(447,112,vertical=True) + _t(506,154,'FedAvg',True) + _t(506,184,'server',True),2500)
-    art+=group(_t(300,287,'Only parameters cross the device boundary',True),3600)
-    return svg(art,'Each client combines known emotion labels with accepted pseudo-labels, trains locally and sends model parameters to FedAvg. The server does not require a speech dataset. Data locality is shown, without a formal privacy guarantee.')
 
 
 # PLiX: support-only centroids, a separate query, and an unchanged encoder.
@@ -226,13 +138,7 @@ STORIES = {
             '<strong>Temperature and confidence filtering</strong> limit which predicted targets influence learning.',
             '<strong>Optional contrastive initialization</strong> improves early convergence; three audio tasks test label scarcity and client variation.',
         ],
-        'steps': [
-            {'title':'Prepare a starting point', 'short_title':'Prepare encoder', 'caption':'Optionally pretrain on public FSD-50K: bring segments of the same clip together and distinguish other clips. This happens before downstream federated rounds.', 'svg':_fedstar_prepare()},
-            {'title':'Use both local batches', 'short_title':'Form batches', 'caption':'A selected client receives the global model and forms equally sized labeled and unlabeled batches. Both contribute to local learning.', 'svg':_fedstar_batches()},
-            {'title':'Filter predicted targets', 'short_title':'Filter predictions', 'caption':'Temperature scaling softens confidence without changing the top class. Only predictions above a threshold become pseudo-labels; that threshold rises as training progresses.', 'svg':_fedstar_filter()},
-            {'title':'Combine the learning signals', 'short_title':'Combine losses', 'caption':'Compute both cross-entropy terms, weight the unlabeled term and add them before backpropagation. Teacher and student describe roles within self-training.', 'svg':_fedstar_joint()},
-            {'title':'Share learned parameters', 'short_title':'Aggregate updates', 'caption':'FedAvg combines participating clients’ parameters by their data weights. The updated global model starts the next round; downstream recordings remain local.', 'svg':_fedstar_share()},
-        ],
+        'steps': FEDSTAR_STEPS,
         'method': [
             {'title':'Joint local objective', 'text':'The client learns from known labels and retained pseudo-labels in one update. <strong>β = 0.5</strong> weights the unlabeled term in the reported experiments.', 'formula':_math('<msub><mi>ℒ</mi><mi>k</mi></msub><mo>=</mo><msub><mi>ℒ</mi><mi>s</mi></msub><mo>+</mo><mi>β</mi><msub><mi>ℒ</mi><mi>u</mi></msub>', 'Client loss equals supervised loss plus beta times unlabeled loss'), 'note':'ACM TECS §4.1–4.3, Eqs. 3 and 7. Both losses are computed before backpropagation.'},
             {'title':'Confidence-filtered pseudo-labels', 'text':'Apply softmax to temperature-scaled logits, take the most likely class and retain predictions above <strong>τ</strong>. Temperature is 4; the cosine threshold increases from 0.5 to 0.9.', 'formula':_math('<mover><mi>y</mi><mo>^</mo></mover><mo>=</mo><munder><mi>argmax</mi><mi>c</mi></munder><mfrac><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>c</mi></msub><mo>/</mo><mi>T</mi></mrow></msup><mrow><munder><mo>∑</mo><mi>j</mi></munder><msup><mi>e</mi><mrow><msub><mi>z</mi><mi>j</mi></msub><mo>/</mo><mi>T</mi></mrow></msup></mrow></mfrac>', 'Pseudo-label is the class with maximum temperature-scaled softmax probability'), 'note':'Eq. 5 and Table 2. Confidence filtering reduces exposure to uncertain targets; it does not guarantee correct labels.'},
@@ -255,12 +161,7 @@ STORIES = {
             '<strong>Participation-aware self-training</strong> uses confident predictions on unlabeled recordings.',
             '<strong>Four IEMOCAP partitions</strong> separate speaker overlap from how speech is distributed across clients.',
         ],
-        'steps': [
-            {'title':'Represent the speech', 'short_title':'Represent speech', 'caption':'Log-mel features expose time and frequency structure. Four convolutional blocks combine temporal and spectral filters into learned feature channels.', 'svg':_fedser_features()},
-            {'title':'Reweight useful features', 'short_title':'Apply attention', 'caption':'Temporal, spectral and channel attention maps are combined and normalized. Their weights multiply the CNN features before emotion classification.', 'svg':_fedser_attention()},
-            {'title':'Account for client participation', 'short_title':'Track participation', 'caption':'The confidence schedule uses global progress and each client’s participation history. Local predictions must clear the client’s threshold to supply pseudo-labels.', 'svg':_fedser_schedule()},
-            {'title':'Learn locally, aggregate globally', 'short_title':'Learn and aggregate', 'caption':'Known labels and accepted pseudo-labels contribute jointly to local learning. The server averages model parameters without requiring its own speech dataset.', 'svg':_fedser_local()},
-        ],
+        'steps': FEDSER_STEPS,
         'method': [
             {'title':'Speech representation', 'text':'The method uses <strong>64-bin log-mel features</strong> and four convolutional blocks. Predictions over non-overlapping utterance segments are averaged.', 'note':'§III, public preprint p. 3. Method text specifies two-second segments; Figure 1’s one-second label is inconsistent.'},
             {'title':'Spectral, temporal and channel attention', 'text':'Pooling and convolution produce spectral/temporal maps; pooled channels pass through a small perceptron. Their combined, softmax-scaled weights <strong>multiply the learned features</strong>.', 'note':'§III and Figure 1. The illustration explains feature weighting, not a validated interpretation of human emotion.'},

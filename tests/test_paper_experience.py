@@ -11,6 +11,22 @@ import build_projects as build
 from paper_experience import load_story, validate_story, chart_markup, CHARTS
 
 class PaperExperienceTests(unittest.TestCase):
+    def test_connected_walkthroughs_keep_navigation_and_text_light_scenes(self):
+        projects = build.load_projects()
+        for slug in ['mpsl', 'fedstar', 'fedser']:
+            p = next(p for p in projects if p['slug'] == slug)
+            story = load_story(slug)
+            self.assertEqual(len(story['steps']), 6, slug)
+            html = build.project_page(p, projects)
+            self.assertIn('class="paper-story connected-story"', html)
+            self.assertIn(f'data-story-kind="{slug}"', html)
+            self.assertIn('data-story-navigation hidden', html)
+            self.assertIn('assets/connected-story.css?', html)
+            self.assertIn(f'assets/{slug}-story.css?', html)
+            for step in story['steps']:
+                self.assertTrue(step.get('title_in_art'), slug)
+                self.assertLessEqual(len(step['caption'].split()), 16, slug)
+
     def test_every_other_paper_has_complete_distinct_source_bound_experience(self):
         projects=build.load_projects(); artwork=set(); count=0
         for p in projects:

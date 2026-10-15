@@ -6,6 +6,7 @@ MaTU arXiv:2502.06376v3. Numerical result panels remain in data/insights.
 from html import escape
 from math import atan2, cos, sin
 from story_art import arrow, group, svg
+from stories.mpsl_round import STEPS as MPSL_STEPS
 
 
 def text(x, y, value, tone='', size=22, anchor='middle'):
@@ -55,81 +56,6 @@ def codec(x, y, name, encode=True, tone='accent', frozen=False):
             f'<polygon points="{points}" fill="none" stroke="currentColor" stroke-width="2.5"/></g>'
             +text(x+27,y+53,name,size=24)+(lock(x+15,y-40) if frozen else ''))
 
-
-def layer_stack(x, y, w=115, h=95, name='Encoder', tone='accent'):
-    return (panel(x+10,y-10,w,h,tone)+panel(x+5,y-5,w,h,tone)+panel(x,y,w,h,tone)
-            +text(x+w/2,y+h/2+7,name))
-
-
-MPSL_STEPS = [
-    {
-        'title': 'Turn paired inputs into tokens',
-        'short_title': 'Tokenize inputs',
-        'caption': 'Lightweight client tokenizers convert each modality into activations. This schematic uses image–text inputs; the study also evaluates image–audio and audio–text pairs.',
-        'svg': svg(
-            group(text(300,30,'Client · modality-specific tokenization')
-                  +grid(48,68)+text(88,177,'Image')
-                  +panel(40,202,95,48,'secondary')+text(87,234,'Text'))
-            +group(flow(156,110,248,110)+flow(156,226,248,226,'secondary'),800)
-            +group(panel(257,64,128,190,'muted')+text(321,122,'Local')+text(321,157,'tokenizers'),1500)
-            +group(flow(396,110,444,110)+flow(396,226,444,226,'secondary'),2300)
-            +group(tokens(461,96,3,size=25)+tokens(461,212,3,'secondary',25)
-                   +text(505,174,'Tokens'),3200),
-            'Paired image patches and text enter lightweight local tokenizers and become two token sequences.'),
-    },
-    {
-        'title': 'Choose where modalities meet',
-        'short_title': 'Early or late fusion',
-        'caption': 'Early fusion joins token sequences on the client before server encoding. Late fusion uses the same encoder for each modality separately, then joins the encoded representations.',
-        'svg': svg(
-            group(text(300,28,'Fusion changes the point of interaction')
-                  +text(40,73,'Early',anchor='start')+text(40,202,'Late',anchor='start')
-                  +tokens(40,88,2,size=22)+tokens(40,119,2,'secondary',22)
-                  +tokens(40,218,2,size=22)+tokens(40,249,2,'secondary',22))
-            +group(flow(112,114,177,114)+flow(112,244,215,244),700)
-            +group(tokens(191,102,2,size=22)+tokens(245,102,2,'secondary',22)
-                   +text(245,158,'Join tokens')
-                   +panel(229,207,126,72)+text(292,236,'Shared')+text(292,269,'encoder'),1500)
-            +group(flow(310,114,378,114)+flow(365,244,410,244),2300)
-            +group(layer_stack(392,82,143,70,'Encoder')
-                   +tokens(427,232,2,size=22)+tokens(481,232,2,'secondary',22)
-                   +text(480,205,'Join outputs'),3100),
-            'Early fusion concatenates modality tokens before a server encoder; late fusion encodes each modality with shared weights before concatenation.'),
-    },
-    {
-        'title': 'Return predictions to local labels',
-        'short_title': 'Keep labels local',
-        'caption': 'The server returns predictions. Each client computes its loss with labels stored locally and sends that loss back for aggregation. Keeping labels local is not a formal privacy guarantee.',
-        'svg': svg(
-            group(panel(27,58,233,213,'muted')+text(143,88,'Client')
-                  +layer_stack(428,110,125,105,'Server')
-                  +text(490,247,'Encoder + head',size=18))
-            +group(flow(424,115,204,115,curved='M424 115 L204 115')
-                   +text(320,91,'Predictions',size=20)
-                   +panel(152,123,76,40)+text(190,151,'ŷ',size=24),800)
-            +group(lock(56,125)+text(87,187,'Labels',size=20)
-                   +flow(93,199,145,222,'secondary')+flow(190,174,190,207),1800)
-            +group(panel(149,211,79,42,'secondary')+text(189,240,'Loss'),2800)
-            +group(flow(260,231,416,231,'secondary')+text(334,210,'Local loss',size=20),3800),
-            'A prediction travels from the server to a client. The client combines it with local labels to compute a loss and sends the loss to the server.'),
-    },
-    {
-        'title': 'Backpropagate one shared objective',
-        'short_title': 'Return gradients',
-        'caption': 'Batch-size-weighted client losses form one server objective. The backward pass updates the shared model and returns cut-layer gradients so every client can update its tokenizers.',
-        'svg': svg(
-            group(text(300,29,'One aggregated loss, gradients for each client')
-                  +panel(35,54,90,45,'secondary')+text(80,84,'Loss 1')
-                  +panel(35,119,90,45,'secondary')+text(80,149,'Loss 2'))
-            +group(flow(133,77,215,110,'secondary')+flow(133,142,215,110,'secondary'),700)
-            +group(panel(229,70,115,90,'secondary')+text(286,106,'Weighted')+text(286,137,'sum'),1600)
-            +group(flow(354,115,420,115,'secondary')+layer_stack(434,72,125,90,'Backward'),2400)
-            +group(flow(492,175,184,234,curved='M492 175 V234 H184',angle=3.141592653589793)
-                   +text(354,216,'Cut-layer gradients',size=20),3400)
-            +group(panel(30,196,144,80)+text(102,226,'Update')+text(102,260,'tokenizers'),4200),
-            'Two client losses are weighted and summed for a shared server backward pass. Cut-layer gradients return to update client tokenizers.'),
-    },
-]
 
 AE_STEPS = [
     {

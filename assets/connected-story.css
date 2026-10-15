@@ -1,0 +1,42 @@
+/* Shared reading frame for connected, responsive method walkthroughs. */
+.connected-story .story-viewport {padding:0 24px 18px;}
+.connected-story.is-enhanced .story-viewport {display:grid;}
+.connected-story.is-enhanced .story-viewport>figure {grid-area:1/1;}
+/* Reserve the tallest scene to prevent step changes from moving the page.
+   Invisible scenes stay out of the accessibility tree and pointer navigation. */
+.connected-story.is-enhanced .story-viewport>figure[hidden] {display:block!important;visibility:hidden;pointer-events:none;}
+.connected-story.is-enhanced .story-expand {grid-column:1;justify-self:end;}
+.connected-story .story-picture {max-width:none;aspect-ratio:auto;display:block;}
+.connected-story .story-art {max-height:none;}
+.connected-story .story-steps {gap:5px;}
+.connected-story .story-steps button {padding:10px 8px;font-size:.73rem;gap:6px;min-height:48px;height:48px;}
+.connected-story .story-viewport figcaption {min-height:26px;max-width:780px;margin:14px auto 0;text-align:center;}
+.connected-story .story-viewport figcaption span {font-size:.73rem;line-height:1.8;}
+.connected-story .story-navigation {display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding:11px 24px;background:var(--soft);}
+.connected-story .story-navigation button {min-height:44px;padding:7px 12px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--text);font-size:.73rem;font-weight:600;}
+.connected-story .story-navigation button:hover:not(:disabled) {border-color:var(--accent);color:var(--accent);}
+.connected-story .story-navigation button:disabled {opacity:.35;cursor:default;}
+.connected-story .story-navigation>span {font-size:.68rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+.connected-story .story-toggle,.connected-story .story-expand {min-height:44px;}
+.connected-story :is(button,[tabindex]):focus-visible {outline:2px solid var(--accent);outline-offset:3px;}
+@media(max-width:800px) {
+ .connected-story .story-steps {grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:600px) {
+ .connected-story .story-head {gap:8px;padding:15px 13px 13px;}
+ .connected-story .story-head>.px-kicker {font-size:.59rem;letter-spacing:.03em;max-width:160px;}
+ .connected-story .story-toggle {min-width:113px;font-size:.67rem;padding:9px;}
+ .connected-story .story-steps {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;padding:0 12px 13px;}
+ .connected-story .story-steps button {font-size:.65rem;gap:5px;padding:7px 6px;}
+ .connected-story .story-steps button>span {font-size:.55rem;}
+ .connected-story .story-viewport {padding:0 13px 13px;}
+ .connected-story .story-viewport figcaption {min-height:40px;margin:14px 0 0;}
+ .connected-story .story-viewport figcaption span {font-size:.65rem;line-height:1.7;}
+ .connected-story .story-navigation {padding:10px 13px;}
+ .connected-story .story-navigation button {font-size:.69rem;}
+}
+@media print {
+ .connected-story.is-enhanced .story-viewport {display:block;}
+ .connected-story.is-enhanced .story-viewport>figure[hidden] {visibility:visible;}
+ .connected-story .story-navigation {display:none;}
+}
