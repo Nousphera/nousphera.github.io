@@ -47,7 +47,6 @@
     const status = collection.querySelector('#catalog-status');
     const reset = collection.querySelector('[data-reset-projects]');
     const empty = collection.querySelector('.catalog-empty');
-    const links = [...collection.querySelectorAll('[data-year-link]')];
     let state = readState(win.location.search, areas);
     function render(historyMode) {
       const result = filterRecords(records, state), visible = new Set(result.visible);
@@ -56,9 +55,7 @@
         const count = result.years[group.dataset.projectYear] || 0;
         group.hidden = count === 0;
         group.dataset.visibleCount = String(count);
-        group.querySelector('[data-year-count]').textContent = String(count).padStart(2, '0');
       });
-      links.forEach(link => { link.hidden = !result.years[link.dataset.yearLink]; });
       filters.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === state.area)));
       if (input.value !== state.query) input.value = state.query;
       status.textContent = result.visible.length === records.length ? records.length + ' projects' : result.visible.length + ' of ' + records.length + ' projects';
