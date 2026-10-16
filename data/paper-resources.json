@@ -94,10 +94,10 @@
     },
     {
       "slug": "da-mldg",
-      "repository": "https://github.com/Nousphera/DA_MLDG",
-      "pages": "https://nousphera.github.io/DA_MLDG/",
+      "repository": "https://github.com/Nousphera/DA-MLDG",
+      "pages": "https://nousphera.github.io/DA-MLDG/",
       "release_status": "implementation_present",
-      "code_url": "https://github.com/Nousphera/DA_MLDG",
+      "code_url": "https://github.com/Nousphera/DA-MLDG",
       "poster_url": "https://nousphera.github.io/assets/posters/da-mldg-a0-landscape.pdf"
     },
     {
