@@ -55,7 +55,12 @@ def validate_results(p, data):
         source = urlparse(panel['source']['url'])
         if source.scheme != 'https' or not source.hostname or source.hostname in {'localhost', '127.0.0.1'}:
             raise ValueError('Result source must be a public HTTPS URL')
-        if panel['kind'] == 'scatter':
+        if panel['kind'] == 'curves':
+            from result_curves import validate_curve_groups
+            validate_curve_groups(panel['groups'])
+            if 'summary_result_index' in panel:
+                selected_result(p, {'result_index': panel['summary_result_index']})
+        elif panel['kind'] == 'scatter':
             plot = panel['plot']
             for axis in ('x', 'y'):
                 spec = plot[axis]
@@ -229,7 +234,13 @@ def results_markup(p):
     data = load_results(p)
     blocks = []
     for i, panel in enumerate(data['panels']):
-        if panel['kind'] == 'scatter':
+        if panel['kind'] == 'curves':
+            from result_curves import curve_groups
+            content = curve_groups(panel, f'{p["slug"]}-metric-{i}')
+            if 'summary_result_index' in panel:
+                summary = selected_result(p, {'result_index': panel['summary_result_index']})
+                content += f'<h4 class="rs-summary-title">{esc(summary["title"])}</h4>' + compact_table(summary)
+        elif panel['kind'] == 'scatter':
             content = scatter_plot(panel)
         else:
             result = selected_result(p, panel)
@@ -239,6 +250,7 @@ def results_markup(p):
             else:
                 content = compact_table(result, panel.get('columns'), panel.get('column_labels'))
         source = panel['source']
-        blocks.append(f'<article class="rs-card rs-kind-{panel["kind"]}" aria-labelledby="result-{i}-title"><header class="rs-card-heading"><div><h3 id="result-{i}-title">{esc(panel["title"])}</h3><p>{esc(panel["subtitle"])}</p></div></header>{content}<footer class="rs-card-footer"><p>{emphasis(panel["finding"])}</p><a href="{esc(source["url"])}" title="{esc(source["label"])}" aria-label="Source: {esc(source["label"])}">Paper ↗</a></footer></article>')
+        link_label = source.get('link_label', 'Paper')
+        blocks.append(f'<article class="rs-card rs-kind-{panel["kind"]}" aria-labelledby="result-{i}-title"><header class="rs-card-heading"><div><h3 id="result-{i}-title">{esc(panel["title"])}</h3><p>{esc(panel["subtitle"])}</p></div></header>{content}<footer class="rs-card-footer"><p>{emphasis(panel["finding"])}</p><a href="{esc(source["url"])}" title="{esc(source["label"])}" aria-label="Source: {esc(source["label"])}">{esc(link_label)} ↗</a></footer></article>')
     takeaways = ''.join(f'<li>{emphasis(text)}</li>' for text in data['takeaways'])
     return f'<section id="findings" data-tab-panel class="results-panel" aria-labelledby="results-title"><header class="rs-heading"><span>Evaluation</span><h2 id="results-title">Results</h2></header>{"".join(blocks)}<aside class="rs-takeaways"><h3>Takeaways</h3><ul>{takeaways}</ul></aside></section>'

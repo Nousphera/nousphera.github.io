@@ -3,7 +3,7 @@ from html import escape as esc
 import importlib
 from xml.etree import ElementTree as ET
 
-GROUPS = ('compression', 'audio', 'foundations', 'privacy')
+GROUPS = ('compression', 'audio', 'foundations', 'privacy', 'sdapt')
 CONNECTED_STORIES = {
     'mpsl': 'One training step · Late fusion',
     'fedstar': 'One federated round · Audio',
@@ -17,6 +17,7 @@ CONNECTED_STORIES = {
     'fiba': 'Local poisoning · Global impact',
     'plix': 'Learn once · Recognize new words',
     'da-mldg': 'Learn across source domains',
+    'sdapt': 'Adapt together · Specialize locally',
 }
 STORY_STYLES = {
     **{slug: slug for slug in ('mpsl', 'fedstar', 'fedser')},
@@ -24,6 +25,7 @@ STORY_STYLES = {
     **{slug: 'foundation' for slug in ('ae-psl', 'matu')},
     **{slug: 'privacy' for slug in ('enccluster', 'efu', 'fiba')},
     **{slug: 'audio-method' for slug in ('plix', 'da-mldg')},
+    'sdapt': 'sdapt',
 }
 
 
@@ -112,4 +114,5 @@ def method_markup(p, s, originals):
         extra = f'<div class="px-technical">{formula}{note}</div>' if formula or note else ''
         cards.append(f'<article class="px-method-card"><header><span>{i:02d}</span><h3>{esc(card["title"])}</h3></header><div class="px-method-body {"has-technical" if extra else ""}"><p>{inline(card["text"])}</p>{extra}</div></article>')
     source=p['insight']['evidence_inventory']
-    return f'''<section id="method" data-tab-panel class="px-panel"><header class="px-section-heading"><span class="px-kicker">How it works</span><h2>{esc(p['name'])}</h2></header><div class="px-method-cards">{''.join(cards)}</div><p class="px-source"><a href="{esc(source['source_url'])}">Method details in the paper ↗</a></p>{originals}</section>'''
+    source_label = source.get('link_label', 'Method details in the paper')
+    return f'''<section id="method" data-tab-panel class="px-panel"><header class="px-section-heading"><span class="px-kicker">How it works</span><h2>{esc(p['name'])}</h2></header><div class="px-method-cards">{''.join(cards)}</div><p class="px-source"><a href="{esc(source['source_url'])}">{esc(source_label)} ↗</a></p>{originals}</section>'''

@@ -1,0 +1,1177 @@
+{
+  "title": "Domain Adaptive Pretraining in Split Learning for Vision Foundation Models",
+  "authors": [
+    "Stan van Honk",
+    "Vasileios Tsouvalas",
+    "Nirvana Meratnia"
+  ],
+  "version": "Author manuscript compiled 13 October 2026",
+  "manuscript_sha256": "34993089d8f5ea0f7dd07c12ff4f9eb2e8fbf6a64634c951289b29d447c3862c",
+  "methodology": {
+    "source": "PDF sections 2 and 3, pages 2-3; Fig. 1",
+    "backbone": "DINOv2-pretrained ViT-B/14",
+    "clients": 10,
+    "partition": "identical IID partitions for DAPT and fine-tuning",
+    "domain_scope": "three independent same-domain vision experiments",
+    "split": "client keeps first transformer block frozen; server hosts remaining blocks",
+    "server_training": "last transformer block fully unfrozen (last two for CheXpert); other server blocks adapted with LoRA",
+    "phase1": "Clients form 2 global and 8 local crops from unlabeled in-domain images, compute frozen frontend features, and upload CLS and patch tokens. Server concatenates all client features, trains the DINOv2 student using self-supervision and updates an EMA teacher. iBOT masking is applied on the server. No gradients return to clients.",
+    "phase2": "The adapted teacher backbone is frozen. Clients send features of original non-augmented labeled images, server returns CLS representation for classification, and each client trains its task-specific head locally. No task-head gradients are sent to the server.",
+    "crop_pixels": {
+      "fMoW": {
+        "global": 224,
+        "local": 98
+      },
+      "QuickDraw": {
+        "global": 224,
+        "local": 98
+      },
+      "CheXpert": {
+        "global": 518,
+        "local": 196
+      }
+    },
+    "task_data": "DAPT uses training images without their labels; downstream fine-tuning uses only labeled subset. CheXpert training is evaluated on the CheXlocalize test set.",
+    "fewshot_sampling": "Each client samples k-shot data with a client-specific seed shared across methods; numerical seeds are not given.",
+    "dino_naming": "DINOv2 is the pretrained model and continued pretraining recipe. L_DINO is one term of the DINOv2 objective, alongside iBOT and KoLeo; calling the method DINO-only would omit those terms."
+  },
+  "equations": [
+    {
+      "id": "feature_split",
+      "source": "section 2.1, page 2",
+      "latex": "(h_{\\mathrm{cls}},\\mathbf H)=f_{\\theta_c}(x),\\qquad (z_{\\mathrm{cls}},\\mathbf Z)=f_{\\theta_s}(h_{\\mathrm{cls}},\\mathbf H)"
+    },
+    {
+      "id": "global_batch",
+      "source": "section 2.1, page 2",
+      "latex": "\\mathcal B^U=\\bigcup_{n\\in\\mathcal N}\\mathcal B_n^U"
+    },
+    {
+      "id": "ssl_loss",
+      "source": "Eq. (1), page 2",
+      "latex": "\\mathcal L_{\\mathrm{SSL}}=\\mathcal L_{\\mathrm{DINO}}+\\lambda_1\\mathcal L_{\\mathrm{iBOT}}+\\lambda_2\\mathcal L_{\\mathrm{KoLeo}}"
+    },
+    {
+      "id": "task_loss",
+      "source": "Eq. (2), page 3",
+      "latex": "\\mathcal L_{\\mathrm{FT}}^{(n)}=\\mathcal L_{\\mathrm{sup}}\\!\\left(g_{\\phi_n}(r_n(x)),y\\right)"
+    }
+  ],
+  "table1": {
+    "source": "PDF Table 1, page 3",
+    "conditions": [
+      "4-shot",
+      "8-shot",
+      "16-shot",
+      "LP"
+    ],
+    "methods": [
+      "FT w/o DAPT",
+      "FedAvg",
+      "MocoSFL",
+      "SDAPT"
+    ],
+    "datasets": [
+      {
+        "dataset": "fMoW",
+        "metric": "Accuracy",
+        "score_unit": "percent",
+        "direction": "higher is better",
+        "rows": [
+          {
+            "method": "FT w/o DAPT",
+            "scores": [
+              12.8,
+              18.3,
+              23.4,
+              53.9
+            ],
+            "gains_over_ft_pp": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "method": "FedAvg",
+            "scores": [
+              18.4,
+              28.8,
+              38.8,
+              67.3
+            ],
+            "gains_over_ft_pp": [
+              5.6,
+              10.5,
+              15.4,
+              13.4
+            ]
+          },
+          {
+            "method": "MocoSFL",
+            "scores": [
+              22.4,
+              31.5,
+              35.7,
+              62.1
+            ],
+            "gains_over_ft_pp": [
+              9.6,
+              13.2,
+              12.3,
+              8.2
+            ]
+          },
+          {
+            "method": "SDAPT",
+            "scores": [
+              16.9,
+              27.5,
+              37.5,
+              66.7
+            ],
+            "gains_over_ft_pp": [
+              4.1,
+              9.2,
+              14.1,
+              12.8
+            ]
+          }
+        ],
+        "mean_sdapt_fewshot_gain_pp": 9.13333333
+      },
+      {
+        "dataset": "CheXpert",
+        "metric": "AUROC",
+        "score_unit": "AUROC on 0-100 scale",
+        "direction": "higher is better",
+        "rows": [
+          {
+            "method": "FT w/o DAPT",
+            "scores": [
+              34.7,
+              38.1,
+              37.8,
+              77.4
+            ],
+            "gains_over_ft_pp": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "method": "FedAvg",
+            "scores": [
+              37.7,
+              39.3,
+              43.9,
+              78.1
+            ],
+            "gains_over_ft_pp": [
+              3.0,
+              1.2,
+              6.1,
+              0.7
+            ]
+          },
+          {
+            "method": "MocoSFL",
+            "scores": [
+              39.3,
+              39.7,
+              43.4,
+              80.2
+            ],
+            "gains_over_ft_pp": [
+              4.6,
+              1.6,
+              5.6,
+              2.8
+            ]
+          },
+          {
+            "method": "SDAPT",
+            "scores": [
+              41.3,
+              41.7,
+              44.4,
+              80.7
+            ],
+            "gains_over_ft_pp": [
+              6.6,
+              3.6,
+              6.6,
+              3.3
+            ]
+          }
+        ],
+        "mean_sdapt_fewshot_gain_pp": 5.6
+      },
+      {
+        "dataset": "QuickDraw",
+        "metric": "Accuracy",
+        "score_unit": "percent",
+        "direction": "higher is better",
+        "rows": [
+          {
+            "method": "FT w/o DAPT",
+            "scores": [
+              18.4,
+              25.8,
+              32.3,
+              42.9
+            ],
+            "gains_over_ft_pp": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "method": "FedAvg",
+            "scores": [
+              27.0,
+              37.2,
+              43.9,
+              50.8
+            ],
+            "gains_over_ft_pp": [
+              8.6,
+              11.4,
+              11.6,
+              7.9
+            ]
+          },
+          {
+            "method": "MocoSFL",
+            "scores": [
+              23.2,
+              32.4,
+              39.0,
+              48.1
+            ],
+            "gains_over_ft_pp": [
+              4.8,
+              6.6,
+              6.7,
+              5.2
+            ]
+          },
+          {
+            "method": "SDAPT",
+            "scores": [
+              22.3,
+              33.2,
+              43.1,
+              51.1
+            ],
+            "gains_over_ft_pp": [
+              3.9,
+              7.4,
+              10.8,
+              8.2
+            ]
+          }
+        ],
+        "mean_sdapt_fewshot_gain_pp": 7.36666667
+      }
+    ],
+    "mean_sdapt_fewshot_gain_pp_calculated": 7.36666667,
+    "mean_sdapt_fewshot_gain_pp_reported": 7.4,
+    "mean_scope": "Unweighted average over 9 few-shot settings; excludes LP."
+  },
+  "table2": {
+    "source": "PDF Table 2, page 3; interpretation page 4",
+    "adaptation_dataset": "CheXpert",
+    "evaluation_dataset": "CheXlocalize test set",
+    "metric": "AUROC on 0-100 scale",
+    "direction": "higher is better",
+    "rows": [
+      {
+        "category": "Cardiomediastinal",
+        "label_as_printed": "Enlarged cardiom.",
+        "FT w/o DAPT": 51.72,
+        "MocoSFL": 57.02,
+        "SDAPT": 57.18,
+        "mocosfl_gain_pp": 5.3,
+        "sdapt_gain_pp": 5.46
+      },
+      {
+        "category": "Cardiomediastinal",
+        "label_as_printed": "Cardiomegaly",
+        "FT w/o DAPT": 72.0,
+        "MocoSFL": 76.51,
+        "SDAPT": 78.42,
+        "mocosfl_gain_pp": 4.51,
+        "sdapt_gain_pp": 6.42
+      },
+      {
+        "category": "Pulmonary",
+        "label_as_printed": "Lung opacity",
+        "FT w/o DAPT": 86.03,
+        "MocoSFL": 88.43,
+        "SDAPT": 87.22,
+        "mocosfl_gain_pp": 2.4,
+        "sdapt_gain_pp": 1.19
+      },
+      {
+        "category": "Pulmonary",
+        "label_as_printed": "Edema",
+        "FT w/o DAPT": 90.04,
+        "MocoSFL": 91.22,
+        "SDAPT": 87.79,
+        "mocosfl_gain_pp": 1.18,
+        "sdapt_gain_pp": -2.25
+      },
+      {
+        "category": "Pulmonary",
+        "label_as_printed": "Consolidation",
+        "FT w/o DAPT": 75.37,
+        "MocoSFL": 75.59,
+        "SDAPT": 75.09,
+        "mocosfl_gain_pp": 0.22,
+        "sdapt_gain_pp": -0.28
+      },
+      {
+        "category": "Pulmonary",
+        "label_as_printed": "Atelectasis",
+        "FT w/o DAPT": 75.95,
+        "MocoSFL": 78.81,
+        "SDAPT": 76.22,
+        "mocosfl_gain_pp": 2.86,
+        "sdapt_gain_pp": 0.27
+      },
+      {
+        "category": "Pleural",
+        "label_as_printed": "Pleural effusion",
+        "FT w/o DAPT": 88.61,
+        "MocoSFL": 89.18,
+        "SDAPT": 89.97,
+        "mocosfl_gain_pp": 0.57,
+        "sdapt_gain_pp": 1.36
+      },
+      {
+        "category": "Devices",
+        "label_as_printed": "Support devices",
+        "FT w/o DAPT": 79.57,
+        "MocoSFL": 85.01,
+        "SDAPT": 93.58,
+        "mocosfl_gain_pp": 5.44,
+        "sdapt_gain_pp": 14.01
+      }
+    ],
+    "reported_average": {
+      "FT w/o DAPT": 77.41,
+      "MocoSFL": 80.22,
+      "SDAPT": 80.68,
+      "mocosfl_gain_pp": 2.81,
+      "sdapt_gain_pp": 3.27
+    },
+    "sdapt_improved_labels": 6,
+    "total_labels": 8
+  },
+  "figure2": {
+    "source": "PDF Fig. 2, page 4",
+    "x_axes": {
+      "samples_seen": {
+        "unit": "cumulative sample presentations",
+        "direction": "less cost for equal performance"
+      },
+      "communication_tb": {
+        "unit": "decimal TB",
+        "scope": "modeled BF16 feature uplink during DAPT",
+        "direction": "less cost for equal performance"
+      },
+      "client_compute_gflops": {
+        "unit": "GFLOPs",
+        "scope": "all-client forward computation during DAPT, excluding server",
+        "direction": "less cost for equal performance"
+      }
+    },
+    "y_axis": {
+      "unit": "percentage points",
+      "definition": "checkpoint score minus dataset-specific displayed Table 1 LP no-DAPT baseline",
+      "direction": "higher is better",
+      "metric_by_dataset": {
+        "fMoW": "accuracy gain",
+        "QuickDraw": "accuracy gain",
+        "CheXpert": "AUROC gain"
+      }
+    },
+    "series": [
+      {
+        "dataset": "fMoW",
+        "method": "SDAPT",
+        "original_workbook_method": "SDAPT",
+        "baseline": 53.9,
+        "checkpoint_count": 10,
+        "assumptions": {
+          "global_crop_px": 224.0,
+          "local_crop_px": 98.0,
+          "global_crops": 2.0,
+          "local_crops": 8.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 914.0,
+          "bytes_per_sample": 1403904.0,
+          "client_gflops_per_sample": 1.28,
+          "iterations_per_epoch": 250.0,
+          "batch_size": 125.0,
+          "samples_per_epoch": 31250.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r04",
+            "epoch": 10,
+            "samples_seen": 312500,
+            "communication_tb": 0.43872,
+            "client_compute_gflops": 400000.0,
+            "score": 59.66,
+            "gain_pp": 5.76,
+            "score_source_cell": "Checkpoints!I4",
+            "source_row_range": "Checkpoints!A4:J4"
+          },
+          {
+            "record_id": "workbook-20260923-r05",
+            "epoch": 20,
+            "samples_seen": 625000,
+            "communication_tb": 0.87744,
+            "client_compute_gflops": 800000.0,
+            "score": 62.46,
+            "gain_pp": 8.56,
+            "score_source_cell": "Checkpoints!I5",
+            "source_row_range": "Checkpoints!A5:J5"
+          },
+          {
+            "record_id": "workbook-20260923-r06",
+            "epoch": 30,
+            "samples_seen": 937500,
+            "communication_tb": 1.31616,
+            "client_compute_gflops": 1200000.0,
+            "score": 64.08,
+            "gain_pp": 10.18,
+            "score_source_cell": "Checkpoints!I6",
+            "source_row_range": "Checkpoints!A6:J6"
+          },
+          {
+            "record_id": "workbook-20260923-r07",
+            "epoch": 40,
+            "samples_seen": 1250000,
+            "communication_tb": 1.75488,
+            "client_compute_gflops": 1600000.0,
+            "score": 65.07,
+            "gain_pp": 11.17,
+            "score_source_cell": "Checkpoints!I7",
+            "source_row_range": "Checkpoints!A7:J7"
+          },
+          {
+            "record_id": "workbook-20260923-r08",
+            "epoch": 50,
+            "samples_seen": 1562500,
+            "communication_tb": 2.1936,
+            "client_compute_gflops": 2000000.0,
+            "score": 65.82,
+            "gain_pp": 11.92,
+            "score_source_cell": "Checkpoints!I8",
+            "source_row_range": "Checkpoints!A8:J8"
+          },
+          {
+            "record_id": "workbook-20260923-r09",
+            "epoch": 60,
+            "samples_seen": 1875000,
+            "communication_tb": 2.63232,
+            "client_compute_gflops": 2400000.0,
+            "score": 66.31,
+            "gain_pp": 12.41,
+            "score_source_cell": "Checkpoints!I9",
+            "source_row_range": "Checkpoints!A9:J9"
+          },
+          {
+            "record_id": "workbook-20260923-r10",
+            "epoch": 70,
+            "samples_seen": 2187500,
+            "communication_tb": 3.07104,
+            "client_compute_gflops": 2800000.0,
+            "score": 66.46,
+            "gain_pp": 12.56,
+            "score_source_cell": "Checkpoints!I10",
+            "source_row_range": "Checkpoints!A10:J10"
+          },
+          {
+            "record_id": "workbook-20260923-r11",
+            "epoch": 80,
+            "samples_seen": 2500000,
+            "communication_tb": 3.50976,
+            "client_compute_gflops": 3200000.0,
+            "score": 66.6,
+            "gain_pp": 12.7,
+            "score_source_cell": "Checkpoints!I11",
+            "source_row_range": "Checkpoints!A11:J11"
+          },
+          {
+            "record_id": "workbook-20260923-r12",
+            "epoch": 90,
+            "samples_seen": 2812500,
+            "communication_tb": 3.94848,
+            "client_compute_gflops": 3600000.0,
+            "score": 66.65,
+            "gain_pp": 12.75,
+            "score_source_cell": "Checkpoints!I12",
+            "source_row_range": "Checkpoints!A12:J12"
+          },
+          {
+            "record_id": "workbook-20260923-r13",
+            "epoch": 100,
+            "samples_seen": 3125000,
+            "communication_tb": 4.3872,
+            "client_compute_gflops": 4000000.0,
+            "score": 66.68,
+            "gain_pp": 12.78,
+            "score_source_cell": "Checkpoints!I13",
+            "source_row_range": "Checkpoints!A13:J13"
+          }
+        ]
+      },
+      {
+        "dataset": "fMoW",
+        "method": "MocoSFL",
+        "original_workbook_method": "MoCo-v3 SL",
+        "baseline": 53.9,
+        "checkpoint_count": 10,
+        "assumptions": {
+          "global_crop_px": 224.0,
+          "local_crop_px": null,
+          "global_crops": 2.0,
+          "local_crops": 0.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 514.0,
+          "bytes_per_sample": 789504.0,
+          "client_gflops_per_sample": 0.924,
+          "iterations_per_epoch": 50.0,
+          "batch_size": 500.0,
+          "samples_per_epoch": 25000.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r14",
+            "epoch": 10,
+            "samples_seen": 250000,
+            "communication_tb": 0.197376,
+            "client_compute_gflops": 231000.0,
+            "score": 57.18,
+            "gain_pp": 3.28,
+            "score_source_cell": "Checkpoints!I14",
+            "source_row_range": "Checkpoints!A14:J14"
+          },
+          {
+            "record_id": "workbook-20260923-r15",
+            "epoch": 20,
+            "samples_seen": 500000,
+            "communication_tb": 0.394752,
+            "client_compute_gflops": 462000.0,
+            "score": 60.01,
+            "gain_pp": 6.11,
+            "score_source_cell": "Checkpoints!I15",
+            "source_row_range": "Checkpoints!A15:J15"
+          },
+          {
+            "record_id": "workbook-20260923-r16",
+            "epoch": 30,
+            "samples_seen": 750000,
+            "communication_tb": 0.592128,
+            "client_compute_gflops": 693000.0,
+            "score": 61.18,
+            "gain_pp": 7.28,
+            "score_source_cell": "Checkpoints!I16",
+            "source_row_range": "Checkpoints!A16:J16"
+          },
+          {
+            "record_id": "workbook-20260923-r17",
+            "epoch": 40,
+            "samples_seen": 1000000,
+            "communication_tb": 0.789504,
+            "client_compute_gflops": 924000.0,
+            "score": 61.7,
+            "gain_pp": 7.8,
+            "score_source_cell": "Checkpoints!I17",
+            "source_row_range": "Checkpoints!A17:J17"
+          },
+          {
+            "record_id": "workbook-20260923-r18",
+            "epoch": 50,
+            "samples_seen": 1250000,
+            "communication_tb": 0.98688,
+            "client_compute_gflops": 1155000.0,
+            "score": 61.98,
+            "gain_pp": 8.08,
+            "score_source_cell": "Checkpoints!I18",
+            "source_row_range": "Checkpoints!A18:J18"
+          },
+          {
+            "record_id": "workbook-20260923-r19",
+            "epoch": 60,
+            "samples_seen": 1500000,
+            "communication_tb": 1.184256,
+            "client_compute_gflops": 1386000.0,
+            "score": 62.08,
+            "gain_pp": 8.18,
+            "score_source_cell": "Checkpoints!I19",
+            "source_row_range": "Checkpoints!A19:J19"
+          },
+          {
+            "record_id": "workbook-20260923-r20",
+            "epoch": 70,
+            "samples_seen": 1750000,
+            "communication_tb": 1.381632,
+            "client_compute_gflops": 1617000.0,
+            "score": 62.08,
+            "gain_pp": 8.18,
+            "score_source_cell": "Checkpoints!I20",
+            "source_row_range": "Checkpoints!A20:J20"
+          },
+          {
+            "record_id": "workbook-20260923-r21",
+            "epoch": 80,
+            "samples_seen": 2000000,
+            "communication_tb": 1.579008,
+            "client_compute_gflops": 1848000.0,
+            "score": 62.09,
+            "gain_pp": 8.19,
+            "score_source_cell": "Checkpoints!I21",
+            "source_row_range": "Checkpoints!A21:J21"
+          },
+          {
+            "record_id": "workbook-20260923-r22",
+            "epoch": 90,
+            "samples_seen": 2250000,
+            "communication_tb": 1.776384,
+            "client_compute_gflops": 2079000.0,
+            "score": 62.07,
+            "gain_pp": 8.17,
+            "score_source_cell": "Checkpoints!I22",
+            "source_row_range": "Checkpoints!A22:J22"
+          },
+          {
+            "record_id": "workbook-20260923-r23",
+            "epoch": 100,
+            "samples_seen": 2500000,
+            "communication_tb": 1.97376,
+            "client_compute_gflops": 2310000.0,
+            "score": 62.07,
+            "gain_pp": 8.17,
+            "score_source_cell": "Checkpoints!I23",
+            "source_row_range": "Checkpoints!A23:J23"
+          }
+        ]
+      },
+      {
+        "dataset": "QuickDraw",
+        "method": "SDAPT",
+        "original_workbook_method": "SDAPT",
+        "baseline": 42.9,
+        "checkpoint_count": 10,
+        "assumptions": {
+          "global_crop_px": 224.0,
+          "local_crop_px": 98.0,
+          "global_crops": 2.0,
+          "local_crops": 8.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 914.0,
+          "bytes_per_sample": 1403904.0,
+          "client_gflops_per_sample": 1.28,
+          "iterations_per_epoch": 250.0,
+          "batch_size": 125.0,
+          "samples_per_epoch": 31250.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r24",
+            "epoch": 10,
+            "samples_seen": 312500,
+            "communication_tb": 0.43872,
+            "client_compute_gflops": 400000.0,
+            "score": 47.3,
+            "gain_pp": 4.4,
+            "score_source_cell": "Checkpoints!I24",
+            "source_row_range": "Checkpoints!A24:J24"
+          },
+          {
+            "record_id": "workbook-20260923-r25",
+            "epoch": 20,
+            "samples_seen": 625000,
+            "communication_tb": 0.87744,
+            "client_compute_gflops": 800000.0,
+            "score": 48.42,
+            "gain_pp": 5.52,
+            "score_source_cell": "Checkpoints!I25",
+            "source_row_range": "Checkpoints!A25:J25"
+          },
+          {
+            "record_id": "workbook-20260923-r26",
+            "epoch": 30,
+            "samples_seen": 937500,
+            "communication_tb": 1.31616,
+            "client_compute_gflops": 1200000.0,
+            "score": 49.43,
+            "gain_pp": 6.53,
+            "score_source_cell": "Checkpoints!I26",
+            "source_row_range": "Checkpoints!A26:J26"
+          },
+          {
+            "record_id": "workbook-20260923-r27",
+            "epoch": 40,
+            "samples_seen": 1250000,
+            "communication_tb": 1.75488,
+            "client_compute_gflops": 1600000.0,
+            "score": 50.24,
+            "gain_pp": 7.34,
+            "score_source_cell": "Checkpoints!I27",
+            "source_row_range": "Checkpoints!A27:J27"
+          },
+          {
+            "record_id": "workbook-20260923-r28",
+            "epoch": 50,
+            "samples_seen": 1562500,
+            "communication_tb": 2.1936,
+            "client_compute_gflops": 2000000.0,
+            "score": 50.8,
+            "gain_pp": 7.9,
+            "score_source_cell": "Checkpoints!I28",
+            "source_row_range": "Checkpoints!A28:J28"
+          },
+          {
+            "record_id": "workbook-20260923-r29",
+            "epoch": 60,
+            "samples_seen": 1875000,
+            "communication_tb": 2.63232,
+            "client_compute_gflops": 2400000.0,
+            "score": 50.93,
+            "gain_pp": 8.03,
+            "score_source_cell": "Checkpoints!I29",
+            "source_row_range": "Checkpoints!A29:J29"
+          },
+          {
+            "record_id": "workbook-20260923-r30",
+            "epoch": 70,
+            "samples_seen": 2187500,
+            "communication_tb": 3.07104,
+            "client_compute_gflops": 2800000.0,
+            "score": 50.97,
+            "gain_pp": 8.07,
+            "score_source_cell": "Checkpoints!I30",
+            "source_row_range": "Checkpoints!A30:J30"
+          },
+          {
+            "record_id": "workbook-20260923-r31",
+            "epoch": 80,
+            "samples_seen": 2500000,
+            "communication_tb": 3.50976,
+            "client_compute_gflops": 3200000.0,
+            "score": 51.04,
+            "gain_pp": 8.14,
+            "score_source_cell": "Checkpoints!I31",
+            "source_row_range": "Checkpoints!A31:J31"
+          },
+          {
+            "record_id": "workbook-20260923-r32",
+            "epoch": 90,
+            "samples_seen": 2812500,
+            "communication_tb": 3.94848,
+            "client_compute_gflops": 3600000.0,
+            "score": 51.05,
+            "gain_pp": 8.15,
+            "score_source_cell": "Checkpoints!I32",
+            "source_row_range": "Checkpoints!A32:J32"
+          },
+          {
+            "record_id": "workbook-20260923-r33",
+            "epoch": 100,
+            "samples_seen": 3125000,
+            "communication_tb": 4.3872,
+            "client_compute_gflops": 4000000.0,
+            "score": 51.05,
+            "gain_pp": 8.15,
+            "score_source_cell": "Checkpoints!I33",
+            "source_row_range": "Checkpoints!A33:J33"
+          }
+        ]
+      },
+      {
+        "dataset": "QuickDraw",
+        "method": "MocoSFL",
+        "original_workbook_method": "MoCo-v3 SL",
+        "baseline": 42.9,
+        "checkpoint_count": 9,
+        "assumptions": {
+          "global_crop_px": 224.0,
+          "local_crop_px": null,
+          "global_crops": 2.0,
+          "local_crops": 0.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 514.0,
+          "bytes_per_sample": 789504.0,
+          "client_gflops_per_sample": 0.924,
+          "iterations_per_epoch": 50.0,
+          "batch_size": 500.0,
+          "samples_per_epoch": 25000.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r34",
+            "epoch": 10,
+            "samples_seen": 250000,
+            "communication_tb": 0.197376,
+            "client_compute_gflops": 231000.0,
+            "score": 47.11,
+            "gain_pp": 4.21,
+            "score_source_cell": "Checkpoints!I34",
+            "source_row_range": "Checkpoints!A34:J34"
+          },
+          {
+            "record_id": "workbook-20260923-r35",
+            "epoch": 20,
+            "samples_seen": 500000,
+            "communication_tb": 0.394752,
+            "client_compute_gflops": 462000.0,
+            "score": 48.32,
+            "gain_pp": 5.42,
+            "score_source_cell": "Checkpoints!I35",
+            "source_row_range": "Checkpoints!A35:J35"
+          },
+          {
+            "record_id": "workbook-20260923-r36",
+            "epoch": 30,
+            "samples_seen": 750000,
+            "communication_tb": 0.592128,
+            "client_compute_gflops": 693000.0,
+            "score": 48.38,
+            "gain_pp": 5.48,
+            "score_source_cell": "Checkpoints!I36",
+            "source_row_range": "Checkpoints!A36:J36"
+          },
+          {
+            "record_id": "workbook-20260923-r37",
+            "epoch": 40,
+            "samples_seen": 1000000,
+            "communication_tb": 0.789504,
+            "client_compute_gflops": 924000.0,
+            "score": 48.35,
+            "gain_pp": 5.45,
+            "score_source_cell": "Checkpoints!I37",
+            "source_row_range": "Checkpoints!A37:J37"
+          },
+          {
+            "record_id": "workbook-20260923-r38",
+            "epoch": 50,
+            "samples_seen": 1250000,
+            "communication_tb": 0.98688,
+            "client_compute_gflops": 1155000.0,
+            "score": 48.24,
+            "gain_pp": 5.34,
+            "score_source_cell": "Checkpoints!I38",
+            "source_row_range": "Checkpoints!A38:J38"
+          },
+          {
+            "record_id": "workbook-20260923-r39",
+            "epoch": 60,
+            "samples_seen": 1500000,
+            "communication_tb": 1.184256,
+            "client_compute_gflops": 1386000.0,
+            "score": 48.19,
+            "gain_pp": 5.29,
+            "score_source_cell": "Checkpoints!I39",
+            "source_row_range": "Checkpoints!A39:J39"
+          },
+          {
+            "record_id": "workbook-20260923-r40",
+            "epoch": 70,
+            "samples_seen": 1750000,
+            "communication_tb": 1.381632,
+            "client_compute_gflops": 1617000.0,
+            "score": 48.13,
+            "gain_pp": 5.23,
+            "score_source_cell": "Checkpoints!I40",
+            "source_row_range": "Checkpoints!A40:J40"
+          },
+          {
+            "record_id": "workbook-20260923-r41",
+            "epoch": 80,
+            "samples_seen": 2000000,
+            "communication_tb": 1.579008,
+            "client_compute_gflops": 1848000.0,
+            "score": 48.08,
+            "gain_pp": 5.18,
+            "score_source_cell": "Checkpoints!I41",
+            "source_row_range": "Checkpoints!A41:J41"
+          },
+          {
+            "record_id": "workbook-20260923-r42",
+            "epoch": 90,
+            "samples_seen": 2250000,
+            "communication_tb": 1.776384,
+            "client_compute_gflops": 2079000.0,
+            "score": 48.06,
+            "gain_pp": 5.16,
+            "score_source_cell": "Checkpoints!I42",
+            "source_row_range": "Checkpoints!A42:J42"
+          }
+        ]
+      },
+      {
+        "dataset": "CheXpert",
+        "method": "SDAPT",
+        "original_workbook_method": "SDAPT",
+        "baseline": 77.4,
+        "checkpoint_count": 10,
+        "assumptions": {
+          "global_crop_px": 518.0,
+          "local_crop_px": 196.0,
+          "global_crops": 2.0,
+          "local_crops": 8.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 4316.0,
+          "bytes_per_sample": 6629376.0,
+          "client_gflops_per_sample": 6.36,
+          "iterations_per_epoch": 750.0,
+          "batch_size": 50.0,
+          "samples_per_epoch": 37500.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r43",
+            "epoch": 10,
+            "samples_seen": 375000,
+            "communication_tb": 2.486016,
+            "client_compute_gflops": 2385000.0,
+            "score": 78.21,
+            "gain_pp": 0.81,
+            "score_source_cell": "Checkpoints!I43",
+            "source_row_range": "Checkpoints!A43:J43"
+          },
+          {
+            "record_id": "workbook-20260923-r44",
+            "epoch": 15,
+            "samples_seen": 562500,
+            "communication_tb": 3.729024,
+            "client_compute_gflops": 3577500.0,
+            "score": 79.24,
+            "gain_pp": 1.84,
+            "score_source_cell": "Checkpoints!I44",
+            "source_row_range": "Checkpoints!A44:J44"
+          },
+          {
+            "record_id": "workbook-20260923-r45",
+            "epoch": 20,
+            "samples_seen": 750000,
+            "communication_tb": 4.972032,
+            "client_compute_gflops": 4770000.0,
+            "score": 80.5,
+            "gain_pp": 3.1,
+            "score_source_cell": "Checkpoints!I45",
+            "source_row_range": "Checkpoints!A45:J45"
+          },
+          {
+            "record_id": "workbook-20260923-r46",
+            "epoch": 30,
+            "samples_seen": 1125000,
+            "communication_tb": 7.458048,
+            "client_compute_gflops": 7155000.0,
+            "score": 80.89,
+            "gain_pp": 3.49,
+            "score_source_cell": "Checkpoints!I46",
+            "source_row_range": "Checkpoints!A46:J46"
+          },
+          {
+            "record_id": "workbook-20260923-r47",
+            "epoch": 40,
+            "samples_seen": 1500000,
+            "communication_tb": 9.944064,
+            "client_compute_gflops": 9540000.0,
+            "score": 80.81,
+            "gain_pp": 3.41,
+            "score_source_cell": "Checkpoints!I47",
+            "source_row_range": "Checkpoints!A47:J47"
+          },
+          {
+            "record_id": "workbook-20260923-r48",
+            "epoch": 50,
+            "samples_seen": 1875000,
+            "communication_tb": 12.43008,
+            "client_compute_gflops": 11925000.0,
+            "score": 80.73,
+            "gain_pp": 3.33,
+            "score_source_cell": "Checkpoints!I48",
+            "source_row_range": "Checkpoints!A48:J48"
+          },
+          {
+            "record_id": "workbook-20260923-r49",
+            "epoch": 60,
+            "samples_seen": 2250000,
+            "communication_tb": 14.916096,
+            "client_compute_gflops": 14310000.0,
+            "score": 80.84,
+            "gain_pp": 3.44,
+            "score_source_cell": "Checkpoints!I49",
+            "source_row_range": "Checkpoints!A49:J49"
+          },
+          {
+            "record_id": "workbook-20260923-r50",
+            "epoch": 70,
+            "samples_seen": 2625000,
+            "communication_tb": 17.402112,
+            "client_compute_gflops": 16695000.0,
+            "score": 80.76,
+            "gain_pp": 3.36,
+            "score_source_cell": "Checkpoints!I50",
+            "source_row_range": "Checkpoints!A50:J50"
+          },
+          {
+            "record_id": "workbook-20260923-r51",
+            "epoch": 80,
+            "samples_seen": 3000000,
+            "communication_tb": 19.888128,
+            "client_compute_gflops": 19080000.0,
+            "score": 80.72,
+            "gain_pp": 3.32,
+            "score_source_cell": "Checkpoints!I51",
+            "source_row_range": "Checkpoints!A51:J51"
+          },
+          {
+            "record_id": "workbook-20260923-r52",
+            "epoch": 90,
+            "samples_seen": 3375000,
+            "communication_tb": 22.374144,
+            "client_compute_gflops": 21465000.0,
+            "score": 80.68,
+            "gain_pp": 3.28,
+            "score_source_cell": "Checkpoints!I52",
+            "source_row_range": "Checkpoints!A52:J52"
+          }
+        ]
+      },
+      {
+        "dataset": "CheXpert",
+        "method": "MocoSFL",
+        "original_workbook_method": "MoCo-v3 SL",
+        "baseline": 77.4,
+        "checkpoint_count": 7,
+        "assumptions": {
+          "global_crop_px": 518.0,
+          "local_crop_px": null,
+          "global_crops": 2.0,
+          "local_crops": 0.0,
+          "patch_size_px": 14.0,
+          "embedding_dimension": 768.0,
+          "bytes_per_scalar": 2.0,
+          "tokens_per_sample": 2740.0,
+          "bytes_per_sample": 4208640.0,
+          "client_gflops_per_sample": 4.994,
+          "iterations_per_epoch": 150.0,
+          "batch_size": 75.0,
+          "samples_per_epoch": 11250.0
+        },
+        "checkpoints": [
+          {
+            "record_id": "workbook-20260923-r53",
+            "epoch": 10,
+            "samples_seen": 112500,
+            "communication_tb": 0.473472,
+            "client_compute_gflops": 561825.0,
+            "score": 78.59,
+            "gain_pp": 1.19,
+            "score_source_cell": "Checkpoints!I53",
+            "source_row_range": "Checkpoints!A53:J53"
+          },
+          {
+            "record_id": "workbook-20260923-r54",
+            "epoch": 20,
+            "samples_seen": 225000,
+            "communication_tb": 0.946944,
+            "client_compute_gflops": 1123650.0,
+            "score": 79.3,
+            "gain_pp": 1.9,
+            "score_source_cell": "Checkpoints!I54",
+            "source_row_range": "Checkpoints!A54:J54"
+          },
+          {
+            "record_id": "workbook-20260923-r55",
+            "epoch": 30,
+            "samples_seen": 337500,
+            "communication_tb": 1.420416,
+            "client_compute_gflops": 1685475.0,
+            "score": 79.72,
+            "gain_pp": 2.32,
+            "score_source_cell": "Checkpoints!I55",
+            "source_row_range": "Checkpoints!A55:J55"
+          },
+          {
+            "record_id": "workbook-20260923-r56",
+            "epoch": 40,
+            "samples_seen": 450000,
+            "communication_tb": 1.893888,
+            "client_compute_gflops": 2247300.0,
+            "score": 79.97,
+            "gain_pp": 2.57,
+            "score_source_cell": "Checkpoints!I56",
+            "source_row_range": "Checkpoints!A56:J56"
+          },
+          {
+            "record_id": "workbook-20260923-r57",
+            "epoch": 50,
+            "samples_seen": 562500,
+            "communication_tb": 2.36736,
+            "client_compute_gflops": 2809125.0,
+            "score": 80.15,
+            "gain_pp": 2.75,
+            "score_source_cell": "Checkpoints!I57",
+            "source_row_range": "Checkpoints!A57:J57"
+          },
+          {
+            "record_id": "workbook-20260923-r58",
+            "epoch": 60,
+            "samples_seen": 675000,
+            "communication_tb": 2.840832,
+            "client_compute_gflops": 3370950.0,
+            "score": 80.22,
+            "gain_pp": 2.82,
+            "score_source_cell": "Checkpoints!I58",
+            "source_row_range": "Checkpoints!A58:J58"
+          },
+          {
+            "record_id": "workbook-20260923-r59",
+            "epoch": 70,
+            "samples_seen": 787500,
+            "communication_tb": 3.314304,
+            "client_compute_gflops": 3932775.0,
+            "score": 80.24,
+            "gain_pp": 2.84,
+            "score_source_cell": "Checkpoints!I59",
+            "source_row_range": "Checkpoints!A59:J59"
+          }
+        ]
+      }
+    ],
+    "no_interpolation_or_extrapolation": true,
+    "budget_costs_are_estimates": true
+  },
+  "notes": [
+    "Table 1 scores and Table 2 changes are preserved exactly. Reported 7.4 pp averages nine few-shot gains, mixing accuracy and AUROC differences on 0–100 scales; it is not relative percent improvement.",
+    "All 56 Figure 2 checkpoints are plotted on each cost axis. Sample counts denote cumulative presentations including repeats. Costs exclude server work and are estimates, not measured latency or energy.",
+    "Table 1 LP results and Figure 2 checkpoint results remain separate because rounded reference scores and checkpoint selection differ. No uncertainty intervals are supplied.",
+    "Classification with 10 IID clients; dense prediction and heterogeneous partitions are not evaluated here.",
+    "Figure 2 uses the original plotting data; its source vector stream is identical to the figure embedded in the manuscript."
+  ]
+}

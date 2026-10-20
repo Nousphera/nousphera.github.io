@@ -1,0 +1,98 @@
+{
+  "slug": "sdapt",
+  "library_id": "sdapt-2026",
+  "name": "SDAPT",
+  "title": "Domain Adaptive Pretraining in Split Learning for Vision Foundation Models",
+  "year": 2026,
+  "venue": "Manuscript",
+  "type": "Manuscript",
+  "public_pdf": false,
+  "authors": [
+    "Stan van Honk",
+    "Vasileios Tsouvalas",
+    "Nirvana Meratnia"
+  ],
+  "tagline": "Adapt together. Specialize locally.",
+  "summary": "SDAPT adapts a shared vision foundation model to unlabeled domain images. Frozen client layers keep local computation light; server-side self-distillation learns a common representation, then each client trains its own task head.",
+  "category": "Efficient learning",
+  "topics": [
+    "Split learning",
+    "Domain adaptation",
+    "Self-supervised learning",
+    "Vision foundation models"
+  ],
+  "keywords": [
+    "DAPT",
+    "DINOv2",
+    "ViT",
+    "LoRA",
+    "EMA teacher",
+    "iBOT",
+    "KoLeo",
+    "Few-shot learning",
+    "fMoW",
+    "CheXpert",
+    "QuickDraw",
+    "MocoSFL"
+  ],
+  "accent": "#266f85",
+  "accent_dark": "#83d4e6",
+  "tint": "#edf6f8",
+  "links": {
+    "Code": "https://github.com/Nousphera/SDAPT",
+    "Repository": "https://github.com/Nousphera/SDAPT"
+  },
+  "figure": {
+    "src": "assets/projects/sdapt/overview.svg",
+    "width": 1200,
+    "height": 540,
+    "alt": "Frozen client layers upload image features to a shared self-distillation server. The adapted frozen encoder returns representations for local task heads.",
+    "caption": "Adapt a shared backbone with unlabeled images, then train task-specific heads locally.",
+    "source_label": "Explanatory schematic · manuscript Figure 1",
+    "source_url": "https://nousphera.github.io/assets/projects/sdapt/results.json"
+  },
+  "method": [
+    {
+      "title": "Extract local features",
+      "text": "Frozen client layers process two global and eight local image crops. Raw images remain local; CLS and patch tokens are uploaded."
+    },
+    {
+      "title": "Adapt on the server",
+      "text": "Combine all client features into one batch. Train the student with DINO, iBOT and KoLeo, update an EMA teacher, and return no gradients to frozen clients."
+    },
+    {
+      "title": "Specialize locally",
+      "text": "Freeze the adapted teacher backbone. Return representations to each client, which trains a task-specific head using its own labels."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Label-efficient adaptation",
+      "text": "SDAPT gains 7.4 percentage points on average across nine few-shot settings spanning three domains."
+    },
+    {
+      "title": "Budget-dependent trade-offs",
+      "text": "MocoSFL is competitive at low adaptation budgets; SDAPT benefits more from additional data and communication."
+    },
+    {
+      "title": "Shared representations, distinct tasks",
+      "text": "One CheXpert-adapted backbone improves average AUROC from 77.41 to 80.68 across eight labels."
+    }
+  ],
+  "abstract": "Vision Foundation Models (VFMs) support tasks with limited labeled data, although their performance can decline in specialized domains. Domain-Adaptive Pretraining (DAPT) can address this limitation by adapting their representations using unlabeled in-domain images; yet these often are privacy-sensitive and distributed across resource-constrained devices. Split Learning (SL) addresses these constraints by offloading computation to a server while keeping raw images local. Existing SL methods, however, explore self-supervised training from scratch, leaving collaborative DAPT of VFMs underexplored. For this, we propose SDAPT, which performs server-side DAPT with LoRA adapters using features from frozen client layers, then trains task-specific heads on the frozen adapted VFM, keeping images and labels local. Across 3 domains, and diverse few-shot settings, we observe mean gains of 7.4 pp over direct fine-tuning, while adapting once on unlabeled domain data yields shared representations that improve performance across multiple downstream tasks.",
+  "abstract_source": {
+    "url": "https://github.com/Nousphera/SDAPT",
+    "label": "Project implementation"
+  },
+  "bibtex": "@misc{vanhonk2026sdapt,\n  title = {Domain Adaptive Pretraining in Split Learning for Vision Foundation Models},\n  author = {Stan van Honk and Vasileios Tsouvalas and Nirvana Meratnia},\n  year = {2026},\n  note = {Manuscript},\n  url = {https://nousphera.github.io/projects/sdapt/}\n}",
+  "provenance": {
+    "source_url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+    "content_pages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "figure_note": "Original explanatory vector illustration. Results transcribed from Tables 1–2 and original Figure 2 checkpoints of the author manuscript compiled 13 October 2026."
+  }
+}

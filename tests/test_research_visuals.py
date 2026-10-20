@@ -14,7 +14,7 @@ from research_visuals import numeric_value, validate_insight, diagram_markup, ch
 class ResearchVisualTests(unittest.TestCase):
     def test_all_papers_have_audited_evidence_and_comparable_tables(self):
         projects=build.load_projects()
-        self.assertEqual(len(projects),14)
+        self.assertEqual(len(projects),15)
         for p in projects:
             self.assertIn('insight',p,p['slug'])
             validate_insight(p['insight'],build.public_url)
@@ -31,7 +31,7 @@ class ResearchVisualTests(unittest.TestCase):
             from paper_results import load_results, selected_result
             for panel in load_results(p)['panels']:
                 self.assertIn(build.esc(panel['source']['url']), html)
-                if panel['kind'] == 'scatter': continue
+                if panel['kind'] in ('scatter', 'curves'): continue
                 result = selected_result(p, panel)
                 columns = panel.get('columns', list(range(len(result['columns'])-1))) if panel['kind'] == 'table' else sorted({c for chart in panel['charts'] for c in chart['columns']})
                 for row in result['rows']:

@@ -36,6 +36,18 @@ class ResultsTests(unittest.TestCase):
             html = results_markup(p)
             for panel in load_results(p)['panels']:
                 self.assertIn(build.esc(panel['source']['url']), html)
+                if panel['kind'] == 'curves':
+                    for group in panel['groups']:
+                        for chart in group['charts']:
+                            for series in chart['series']:
+                                for x, y in series['points']:
+                                    self.assertIn(f'data-result-x="{x}" data-result-y="{y}"', html)
+                    if 'summary_result_index' in panel:
+                        summary = selected_result(p, {'result_index': panel['summary_result_index']})
+                        for row in summary['rows']:
+                            for value in row['values']:
+                                self.assertIn(build.esc(str(value)), html)
+                    continue
                 if panel['kind'] == 'scatter':
                     for point in panel['plot']['points']:
                         self.assertIn(f'data-result-x="{point["x"]}"', html)

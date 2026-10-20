@@ -1,0 +1,1475 @@
+{
+  "slug": "sdapt",
+  "panels": [
+    {
+      "kind": "curves",
+      "title": "Stronger representations with more labels",
+      "subtitle": "DINOv2 ViT-B/14 · 10 IID clients · Few-shot classification",
+      "source": {
+        "label": "Table 1 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "groups": [
+        {
+          "label": "Few-shot performance",
+          "charts": [
+            {
+              "title": "fMoW",
+              "x": {
+                "label": "Shots (k)",
+                "min": 3,
+                "max": 17,
+                "ticks": [
+                  4,
+                  8,
+                  16
+                ]
+              },
+              "y": {
+                "label": "Accuracy (%)",
+                "min": 0,
+                "max": 50,
+                "ticks": [
+                  0,
+                  10,
+                  20,
+                  30,
+                  40,
+                  50
+                ]
+              },
+              "series": [
+                {
+                  "label": "FT w/o DAPT",
+                  "tone": "muted",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      12.8
+                    ],
+                    [
+                      8,
+                      18.3
+                    ],
+                    [
+                      16,
+                      23.4
+                    ]
+                  ]
+                },
+                {
+                  "label": "FedAvg",
+                  "tone": "purple",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      18.4
+                    ],
+                    [
+                      8,
+                      28.8
+                    ],
+                    [
+                      16,
+                      38.8
+                    ]
+                  ]
+                },
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      22.4
+                    ],
+                    [
+                      8,
+                      31.5
+                    ],
+                    [
+                      16,
+                      35.7
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      4,
+                      16.9
+                    ],
+                    [
+                      8,
+                      27.5
+                    ],
+                    [
+                      16,
+                      37.5
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "QuickDraw",
+              "x": {
+                "label": "Shots (k)",
+                "min": 3,
+                "max": 17,
+                "ticks": [
+                  4,
+                  8,
+                  16
+                ]
+              },
+              "y": {
+                "label": "Accuracy (%)",
+                "min": 0,
+                "max": 50,
+                "ticks": [
+                  0,
+                  10,
+                  20,
+                  30,
+                  40,
+                  50
+                ]
+              },
+              "series": [
+                {
+                  "label": "FT w/o DAPT",
+                  "tone": "muted",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      18.4
+                    ],
+                    [
+                      8,
+                      25.8
+                    ],
+                    [
+                      16,
+                      32.3
+                    ]
+                  ]
+                },
+                {
+                  "label": "FedAvg",
+                  "tone": "purple",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      27.0
+                    ],
+                    [
+                      8,
+                      37.2
+                    ],
+                    [
+                      16,
+                      43.9
+                    ]
+                  ]
+                },
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      23.2
+                    ],
+                    [
+                      8,
+                      32.4
+                    ],
+                    [
+                      16,
+                      39.0
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      4,
+                      22.3
+                    ],
+                    [
+                      8,
+                      33.2
+                    ],
+                    [
+                      16,
+                      43.1
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "CheXpert",
+              "x": {
+                "label": "Shots (k)",
+                "min": 3,
+                "max": 17,
+                "ticks": [
+                  4,
+                  8,
+                  16
+                ]
+              },
+              "y": {
+                "label": "AUROC (0–100)",
+                "min": 0,
+                "max": 50,
+                "ticks": [
+                  0,
+                  10,
+                  20,
+                  30,
+                  40,
+                  50
+                ]
+              },
+              "series": [
+                {
+                  "label": "FT w/o DAPT",
+                  "tone": "muted",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      34.7
+                    ],
+                    [
+                      8,
+                      38.1
+                    ],
+                    [
+                      16,
+                      37.8
+                    ]
+                  ]
+                },
+                {
+                  "label": "FedAvg",
+                  "tone": "purple",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      37.7
+                    ],
+                    [
+                      8,
+                      39.3
+                    ],
+                    [
+                      16,
+                      43.9
+                    ]
+                  ]
+                },
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      4,
+                      39.3
+                    ],
+                    [
+                      8,
+                      39.7
+                    ],
+                    [
+                      16,
+                      43.4
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      4,
+                      41.3
+                    ],
+                    [
+                      8,
+                      41.7
+                    ],
+                    [
+                      16,
+                      44.4
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "summary_result_index": 3,
+      "finding": "<strong>+7.4 pp on average</strong> over no DAPT across nine few-shot settings. SDAPT exceeds MocoSFL at 16 shots in all three domains; FedAvg leads on few-shot fMoW and QuickDraw."
+    },
+    {
+      "kind": "curves",
+      "title": "The adaptation budget changes the trade-off",
+      "subtitle": "Gain over no DAPT · Estimated feature uplink and all-client forward compute; server compute excluded",
+      "source": {
+        "label": "Figure 2 · Original checkpoint data · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "groups": [
+        {
+          "label": "Upload",
+          "charts": [
+            {
+              "title": "fMoW",
+              "x": {
+                "label": "Feature upload (TB)",
+                "min": 0.15,
+                "max": 5,
+                "ticks": [
+                  0.2,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 15,
+                "ticks": [
+                  0,
+                  5,
+                  10,
+                  15
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.197376,
+                      3.28
+                    ],
+                    [
+                      0.394752,
+                      6.11
+                    ],
+                    [
+                      0.592128,
+                      7.28
+                    ],
+                    [
+                      0.789504,
+                      7.8
+                    ],
+                    [
+                      0.98688,
+                      8.08
+                    ],
+                    [
+                      1.184256,
+                      8.18
+                    ],
+                    [
+                      1.381632,
+                      8.18
+                    ],
+                    [
+                      1.579008,
+                      8.19
+                    ],
+                    [
+                      1.776384,
+                      8.17
+                    ],
+                    [
+                      1.97376,
+                      8.17
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.43872,
+                      5.76
+                    ],
+                    [
+                      0.87744,
+                      8.56
+                    ],
+                    [
+                      1.31616,
+                      10.18
+                    ],
+                    [
+                      1.75488,
+                      11.17
+                    ],
+                    [
+                      2.1936,
+                      11.92
+                    ],
+                    [
+                      2.63232,
+                      12.41
+                    ],
+                    [
+                      3.07104,
+                      12.56
+                    ],
+                    [
+                      3.50976,
+                      12.7
+                    ],
+                    [
+                      3.94848,
+                      12.75
+                    ],
+                    [
+                      4.3872,
+                      12.78
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "QuickDraw",
+              "x": {
+                "label": "Feature upload (TB)",
+                "min": 0.15,
+                "max": 5,
+                "ticks": [
+                  0.2,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 10,
+                "ticks": [
+                  0,
+                  2,
+                  4,
+                  6,
+                  8,
+                  10
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.197376,
+                      4.21
+                    ],
+                    [
+                      0.394752,
+                      5.42
+                    ],
+                    [
+                      0.592128,
+                      5.48
+                    ],
+                    [
+                      0.789504,
+                      5.45
+                    ],
+                    [
+                      0.98688,
+                      5.34
+                    ],
+                    [
+                      1.184256,
+                      5.29
+                    ],
+                    [
+                      1.381632,
+                      5.23
+                    ],
+                    [
+                      1.579008,
+                      5.18
+                    ],
+                    [
+                      1.776384,
+                      5.16
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.43872,
+                      4.4
+                    ],
+                    [
+                      0.87744,
+                      5.52
+                    ],
+                    [
+                      1.31616,
+                      6.53
+                    ],
+                    [
+                      1.75488,
+                      7.34
+                    ],
+                    [
+                      2.1936,
+                      7.9
+                    ],
+                    [
+                      2.63232,
+                      8.03
+                    ],
+                    [
+                      3.07104,
+                      8.07
+                    ],
+                    [
+                      3.50976,
+                      8.14
+                    ],
+                    [
+                      3.94848,
+                      8.15
+                    ],
+                    [
+                      4.3872,
+                      8.15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "CheXpert",
+              "x": {
+                "label": "Feature upload (TB)",
+                "min": 0.4,
+                "max": 25,
+                "ticks": [
+                  0.5,
+                  1,
+                  5,
+                  20
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "AUROC gain (pp)",
+                "min": 0,
+                "max": 4,
+                "ticks": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.473472,
+                      1.19
+                    ],
+                    [
+                      0.946944,
+                      1.9
+                    ],
+                    [
+                      1.420416,
+                      2.32
+                    ],
+                    [
+                      1.893888,
+                      2.57
+                    ],
+                    [
+                      2.36736,
+                      2.75
+                    ],
+                    [
+                      2.840832,
+                      2.82
+                    ],
+                    [
+                      3.314304,
+                      2.84
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      2.486016,
+                      0.81
+                    ],
+                    [
+                      3.729024,
+                      1.84
+                    ],
+                    [
+                      4.972032,
+                      3.1
+                    ],
+                    [
+                      7.458048,
+                      3.49
+                    ],
+                    [
+                      9.944064,
+                      3.41
+                    ],
+                    [
+                      12.43008,
+                      3.33
+                    ],
+                    [
+                      14.916096,
+                      3.44
+                    ],
+                    [
+                      17.402112,
+                      3.36
+                    ],
+                    [
+                      19.888128,
+                      3.32
+                    ],
+                    [
+                      22.374144,
+                      3.28
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Compute",
+          "charts": [
+            {
+              "title": "fMoW",
+              "x": {
+                "label": "Client compute (10⁶ GFLOPs)",
+                "min": 0.15,
+                "max": 5,
+                "ticks": [
+                  0.2,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 15,
+                "ticks": [
+                  0,
+                  5,
+                  10,
+                  15
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.231,
+                      3.28
+                    ],
+                    [
+                      0.462,
+                      6.11
+                    ],
+                    [
+                      0.693,
+                      7.28
+                    ],
+                    [
+                      0.924,
+                      7.8
+                    ],
+                    [
+                      1.155,
+                      8.08
+                    ],
+                    [
+                      1.386,
+                      8.18
+                    ],
+                    [
+                      1.617,
+                      8.18
+                    ],
+                    [
+                      1.848,
+                      8.19
+                    ],
+                    [
+                      2.079,
+                      8.17
+                    ],
+                    [
+                      2.31,
+                      8.17
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.4,
+                      5.76
+                    ],
+                    [
+                      0.8,
+                      8.56
+                    ],
+                    [
+                      1.2,
+                      10.18
+                    ],
+                    [
+                      1.6,
+                      11.17
+                    ],
+                    [
+                      2.0,
+                      11.92
+                    ],
+                    [
+                      2.4,
+                      12.41
+                    ],
+                    [
+                      2.8,
+                      12.56
+                    ],
+                    [
+                      3.2,
+                      12.7
+                    ],
+                    [
+                      3.6,
+                      12.75
+                    ],
+                    [
+                      4.0,
+                      12.78
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "QuickDraw",
+              "x": {
+                "label": "Client compute (10⁶ GFLOPs)",
+                "min": 0.15,
+                "max": 5,
+                "ticks": [
+                  0.2,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 10,
+                "ticks": [
+                  0,
+                  2,
+                  4,
+                  6,
+                  8,
+                  10
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.231,
+                      4.21
+                    ],
+                    [
+                      0.462,
+                      5.42
+                    ],
+                    [
+                      0.693,
+                      5.48
+                    ],
+                    [
+                      0.924,
+                      5.45
+                    ],
+                    [
+                      1.155,
+                      5.34
+                    ],
+                    [
+                      1.386,
+                      5.29
+                    ],
+                    [
+                      1.617,
+                      5.23
+                    ],
+                    [
+                      1.848,
+                      5.18
+                    ],
+                    [
+                      2.079,
+                      5.16
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.4,
+                      4.4
+                    ],
+                    [
+                      0.8,
+                      5.52
+                    ],
+                    [
+                      1.2,
+                      6.53
+                    ],
+                    [
+                      1.6,
+                      7.34
+                    ],
+                    [
+                      2.0,
+                      7.9
+                    ],
+                    [
+                      2.4,
+                      8.03
+                    ],
+                    [
+                      2.8,
+                      8.07
+                    ],
+                    [
+                      3.2,
+                      8.14
+                    ],
+                    [
+                      3.6,
+                      8.15
+                    ],
+                    [
+                      4.0,
+                      8.15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "CheXpert",
+              "x": {
+                "label": "Client compute (10⁶ GFLOPs)",
+                "min": 0.4,
+                "max": 25,
+                "ticks": [
+                  0.5,
+                  1,
+                  5,
+                  20
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "AUROC gain (pp)",
+                "min": 0,
+                "max": 4,
+                "ticks": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.561825,
+                      1.19
+                    ],
+                    [
+                      1.12365,
+                      1.9
+                    ],
+                    [
+                      1.685475,
+                      2.32
+                    ],
+                    [
+                      2.2473,
+                      2.57
+                    ],
+                    [
+                      2.809125,
+                      2.75
+                    ],
+                    [
+                      3.37095,
+                      2.82
+                    ],
+                    [
+                      3.932775,
+                      2.84
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      2.385,
+                      0.81
+                    ],
+                    [
+                      3.5775,
+                      1.84
+                    ],
+                    [
+                      4.77,
+                      3.1
+                    ],
+                    [
+                      7.155,
+                      3.49
+                    ],
+                    [
+                      9.54,
+                      3.41
+                    ],
+                    [
+                      11.925,
+                      3.33
+                    ],
+                    [
+                      14.31,
+                      3.44
+                    ],
+                    [
+                      16.695,
+                      3.36
+                    ],
+                    [
+                      19.08,
+                      3.32
+                    ],
+                    [
+                      21.465,
+                      3.28
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Samples",
+          "charts": [
+            {
+              "title": "fMoW",
+              "x": {
+                "label": "Sample presentations (10⁶)",
+                "min": 0.1,
+                "max": 4,
+                "ticks": [
+                  0.1,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 15,
+                "ticks": [
+                  0,
+                  5,
+                  10,
+                  15
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.25,
+                      3.28
+                    ],
+                    [
+                      0.5,
+                      6.11
+                    ],
+                    [
+                      0.75,
+                      7.28
+                    ],
+                    [
+                      1.0,
+                      7.8
+                    ],
+                    [
+                      1.25,
+                      8.08
+                    ],
+                    [
+                      1.5,
+                      8.18
+                    ],
+                    [
+                      1.75,
+                      8.18
+                    ],
+                    [
+                      2.0,
+                      8.19
+                    ],
+                    [
+                      2.25,
+                      8.17
+                    ],
+                    [
+                      2.5,
+                      8.17
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.3125,
+                      5.76
+                    ],
+                    [
+                      0.625,
+                      8.56
+                    ],
+                    [
+                      0.9375,
+                      10.18
+                    ],
+                    [
+                      1.25,
+                      11.17
+                    ],
+                    [
+                      1.5625,
+                      11.92
+                    ],
+                    [
+                      1.875,
+                      12.41
+                    ],
+                    [
+                      2.1875,
+                      12.56
+                    ],
+                    [
+                      2.5,
+                      12.7
+                    ],
+                    [
+                      2.8125,
+                      12.75
+                    ],
+                    [
+                      3.125,
+                      12.78
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "QuickDraw",
+              "x": {
+                "label": "Sample presentations (10⁶)",
+                "min": 0.1,
+                "max": 4,
+                "ticks": [
+                  0.1,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "Accuracy gain (pp)",
+                "min": 0,
+                "max": 10,
+                "ticks": [
+                  0,
+                  2,
+                  4,
+                  6,
+                  8,
+                  10
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.25,
+                      4.21
+                    ],
+                    [
+                      0.5,
+                      5.42
+                    ],
+                    [
+                      0.75,
+                      5.48
+                    ],
+                    [
+                      1.0,
+                      5.45
+                    ],
+                    [
+                      1.25,
+                      5.34
+                    ],
+                    [
+                      1.5,
+                      5.29
+                    ],
+                    [
+                      1.75,
+                      5.23
+                    ],
+                    [
+                      2.0,
+                      5.18
+                    ],
+                    [
+                      2.25,
+                      5.16
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.3125,
+                      4.4
+                    ],
+                    [
+                      0.625,
+                      5.52
+                    ],
+                    [
+                      0.9375,
+                      6.53
+                    ],
+                    [
+                      1.25,
+                      7.34
+                    ],
+                    [
+                      1.5625,
+                      7.9
+                    ],
+                    [
+                      1.875,
+                      8.03
+                    ],
+                    [
+                      2.1875,
+                      8.07
+                    ],
+                    [
+                      2.5,
+                      8.14
+                    ],
+                    [
+                      2.8125,
+                      8.15
+                    ],
+                    [
+                      3.125,
+                      8.15
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "CheXpert",
+              "x": {
+                "label": "Sample presentations (10⁶)",
+                "min": 0.1,
+                "max": 4,
+                "ticks": [
+                  0.1,
+                  0.5,
+                  1,
+                  4
+                ],
+                "scale": "log"
+              },
+              "y": {
+                "label": "AUROC gain (pp)",
+                "min": 0,
+                "max": 4,
+                "ticks": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4
+                ]
+              },
+              "series": [
+                {
+                  "label": "MocoSFL",
+                  "tone": "orange",
+                  "highlight": false,
+                  "points": [
+                    [
+                      0.1125,
+                      1.19
+                    ],
+                    [
+                      0.225,
+                      1.9
+                    ],
+                    [
+                      0.3375,
+                      2.32
+                    ],
+                    [
+                      0.45,
+                      2.57
+                    ],
+                    [
+                      0.5625,
+                      2.75
+                    ],
+                    [
+                      0.675,
+                      2.82
+                    ],
+                    [
+                      0.7875,
+                      2.84
+                    ]
+                  ]
+                },
+                {
+                  "label": "SDAPT",
+                  "tone": "accent",
+                  "highlight": true,
+                  "points": [
+                    [
+                      0.375,
+                      0.81
+                    ],
+                    [
+                      0.5625,
+                      1.84
+                    ],
+                    [
+                      0.75,
+                      3.1
+                    ],
+                    [
+                      1.125,
+                      3.49
+                    ],
+                    [
+                      1.5,
+                      3.41
+                    ],
+                    [
+                      1.875,
+                      3.33
+                    ],
+                    [
+                      2.25,
+                      3.44
+                    ],
+                    [
+                      2.625,
+                      3.36
+                    ],
+                    [
+                      3.0,
+                      3.32
+                    ],
+                    [
+                      3.375,
+                      3.28
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "default_group": 0,
+      "finding": "<strong>MocoSFL is competitive at small budgets.</strong> SDAPT reaches larger gains at higher budgets; CheXpert peaks before the final checkpoint."
+    },
+    {
+      "kind": "bars",
+      "title": "One adapted backbone, eight local tasks",
+      "subtitle": "CheXpert adaptation → CheXlocalize test set · AUROC gain over no DAPT (pp)",
+      "source": {
+        "label": "Table 2 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "result_index": 4,
+      "charts": [
+        {
+          "columns": [
+            0,
+            1
+          ],
+          "title": "Change per label",
+          "series_labels": [
+            "MocoSFL",
+            "SDAPT"
+          ],
+          "highlight_series": [
+            1
+          ],
+          "maximum": 15,
+          "direction": "higher"
+        }
+      ],
+      "finding": "<strong>77.41 → 80.68 mean AUROC.</strong> SDAPT improves six of eight labels; edema and consolidation decline."
+    }
+  ],
+  "takeaways": [
+    "<strong>Adapt before specializing.</strong> Unlabeled domain images improve the shared representation for label-scarce tasks.",
+    "<strong>Match the method to the budget.</strong> SDAPT gains from more labels and adaptation; low-budget comparisons can favor MocoSFL.",
+    "<strong>Inspect individual tasks.</strong> A better average coexists with task-specific regressions."
+  ],
+  "audit": {
+    "sources": [
+      {
+        "label": "Tables 1–2 and Figure 2 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      }
+    ],
+    "manuscript_sha256": "34993089d8f5ea0f7dd07c12ff4f9eb2e8fbf6a64634c951289b29d447c3862c",
+    "notes": [
+      "Table 1 scores and Table 2 changes are preserved exactly. Reported 7.4 pp averages nine few-shot gains, mixing accuracy and AUROC differences on 0–100 scales; it is not relative percent improvement.",
+      "All 56 Figure 2 checkpoints are plotted on each cost axis. Sample counts denote cumulative presentations including repeats. Costs exclude server work and are estimates, not measured latency or energy.",
+      "Table 1 LP results and Figure 2 checkpoint results remain separate because rounded reference scores and checkpoint selection differ. No uncertainty intervals are supplied.",
+      "Publication status is manuscript, not an accepted conference paper. The manuscript PDF remains private."
+    ]
+  }
+}

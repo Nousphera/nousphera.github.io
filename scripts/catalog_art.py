@@ -295,7 +295,22 @@ def _fiba():
             + target + _label(98, "Input") + _label(247, "Trigger") + _label(344, "Target"))
 
 
+def _sdapt():
+    client = _box(25, 40, 90, 90)
+    client += _path("M38 61 L51 49 L65 62 L78 54 L102 76", "accent")
+    client += _grid(41, 91, ["accent", "soft", "secondary"], 3, 14, 6)
+    shared = _box(170, 40, 90, 90, "accent", "soft")
+    shared += _network(188, 58, 54, 52)
+    head = _box(316, 54, 57, 62, "secondary", "surface")
+    head += _path("M328 73 H359 M328 86 H352 M328 99 H355", "secondary", 2.4)
+    return (client + _arrow(121, 82, 161, 82) + _pulse(shared)
+            + _arrow(268, 82, 308, 82, "secondary") + head
+            + _label(70, "Local views") + _label(215, "Adapt")
+            + _label(344, "Task heads"))
+
+
 _SCENES = {
+    "sdapt": _sdapt,
     "ae-psl": _ae_psl,
     "mpsl": _mpsl,
     "matu": _matu,

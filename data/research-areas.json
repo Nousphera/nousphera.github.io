@@ -11,7 +11,8 @@
         "matu",
         "mpsl",
         "deltamask",
-        "enccluster"
+        "enccluster",
+        "sdapt"
       ]
     },
     {
@@ -31,7 +32,8 @@
         "fedstar",
         "fedser",
         "efu",
-        "fiba"
+        "fiba",
+        "sdapt"
       ]
     },
     {
@@ -44,7 +46,8 @@
         "fedstar",
         "plix",
         "da-mldg",
-        "fedser"
+        "fedser",
+        "sdapt"
       ]
     },
     {
@@ -65,6 +68,7 @@
     "ae-psl": "Parallel split learning belongs to decentralized learning and foundation-model adaptation; it is not federated averaging.",
     "mpsl": "Multimodal parallel split learning belongs to decentralized learning and foundation-model adaptation; it is not federated averaging.",
     "decentralized": "Federated and parallel split learning are distinct collaborative paradigms. PLiX and DA-MLDG are listed under reliable learning because their training is not distributed.",
-    "foundation": "Includes vision-only and multimodal adaptation. EncCluster includes its related federated foundation models workshop version, distinguished on its project page."
+    "foundation": "Includes vision-only and multimodal adaptation. EncCluster includes its related federated foundation models workshop version, distinguished on its project page.",
+    "sdapt": "Vision-only domain-adaptive pretraining via parallel split learning, followed by local task-head training; three independent same-domain studies."
   }
 }

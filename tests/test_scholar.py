@@ -30,6 +30,8 @@ class ScholarTests(unittest.TestCase):
     def test_all_papers_have_searchable_full_text_and_matching_metadata(self):
         from scholar import record
         for p in build.load_projects():
+            if not p.get('public_pdf', True):
+                continue
             with self.subTest(paper=p['slug']):
                 folder = ROOT / 'projects' / p['slug']
                 item = record(p)  # validates PDF signature, size and SHA-256
@@ -58,7 +60,21 @@ class ScholarTests(unittest.TestCase):
         for p in build.load_projects():
             base = f'https://nousphera.github.io/projects/{p["slug"]}/'
             self.assertIn(base, urls)
-            self.assertIn(base + 'paper.html', urls)
+            if p.get('public_pdf', True):
+                self.assertIn(base + 'paper.html', urls)
+            else:
+                self.assertNotIn(base + 'paper.html', urls)
+
+    def test_manuscript_has_no_fictitious_public_archive_or_accepted_venue(self):
+        p = next(p for p in build.load_projects() if p['slug'] == 'sdapt')
+        html = build.project_page(p, [p])
+        self.assertEqual(p['year'], 2026)
+        self.assertEqual(p['venue'], 'Manuscript')
+        self.assertNotIn('Paper', p['links'])
+        for fragment in ['citation_pdf_url', 'citation_abstract_html_url', 'paper.pdf', 'application/pdf']:
+            self.assertNotIn(fragment, html)
+        self.assertFalse((ROOT / 'projects/sdapt/paper.pdf').exists())
+        self.assertIn('name="citation_title"', html)
 
 
 if __name__ == '__main__':

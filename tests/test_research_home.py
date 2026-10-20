@@ -39,13 +39,14 @@ class ResearchHomeTests(unittest.TestCase):
         self.catalog = Catalog(self.html)
 
     def test_every_public_paper_appears_once_in_the_correct_descending_year(self):
-        self.assertEqual(len(self.catalog.cards), 14)
+        self.assertEqual(len(self.catalog.cards), 15)
         self.assertEqual(self.catalog.years, [2026, 2025, 2024, 2023, 2022])
         for p in self.projects:
             self.assertEqual(self.catalog.cards[p['slug']]['year'], p['year'])
             self.assertNotIn('hidden', self.catalog.cards[p['slug']])
         self.assertNotIn('logipuz', self.catalog.cards)
-        self.assertNotIn('sdapt', self.catalog.cards)
+        self.assertEqual(self.catalog.cards['sdapt']['year'], 2026)
+        self.assertIn('manuscript', self.catalog.cards['sdapt']['data-search'].lower())
 
     def test_method_names_and_established_acronyms_are_searchable(self):
         terms = self.catalog.cards['fedln']['data-search']

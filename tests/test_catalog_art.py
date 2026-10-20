@@ -14,7 +14,7 @@ class CatalogArtTests(unittest.TestCase):
     def test_every_public_paper_has_distinct_inline_art(self):
         slugs = [path.stem for path in (ROOT / "data/projects").glob("*.json")]
         scenes = [thumbnail(slug) for slug in slugs]
-        self.assertEqual(len(scenes), 14)
+        self.assertEqual(len(scenes), 15)
         self.assertEqual(len(set(scenes)), len(scenes))
         for slug, markup in zip(slugs, scenes):
             with self.subTest(slug=slug):

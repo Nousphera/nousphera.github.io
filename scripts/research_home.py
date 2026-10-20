@@ -34,9 +34,10 @@ def tile(p, areas, icon):
     code_url = p['links'].get('Code') or p['links'].get('Repository')
     code_icon = 'github' if code_url and urlparse(code_url).hostname == 'github.com' else 'code'
     code_link = f'<a href="{escape(code_url)}" aria-label="{escape(p["name"])} code">{icon(code_icon)}Code</a>' if code_url else ''
+    paper_link = f'<a href="{escape(p["links"]["Paper"])}" aria-label="{escape(p["name"])} paper">{icon("paper")}Paper</a>' if p['links'].get('Paper') else ''
     return f'''<article class="research-tile" data-project="{p['slug']}" data-areas="{' '.join(memberships)}" data-search="{escape(' '.join(terms))}" style="--card-accent:{p['accent']};--card-accent-dark:{p['accent_dark']};--card-tint:{p['tint']};--card-secondary:{secondary};--card-secondary-dark:{secondary_dark}">
 <a class="tile-main" href="/projects/{p['slug']}/" aria-labelledby="name-{p['slug']}" aria-describedby="description-{p['slug']}"><div class="tile-art">{thumbnail(p['slug'])}</div><div class="tile-copy"><div class="tile-topic">{escape(p['topics'][0])}</div><h4 id="name-{p['slug']}">{escape(p['name'])}{icon('arrow')}</h4><p id="description-{p['slug']}">{escape(p['tagline'].rstrip('.'))}</p></div></a>
-<div class="tile-footer"><span class="tile-venue" title="{escape(p['type'] + ' · ' + p['venue'])}">{escape(short_venue)}</span><div class="tile-resources"><a href="{escape(p['links']['Paper'])}" aria-label="{escape(p['name'])} paper">{icon('paper')}Paper</a>{code_link}</div></div></article>'''
+<div class="tile-footer"><span class="tile-venue" title="{escape(p['type'] + ' · ' + p['venue'])}">{escape(short_venue)}</span><div class="tile-resources">{paper_link}{code_link}</div></div></article>'''
 
 
 def home_page(projects, icon, theme_control, asset_url):

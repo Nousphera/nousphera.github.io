@@ -12,6 +12,18 @@
     }
   },
   {
+    "id": "sdapt",
+    "title": "Domain Adaptive Pretraining in Split Learning for Vision Foundation Models",
+    "focus": "Efficient learning",
+    "year": 2026,
+    "venue": "Manuscript",
+    "description": "SDAPT adapts a shared vision foundation model to unlabeled domain images. Frozen client layers keep local computation light; server-side self-distillation learns a common representation, then each client trains its own task head.",
+    "link": {
+      "href": "https://nousphera.github.io/projects/sdapt/",
+      "label": "Project page"
+    }
+  },
+  {
     "id": "efu",
     "title": "EFU: Enforcing Federated Unlearning via Functional Encryption",
     "focus": "Private learning",

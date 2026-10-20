@@ -120,11 +120,17 @@ def shell(title, description, path, body, p=None):
         extras += f'<link rel="stylesheet" href="{asset_url("assets/paper-results.css")}">'
         citation_year = re.search(r'year\s*=\s*\{(\d{4})\}', p['bibtex']).group(1)
         css = f'<style>:root{{--accent-light:{p["accent"]};--accent-dark:{p["accent_dark"]};--tint-light:{p["tint"]};}}</style>'
-        meta += scholar_metadata(p)
+        if p.get('public_pdf', True):
+            meta += scholar_metadata(p)
+        else:
+            meta += f'<meta name="citation_title" content="{esc(p["title"])}">'
+            meta += ''.join(f'<meta name="citation_author" content="{esc(a)}">' for a in p['authors'])
+            meta += f'<meta name="citation_publication_date" content="{citation_year}">'
         preview = p.get('social_image', p['figure']['src'])
         meta += f'<meta property="og:image" content="{ORIGIN}/{esc(preview)}">\n'
         data = {'@context': 'https://schema.org', '@type': 'ScholarlyArticle', 'headline': p['title'], 'description': p['summary'], 'author': [{'@type': 'Person', 'name': a} for a in p['authors']], 'datePublished': citation_year, 'url': ORIGIN + path, 'sameAs': [url for label, url in p['links'].items() if label not in ('Code', 'Project')], 'image': ORIGIN + '/' + p['figure']['src']}
-        data['encoding'] = {'@type': 'MediaObject', 'encodingFormat': 'application/pdf', 'contentUrl': ORIGIN + path + 'paper.pdf'}
+        if p.get('public_pdf', True):
+            data['encoding'] = {'@type': 'MediaObject', 'encodingFormat': 'application/pdf', 'contentUrl': ORIGIN + path + 'paper.pdf'}
         meta += '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026') + '</script>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -141,7 +147,7 @@ def figure_markup(f, primary=False):
 def resources(p):
     # One publication destination; citation is already a persistent page tab.
     sources = p['links']
-    items = [('Paper', sources['Paper'], 'paper')]
+    items = [('Paper', sources['Paper'], 'paper')] if sources.get('Paper') else []
     code = sources.get('Code') or sources.get('Repository')
     if code:
         host = urlparse(code).hostname
@@ -179,7 +185,8 @@ def project_page(p, projects):
         takeaways = takeaways_markup(insight)
         results = evidence_markup(insight)
         original_primary = '' if 'Explanatory schematic' in p['figure']['source_label'] else figure_markup(p['figure'])
-        originals = f'<details class="original-figures"><summary>Original paper figures &amp; sources</summary>{original_primary}{secondary}</details>'
+        if original_primary or secondary:
+            originals = f'<details class="original-figures"><summary>Original paper figures &amp; sources</summary>{original_primary}{secondary}</details>'
     others = sorted((q for q in projects if q['slug'] != p['slug']), key=lambda q: (-len(set(p['topics']) & set(q['topics'])), q['category'] != p['category'], -q['year']))[:2]
     more = ''.join(f'<a href="/projects/{q["slug"]}/"><span>{esc(q["name"])}</span><p>{esc(q["tagline"])}</p>{icon("arrow")}</a>' for q in others)
     overview = f'''<div id="overview" data-tab-panel class="overview-panel">{visual}<section class="overview section"><div class="section-heading"><span class="kicker">The idea</span><h2>At a glance</h2></div><div><p class="overview-text">{esc(p['summary'])}</p>{takeaways}<ul class="topics">{''.join(f'<li>{esc(t)}</li>' for t in p['topics'])}</ul><details class="abstract"><summary>Read the abstract</summary><p>{esc(p['abstract'])}</p>{source_note}</details></div></section></div>'''
@@ -204,9 +211,10 @@ def project_page(p, projects):
     from paper_results import results_markup as refined_results
     results = refined_results(p)
     project_attr = '' if p['slug'] == 'fedln' else f' data-project="{esc(p["slug"])}"'
+    archive = f'<p class="source-note">{archive_link(p)}</p>' if p.get('public_pdf', True) else ''
     body = f'''<main id="main" class="project-main{page_class}"{project_attr}><div class="breadcrumb"><a href="/projects/">{icon('back')}All projects</a>{category}</div>
 <section class="paper-hero" aria-labelledby="paper-title"><div class="eyebrow"><span class="project-name">{esc(p['name'])}</span><span>{esc(venue)}</span></div>
-<h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}<p class="source-note">{archive_link(p)}</p></section>
+<h1 id="paper-title">{esc(p['title'])}</h1><p class="tagline">{esc(p['tagline'])}</p><p class="authors">{authors}</p>{resources(p)}{archive}</section>
 <nav class="section-nav" data-project-tabs aria-label="On this page"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#findings">Results</a><a href="#citation">Citation</a></nav>
 <div class="project-panels">{overview}{method}
 {results}
@@ -227,14 +235,15 @@ def gallery_page(projects, home=False):
 
 def build():
     projects = load_projects()
-    if len(projects) != 14:
-        raise ValueError(f'Expected all 14 paper projects; found {len(projects)}')
+    if not projects or len({p['slug'] for p in projects}) != len(projects):
+        raise ValueError('Expected a nonempty catalog with unique paper slugs')
     for p in projects:
         folder = ROOT / 'projects' / p['slug']
         folder.mkdir(parents=True, exist_ok=True)
         (folder / 'index.html').write_text(project_page(p, projects))
         (folder / 'citation.bib').write_text(p['bibtex'].strip() + '\n')
-        (folder / 'paper.html').write_text(abstract_page(p))
+        if p.get('public_pdf', True):
+            (folder / 'paper.html').write_text(abstract_page(p))
     from research_home import legacy_gallery
     (ROOT / 'projects/index.html').write_text(legacy_gallery(asset_url))
     (ROOT / 'index.html').write_text(gallery_page(projects, home=True))
@@ -242,7 +251,7 @@ def build():
     compatibility = [{'id': p['slug'], 'title': p['title'], 'focus': p['category'], 'year': p['year'], 'venue': p['venue'], 'description': p['summary'], 'link': {'href': f'{ORIGIN}/projects/{p["slug"]}/', 'label': 'Project page'}} for p in projects]
     (ROOT / 'assets/publications.json').write_text(json.dumps(compatibility, indent=2, ensure_ascii=False) + '\n')
     urls = ['/'] + [f'/projects/{p["slug"]}/' for p in projects]
-    urls += [f'/projects/{p["slug"]}/paper.html' for p in projects]
+    urls += [f'/projects/{p["slug"]}/paper.html' for p in projects if p.get('public_pdf', True)]
     (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{ORIGIN}{path}</loc></url>\n' for path in urls) + '</urlset>\n')
     (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {ORIGIN}/sitemap.xml\n')
     (ROOT / '.nojekyll').touch()

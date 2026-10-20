@@ -24,8 +24,8 @@ class ProjectTests(unittest.TestCase):
 
     def test_catalog_complete_unique_and_assets_exist(self):
         projects = build.load_projects()
-        self.assertEqual(len(projects), 14)
-        self.assertEqual(len({p['slug'] for p in projects}), 14)
+        self.assertEqual(len(projects), 15)
+        self.assertEqual(len({p['slug'] for p in projects}), 15)
         for p in projects:
             build.validate(p)
             for key in ('figure', 'secondary_figure'):
@@ -86,7 +86,7 @@ class ProjectTests(unittest.TestCase):
                 for key in ('href', 'src'):
                     if key in attrs: self.urls.append(attrs[key])
         pages = [ROOT / 'index.html', *sorted((ROOT / 'projects').rglob('index.html'))]
-        self.assertEqual(len(pages), 16)
+        self.assertEqual(len(pages), 17)
         for page in pages:
             parser = Links(); parser.feed(page.read_text())
             for url in parser.urls:

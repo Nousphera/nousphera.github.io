@@ -1,0 +1,399 @@
+{
+  "slug": "sdapt",
+  "problem": "Specialized domains have abundant unlabeled images but few task labels and limited client compute.",
+  "contribution": "SDAPT adapts a shared vision foundation model to unlabeled domain images. Frozen client layers keep local computation light; server-side self-distillation learns a common representation, then each client trains its own task head.",
+  "reading_guide": "Compare label budgets, adaptation costs and individual task gains separately.",
+  "diagram": {
+    "type": "pipeline",
+    "title": "Adapt once, train local heads",
+    "description": "SDAPT adapts a shared vision foundation model to unlabeled domain images. Frozen client layers keep local computation light; server-side self-distillation learns a common representation, then each client trains its own task head.",
+    "stages": [
+      {
+        "title": "Frozen clients",
+        "detail": "Frozen client layers process two global and eight local image crops. Raw images remain local; CLS and patch tokens are uploaded.",
+        "icon": "clients",
+        "location": "Clients",
+        "items": [
+          "Unlabeled images",
+          "Multi-crop features"
+        ]
+      },
+      {
+        "title": "Self-distillation",
+        "detail": "Combine all client features into one batch. Train the student with DINO, iBOT and KoLeo, update an EMA teacher, and return no gradients to frozen clients.",
+        "icon": "teacher",
+        "location": "Server",
+        "items": [
+          "Shared batch",
+          "Student + EMA teacher"
+        ]
+      },
+      {
+        "title": "Local task heads",
+        "detail": "Freeze the adapted teacher backbone. Return representations to each client, which trains a task-specific head using its own labels.",
+        "icon": "model",
+        "location": "Clients",
+        "items": [
+          "Frozen backbone",
+          "Local supervision"
+        ]
+      }
+    ],
+    "connections": [
+      "Upload features",
+      "Return representations"
+    ],
+    "footnote": "Raw images and labels stay local; the shared backbone is frozen during task-head training."
+  },
+  "results": [
+    {
+      "title": "fMoW · Accuracy",
+      "question": "How does domain adaptation change few-shot and linear-probe performance?",
+      "context": "DINOv2-pretrained ViT-B/14 · 10 IID clients · percent. LP denotes linear probing.",
+      "source": {
+        "label": "Table 1 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "columns": [
+        "Method",
+        "4-shot",
+        "8-shot",
+        "16-shot",
+        "LP"
+      ],
+      "rows": [
+        {
+          "label": "FT w/o DAPT",
+          "values": [
+            "12.8",
+            "18.3",
+            "23.4",
+            "53.9"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "18.4",
+            "28.8",
+            "38.8",
+            "67.3"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "MocoSFL",
+          "values": [
+            "22.4",
+            "31.5",
+            "35.7",
+            "62.1"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "SDAPT",
+          "values": [
+            "16.9",
+            "27.5",
+            "37.5",
+            "66.7"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "SDAPT improves over the no-adaptation reference; rankings depend on domain and label budget.",
+      "caveat": "Reported scores without uncertainty intervals; CheXpert is evaluated on CheXlocalize."
+    },
+    {
+      "title": "QuickDraw · Accuracy",
+      "question": "How does domain adaptation change few-shot and linear-probe performance?",
+      "context": "DINOv2-pretrained ViT-B/14 · 10 IID clients · percent. LP denotes linear probing.",
+      "source": {
+        "label": "Table 1 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "columns": [
+        "Method",
+        "4-shot",
+        "8-shot",
+        "16-shot",
+        "LP"
+      ],
+      "rows": [
+        {
+          "label": "FT w/o DAPT",
+          "values": [
+            "18.4",
+            "25.8",
+            "32.3",
+            "42.9"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "27.0",
+            "37.2",
+            "43.9",
+            "50.8"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "MocoSFL",
+          "values": [
+            "23.2",
+            "32.4",
+            "39.0",
+            "48.1"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "SDAPT",
+          "values": [
+            "22.3",
+            "33.2",
+            "43.1",
+            "51.1"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "SDAPT improves over the no-adaptation reference; rankings depend on domain and label budget.",
+      "caveat": "Reported scores without uncertainty intervals; CheXpert is evaluated on CheXlocalize."
+    },
+    {
+      "title": "CheXpert · AUROC",
+      "question": "How does domain adaptation change few-shot and linear-probe performance?",
+      "context": "DINOv2-pretrained ViT-B/14 · 10 IID clients · AUROC on 0-100 scale. LP denotes linear probing.",
+      "source": {
+        "label": "Table 1 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "columns": [
+        "Method",
+        "4-shot",
+        "8-shot",
+        "16-shot",
+        "LP"
+      ],
+      "rows": [
+        {
+          "label": "FT w/o DAPT",
+          "values": [
+            "34.7",
+            "38.1",
+            "37.8",
+            "77.4"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "37.7",
+            "39.3",
+            "43.9",
+            "78.1"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "MocoSFL",
+          "values": [
+            "39.3",
+            "39.7",
+            "43.4",
+            "80.2"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "SDAPT",
+          "values": [
+            "41.3",
+            "41.7",
+            "44.4",
+            "80.7"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "SDAPT improves over the no-adaptation reference; rankings depend on domain and label budget.",
+      "caveat": "Reported scores without uncertainty intervals; CheXpert is evaluated on CheXlocalize."
+    },
+    {
+      "title": "Linear probing (LP)",
+      "question": "How do the adapted representations perform under linear probing?",
+      "context": "Table 1 LP scores · fMoW and QuickDraw accuracy (%); CheXpert AUROC (0–100).",
+      "source": {
+        "label": "Table 1 · LP · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "columns": [
+        "Method",
+        "fMoW · Acc.",
+        "QuickDraw · Acc.",
+        "CheXpert · AUROC"
+      ],
+      "rows": [
+        {
+          "label": "FT w/o DAPT",
+          "values": [
+            "53.9",
+            "42.9",
+            "77.4"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "FedAvg",
+          "values": [
+            "67.3",
+            "50.8",
+            "78.1"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "MocoSFL",
+          "values": [
+            "62.1",
+            "48.1",
+            "80.2"
+          ],
+          "highlight": false
+        },
+        {
+          "label": "SDAPT",
+          "values": [
+            "66.7",
+            "51.1",
+            "80.7"
+          ],
+          "highlight": true
+        }
+      ],
+      "interpretation": "SDAPT exceeds MocoSFL for all three LP comparisons; FedAvg leads on fMoW.",
+      "caveat": "Linear probing is reported separately from the few-shot settings."
+    },
+    {
+      "title": "Transfer across eight chest labels",
+      "question": "Which tasks benefit from one adapted backbone?",
+      "context": "CheXpert adaptation → CheXlocalize test set. AUROC gains over FT w/o DAPT in percentage points.",
+      "source": {
+        "label": "Table 2 · Author manuscript, 13 October 2026",
+        "url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+        "link_label": "Source data"
+      },
+      "columns": [
+        "Label",
+        "MocoSFL",
+        "SDAPT"
+      ],
+      "rows": [
+        {
+          "label": "Enlarged cardiom.",
+          "values": [
+            "+5.30",
+            "+5.46"
+          ]
+        },
+        {
+          "label": "Cardiomegaly",
+          "values": [
+            "+4.51",
+            "+6.42"
+          ]
+        },
+        {
+          "label": "Lung opacity",
+          "values": [
+            "+2.40",
+            "+1.19"
+          ]
+        },
+        {
+          "label": "Edema",
+          "values": [
+            "+1.18",
+            "-2.25"
+          ]
+        },
+        {
+          "label": "Consolidation",
+          "values": [
+            "+0.22",
+            "-0.28"
+          ]
+        },
+        {
+          "label": "Atelectasis",
+          "values": [
+            "+2.86",
+            "+0.27"
+          ]
+        },
+        {
+          "label": "Pleural effusion",
+          "values": [
+            "+0.57",
+            "+1.36"
+          ]
+        },
+        {
+          "label": "Support devices",
+          "values": [
+            "+5.44",
+            "+14.01"
+          ]
+        }
+      ],
+      "interpretation": "SDAPT improves six of eight labels and raises mean AUROC by 3.27 points.",
+      "caveat": "Edema and consolidation decline; MocoSFL leads on all four pulmonary labels."
+    }
+  ],
+  "evaluation": [
+    {
+      "label": "Backbone",
+      "value": "DINOv2-pretrained ViT-B/14"
+    },
+    {
+      "label": "Clients",
+      "value": "10 clients · IID partitions"
+    },
+    {
+      "label": "Domains",
+      "value": "Satellite imagery, hand-drawn sketches and chest radiographs"
+    },
+    {
+      "label": "Baselines",
+      "value": "No DAPT, FedAvg and ViT-adapted MocoSFL with MoCo-v3"
+    }
+  ],
+  "limitations": [
+    "Evaluation uses IID partitions and classification tasks.",
+    "Reported costs are feature uplink and client computation during adaptation; server work is excluded.",
+    "Raw-data locality is not a formal privacy guarantee."
+  ],
+  "takeaways": [
+    "Across nine 4-, 8- and 16-shot settings, SDAPT improves over direct fine-tuning by 7.4 percentage points on average.",
+    "At 16 shots, SDAPT gains 14.1 points on fMoW, 10.8 on QuickDraw and 6.6 AUROC points on CheXpert over the no-DAPT baseline; it exceeds MocoSFL in all three.",
+    "One CheXpert-adapted backbone improves mean AUROC from 77.41 to 80.68 across eight labels, with gains on six; larger adaptation budgets favor SDAPT while MocoSFL can be stronger at low budgets."
+  ],
+  "evidence_inventory": {
+    "tables": 2,
+    "figures": 2,
+    "source_url": "https://nousphera.github.io/assets/projects/sdapt/results.json",
+    "version": "Author manuscript · 13 October 2026",
+    "link_label": "Method and experiment source data"
+  }
+}
