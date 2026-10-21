@@ -3,10 +3,10 @@
   "papers": [
     {
       "slug": "ae-psl",
-      "repository": "https://github.com/Nousphera/AE_PSL",
-      "pages": "https://nousphera.github.io/AE_PSL/",
+      "repository": "https://github.com/Nousphera/AE-PSL",
+      "pages": "https://nousphera.github.io/AE-PSL/",
       "release_status": "implementation_present",
-      "code_url": "https://github.com/Nousphera/AE_PSL",
+      "code_url": "https://github.com/Nousphera/AE-PSL",
       "poster_url": "https://nousphera.github.io/assets/posters/ae-psl-a0-landscape.pdf"
     },
     {
